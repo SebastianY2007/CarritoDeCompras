@@ -17,7 +17,7 @@ public class ProductoController {
     private final ProductoAnadirView productoAnadirView;
     private final ProductoListaView productoListaView;
     private final CarritoAnadirView carritoAnadirView;
-    private final ActualizarProductoView actualizarProductoView;
+    private ActualizarProductoView actualizarProductoView = new ActualizarProductoView()  ;
 
     private final ProductoDAO productoDAO;
 
@@ -26,8 +26,7 @@ public class ProductoController {
     public ProductoController(ProductoDAO productoDAO,
                               ProductoAnadirView productoAnadirView,
                               ProductoListaView productoListaView,
-                              CarritoAnadirView carritoAnadirView,
-                              ActualizarProductoView actualizarProductoView) {
+                              CarritoAnadirView carritoAnadirView) {
 
         this.productoDAO = productoDAO;
         this.productoAnadirView = productoAnadirView;

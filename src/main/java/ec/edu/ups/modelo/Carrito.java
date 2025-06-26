@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Carrito {
+    private final double IVA = 0.12;
     private int codigo;
     private GregorianCalendar fechaCreacion;
     private List<ItemCarrito> items;
@@ -58,6 +59,20 @@ public class Carrito {
 
     public void setCodigo(int codigo) {
         this.codigo = codigo;
+    }
+
+
+    public double calcularSubtotal() {
+        double subtotal = 0;
+        for (ItemCarrito item : items) {
+            subtotal += item.getProducto().getPrecio() * item.getCantidad();
+        }
+        return subtotal;
+    }
+
+    public double calcularIVA() {
+        double subtotal = calcularSubtotal();
+        return subtotal * IVA;
     }
 }
 

@@ -33,11 +33,13 @@ public class CarritoAnadirView extends JInternalFrame {
             }
         };
         tblProductos.setModel(tablaModelo);
-        cargarDatos();
+        cargarCantidadesComboBox();
 
+        txtNombre.setEditable(false);
+        txtPrecio.setEditable(false);
     }
 
-    private void cargarDatos(){
+    private void cargarCantidadesComboBox(){ // Renombrado
         cbxCantidad.removeAllItems();
         for(int i = 0; i < 20; i++){
             cbxCantidad.addItem(String.valueOf(i + 1));
