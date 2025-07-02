@@ -32,29 +32,22 @@ public class ProductoDAOMemoria implements ProductoDAO {
 
     @Override
     public boolean actualizarCodigo(int codigoOriginal, int nuevoCodigo) {
-        // Es CRÍTICO que, si el código (ID) es una clave primaria y se usa en una base de datos,
-        // este tipo de actualización sea manejada con EXTREMA PRECAUCIÓN o evitada.
-        // En una base de datos real, cambiar una clave primaria puede romper la integridad referencial.
-        // Aquí, en una implementación en memoria, es más simple, pero sigue siendo un cambio de ID.
 
-        // Primero, verifica si el nuevo código ya existe para evitar duplicados
         for (Producto p : productos) {
             if (p.getCodigo() == nuevoCodigo) {
-                // Si el nuevo código ya existe y no es el mismo que el original, no se puede actualizar
                 if (nuevoCodigo != codigoOriginal) {
-                    return false; // El nuevo código ya está en uso
+                    return false;
                 }
             }
         }
 
-        // Busca el producto por su código original y actualiza su código al nuevo
         for (Producto producto : productos) {
             if (producto.getCodigo() == codigoOriginal) {
-                producto.setCodigo(nuevoCodigo); // Asumiendo que tienes un setter para 'codigo' en tu clase Producto
-                return true; // Código actualizado exitosamente
+                producto.setCodigo(nuevoCodigo);
+                return true;
             }
         }
-        return false; // Producto con el código original no encontrado
+        return false;
     }
 
     @Override
@@ -73,7 +66,6 @@ public class ProductoDAOMemoria implements ProductoDAO {
         for (int i = 0; i < productos.size(); i++) {
             if (productos.get(i).getCodigo() == producto.getCodigo()) {
                 productos.set(i, producto);
-                // Es buena práctica salir del bucle una vez que el producto es encontrado y actualizado
                 return;
             }
         }
@@ -84,22 +76,21 @@ public class ProductoDAOMemoria implements ProductoDAO {
         for (Producto producto : productos) {
             if (producto.getCodigo() == id) {
                 producto.setNombre(nuevoNombre);
-                return true; // Nombre actualizado exitosamente
+                return true;
             }
         }
-        return false; // Producto no encontrado
+        return false;
     }
 
-    // >>>>>>>>>>> SOLUCIÓN AL ERROR: Implementar el método actualizarPrecio <<<<<<<<<<<
     @Override
     public boolean actualizarPrecio(int id, double nuevoPrecio) {
         for (Producto producto : productos) {
             if (producto.getCodigo() == id) {
                 producto.setPrecio(nuevoPrecio);
-                return true; // Precio actualizado exitosamente
+                return true;
             }
         }
-        return false; // Producto no encontrado
+        return false;
     }
 
 
@@ -110,15 +101,14 @@ public class ProductoDAOMemoria implements ProductoDAO {
             Producto producto = iterator.next();
             if (producto.getCodigo() == codigo) {
                 iterator.remove();
-                return true; // Retorna true si se encontró y eliminó el producto
+                return true;
             }
         }
-        return false; // Retorna false si no se encontró el producto para eliminar
+        return false;
     }
 
     @Override
     public List<Producto> listarTodos() {
-        // Es buena práctica devolver una copia para evitar modificaciones externas directas a la lista interna
         return new ArrayList<>(productos);
     }
 }

@@ -10,6 +10,9 @@ import java.util.List;
 public class ProductoAnadirView extends JInternalFrame {
 
     private JPanel panelPrincipal;
+    private JLabel codigoLabel;
+    private JLabel nombreLabel;
+    private JLabel precioLabel;
     private JTextField txtPrecio;
     private JTextField txtNombre;
     private JTextField txtCodigo;

@@ -6,7 +6,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
 
-public class ProductoListaView extends JInternalFrame {
+public class GestionDeProductosView extends JInternalFrame {
 
     private JTextField txtBuscar;
     private JButton btnBuscar;
@@ -15,22 +15,33 @@ public class ProductoListaView extends JInternalFrame {
     private JButton btnListar;
     private JButton btnEliminar;
     private JButton btnActualizar;
+    private JButton btnAgregar;
     private DefaultTableModel modelo;
 
-    public ProductoListaView() {
+    public GestionDeProductosView() {
 
         setContentPane(panelPrincipal);
-        setTitle("Listado de Productos");
+        setTitle("Gestión de Productos");
         setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
         setSize(800, 600);
         setClosable(true);
         setIconifiable(true);
         setResizable(true);
 
-        modelo = new DefaultTableModel();
         Object[] columnas = {"Codigo", "Nombre", "Precio"};
-        modelo.setColumnIdentifiers(columnas);
+
+        modelo = new DefaultTableModel(new Object[][]{}, columnas) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
         tblProductos.setModel(modelo);
+
+        tblProductos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tblProductos.setRowSelectionAllowed(true);
+        tblProductos.setColumnSelectionAllowed(false);
     }
 
     public JTextField getTxtBuscar() {
@@ -93,12 +104,20 @@ public class ProductoListaView extends JInternalFrame {
         return btnActualizar;
     }
 
+    public JButton getBtnAgregar() {
+        return btnAgregar;
+    }
+
+    public void setBtnAgregar(JButton btnAgregar) {
+        this.btnAgregar = btnAgregar;
+    }
+
     public void setBtnActualizar(JButton btnActualizar) {
         this.btnActualizar = btnActualizar;
     }
 
     public void cargarDatos(List<Producto> listaProductos) {
-        modelo.setNumRows(0);
+        modelo.setNumRows(0); // Limpia las filas existentes
 
         for (Producto producto : listaProductos) {
             Object[] fila = {
@@ -108,7 +127,5 @@ public class ProductoListaView extends JInternalFrame {
             };
             modelo.addRow(fila);
         }
-
-
     }
 }
