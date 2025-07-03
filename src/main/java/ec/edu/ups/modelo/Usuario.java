@@ -1,17 +1,18 @@
 package ec.edu.ups.modelo;
 
+// Asegúrate de que el paquete sea el correcto
+// import ec.edu.ups.modelo.Rol; // Asegúrate de tener el enum Rol
+
 public class Usuario {
     private String username;
     private String contrasena;
-    private Rol rol;
-
-    // Nuevos atributos para el registro
-    private String nombreCompleto;
     private String correoElectronico;
-    private String telefono; // NUEVO: Atributo para el teléfono
+    private String nombre; // Cambiado de nombreCompleto a nombre
+    private String telefono;
     private int diaNacimiento;
     private int mesNacimiento; // Número del mes (1-12)
     private int anioNacimiento;
+    private Rol rol; // Enum Rol
 
     private String preguntaSeguridad1;
     private String respuestaSeguridad1;
@@ -21,47 +22,35 @@ public class Usuario {
     private String respuestaSeguridad3;
 
     public Usuario(){
+        // Constructor vacío necesario para algunos frameworks o si se construyen objetos paso a paso
     }
 
-    // Constructor existente (sin preguntas de seguridad y datos extendidos)
-    public Usuario(String username, String contrasena, Rol rol) {
+    // Constructor básico para autenticación o creación simple (usado en DAOMemoria para inicializar)
+    // Se recomienda asignar un rol por defecto si no se especifica
+    public Usuario(String username, String contrasena, String correoElectronico, String nombre) {
         this.username = username;
         this.contrasena = contrasena;
-        this.rol = rol;
-    }
-
-    // Constructor existente (con preguntas de seguridad pero sin datos extendidos como nombre completo, etc.)
-    public Usuario(String username, String contrasena, Rol rol,
-                   String preguntaSeguridad1, String respuestaSeguridad1,
-                   String preguntaSeguridad2, String respuestaSeguridad2,
-                   String preguntaSeguridad3, String respuestaSeguridad3) {
-        this.username = username;
-        this.contrasena = contrasena;
-        this.rol = rol;
-        this.preguntaSeguridad1 = preguntaSeguridad1;
-        this.respuestaSeguridad1 = respuestaSeguridad1;
-        this.preguntaSeguridad2 = preguntaSeguridad2;
-        this.respuestaSeguridad2 = respuestaSeguridad2;
-        this.preguntaSeguridad3 = preguntaSeguridad3;
-        this.respuestaSeguridad3 = respuestaSeguridad3;
-    }
-
-    // --- NUEVO CONSTRUCTOR COMPLETO para incluir todos los datos del RegistroView ---
-    public Usuario(String username, String contrasena, Rol rol,
-                   String nombreCompleto, String correoElectronico, String telefono, // AÑADIDO 'telefono'
-                   int diaNacimiento, int mesNacimiento, int anioNacimiento,
-                   String preguntaSeguridad1, String respuestaSeguridad1,
-                   String preguntaSeguridad2, String respuestaSeguridad2,
-                   String preguntaSeguridad3, String respuestaSeguridad3) {
-        this.username = username;
-        this.contrasena = contrasena;
-        this.rol = rol;
-        this.nombreCompleto = nombreCompleto;
         this.correoElectronico = correoElectronico;
-        this.telefono = telefono; // Asignar el nuevo atributo
+        this.nombre = nombre;
+        this.rol = Rol.USUARIO; // Rol por defecto, se puede cambiar luego con setRol()
+    }
+
+
+    // Constructor completo para el registro (incluye todos los datos que pusiste en RegistroView)
+    public Usuario(String username, String contrasena, String correoElectronico, String nombre, String apellido,
+                   String telefono, int diaNacimiento, int mesNacimiento, int anioNacimiento, Rol rol,
+                   String preguntaSeguridad1, String respuestaSeguridad1,
+                   String preguntaSeguridad2, String respuestaSeguridad2,
+                   String preguntaSeguridad3, String respuestaSeguridad3) {
+        this.username = username;
+        this.contrasena = contrasena;
+        this.correoElectronico = correoElectronico;
+        this.nombre = nombre;
+        this.telefono = telefono;
         this.diaNacimiento = diaNacimiento;
         this.mesNacimiento = mesNacimiento;
         this.anioNacimiento = anioNacimiento;
+        this.rol = rol;
         this.preguntaSeguridad1 = preguntaSeguridad1;
         this.respuestaSeguridad1 = respuestaSeguridad1;
         this.preguntaSeguridad2 = preguntaSeguridad2;
@@ -70,7 +59,10 @@ public class Usuario {
         this.respuestaSeguridad3 = respuestaSeguridad3;
     }
 
-    // --- GETTERS y SETTERS existentes ---
+    public Usuario(String username, String contrasena, String correoElectronico, String nombre, String telefono, Integer dia, int numeroMes, Integer anio, Rol rol, String pregunta1, String respuesta1, String pregunta2, String respuesta2, String pregunta3, String respuesta3) {
+    }
+
+    // --- GETTERS y SETTERS ---
     public String getUsername() {
         return username;
     }
@@ -87,6 +79,54 @@ public class Usuario {
         this.contrasena = contrasena;
     }
 
+    public String getCorreoElectronico() {
+        return correoElectronico;
+    }
+
+    public void setCorreoElectronico(String correoElectronico) {
+        this.correoElectronico = correoElectronico;
+    }
+
+    public String getNombre() { // Nuevo getter
+        return nombre;
+    }
+
+    public void setNombre(String nombre) { // Nuevo setter
+        this.nombre = nombre;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
+
+    public int getDiaNacimiento() {
+        return diaNacimiento;
+    }
+
+    public void setDiaNacimiento(int diaNacimiento) {
+        this.diaNacimiento = diaNacimiento;
+    }
+
+    public int getMesNacimiento() {
+        return mesNacimiento;
+    }
+
+    public void setMesNacimiento(int mesNacimiento) {
+        this.mesNacimiento = mesNacimiento;
+    }
+
+    public int getAnioNacimiento() {
+        return anioNacimiento;
+    }
+
+    public void setAnioNacimiento(int anioNacimiento) {
+        this.anioNacimiento = anioNacimiento;
+    }
+
     public Rol getRol() {
         return rol;
     }
@@ -95,7 +135,6 @@ public class Usuario {
         this.rol = rol;
     }
 
-    // GETTERS y SETTERS para las preguntas y respuestas de seguridad
     public String getPreguntaSeguridad1() {
         return preguntaSeguridad1;
     }
@@ -144,71 +183,24 @@ public class Usuario {
         this.respuestaSeguridad3 = respuestaSeguridad3;
     }
 
-    // --- NUEVOS GETTERS y SETTERS para Nombre Completo, Correo Electrónico y Fecha de Nacimiento ---
-    public String getNombreCompleto() {
-        return nombreCompleto;
-    }
-
-    public void setNombreCompleto(String nombreCompleto) {
-        this.nombreCompleto = nombreCompleto;
-    }
-
-    public String getCorreoElectronico() {
-        return correoElectronico;
-    }
-
-    public void setCorreoElectronico(String correoElectronico) {
-        this.correoElectronico = correoElectronico;
-    }
-
-    // NUEVO: Getter y Setter para teléfono
-    public String getTelefono() {
-        return telefono;
-    }
-
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
-    }
-
-    public int getDiaNacimiento() {
-        return diaNacimiento;
-    }
-
-    public void setDiaNacimiento(int diaNacimiento) {
-        this.diaNacimiento = diaNacimiento;
-    }
-
-    public int getMesNacimiento() {
-        return mesNacimiento;
-    }
-
-    public void setMesNacimiento(int mesNacimiento) {
-        this.mesNacimiento = mesNacimiento;
-    }
-
-    public int getAnioNacimiento() {
-        return anioNacimiento;
-    }
-
-    public void setAnioNacimiento(int anioNacimiento) {
-        this.anioNacimiento = anioNacimiento;
-    }
-
     @Override
     public String toString() {
-        return "Usuario:\n" +
-                "Nombre de Usuario: " + username + '\n' +
-                "Contraseña: " + contrasena + '\n' +
-                "Rol: " + rol + '\n' +
-                "Nombre Completo: " + nombreCompleto + '\n' +
-                "Correo Electrónico: " + correoElectronico + '\n' +
-                "Teléfono: " + telefono + '\n' + // Incluido en toString
-                "Fecha de Nacimiento: " + diaNacimiento + "/" + mesNacimiento + "/" + anioNacimiento + '\n' +
-                "Pregunta 1: " + preguntaSeguridad1 + '\n' +
-                "Respuesta 1: " + respuestaSeguridad1 + '\n' +
-                "Pregunta 2: " + preguntaSeguridad2 + '\n' +
-                "Respuesta 2: " + respuestaSeguridad2 + '\n' +
-                "Pregunta 3: " + preguntaSeguridad3 + '\n' +
-                "Respuesta 3: " + respuestaSeguridad3;
+        return "Usuario{" +
+                "username='" + username + '\'' +
+                ", contrasena='" + contrasena + '\'' +
+                ", correoElectronico='" + correoElectronico + '\'' +
+                ", nombre='" + nombre + '\'' +
+                ", telefono='" + telefono + '\'' +
+                ", diaNacimiento=" + diaNacimiento +
+                ", mesNacimiento=" + mesNacimiento +
+                ", anioNacimiento=" + anioNacimiento +
+                ", rol=" + rol +
+                ", preguntaSeguridad1='" + preguntaSeguridad1 + '\'' +
+                ", respuestaSeguridad1='" + respuestaSeguridad1 + '\'' +
+                ", preguntaSeguridad2='" + preguntaSeguridad2 + '\'' +
+                ", respuestaSeguridad2='" + respuestaSeguridad2 + '\'' +
+                ", preguntaSeguridad3='" + preguntaSeguridad3 + '\'' +
+                ", respuestaSeguridad3='" + respuestaSeguridad3 + '\'' +
+                '}';
     }
 }
