@@ -47,7 +47,7 @@ public class LoginView extends JFrame {
         setTitle("Inicio de Sesión");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setContentPane(panelPrincipal);
-        setSize(450, 250);
+        setSize(600, 400);
         setLocationRelativeTo(null);
 
         configurarSelectorDeIdioma();
