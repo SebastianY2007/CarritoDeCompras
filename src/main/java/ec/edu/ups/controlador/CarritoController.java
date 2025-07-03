@@ -5,8 +5,9 @@ import ec.edu.ups.dao.ProductoDAO;
 import ec.edu.ups.modelo.Carrito;
 import ec.edu.ups.modelo.ItemCarrito;
 import ec.edu.ups.modelo.Producto;
-import ec.edu.ups.vista.CarritoAnadirView;
+import ec.edu.ups.vista.carrito.CarritoAnadirView;
 
+import javax.swing.JOptionPane; // ¡Asegúrate de que esta importación exista!
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,39 +31,17 @@ public class CarritoController {
     }
 
     private void configurarEventosEnVistas() {
-        carritoAnadirView.getBtnAnadir().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                anadirProducto();
-            }
-        });
-
-        carritoAnadirView.getBtnGuardar().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                guardarCarrito();
-            }
-        });
-
-        carritoAnadirView.getBtnBuscar().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                buscarProductoParaAnadir();
-            }
-        });
-
-        carritoAnadirView.getBtnLimpiar().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                limpiarCarrito();
-            }
-        });
+        carritoAnadirView.getBtnAnadir().addActionListener(e -> anadirProducto());
+        carritoAnadirView.getBtnGuardar().addActionListener(e -> guardarCarrito());
+        carritoAnadirView.getBtnBuscar().addActionListener(e -> buscarProductoParaAnadir());
+        carritoAnadirView.getBtnLimpiar().addActionListener(e -> limpiarCarrito());
     }
 
     private void buscarProductoParaAnadir() {
         String codigoStr = carritoAnadirView.getTxtCodigo().getText();
         if (codigoStr.isEmpty()) {
-            carritoAnadirView.mostrarMensaje("Por favor, ingrese un código de producto.");
+            // Mensaje de advertencia
+            carritoAnadirView.mostrarMensaje("Por favor, ingrese un código de producto.", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -73,24 +52,29 @@ public class CarritoController {
             if (productoEncontrado != null) {
                 carritoAnadirView.getTxtNombre().setText(productoEncontrado.getNombre());
                 carritoAnadirView.getTxtPrecio().setText(String.valueOf(productoEncontrado.getPrecio()));
-                carritoAnadirView.mostrarMensaje("Producto encontrado: " + productoEncontrado.getNombre());
+                // Mensaje de información
+                carritoAnadirView.mostrarMensaje("Producto encontrado: " + productoEncontrado.getNombre(), JOptionPane.INFORMATION_MESSAGE);
             } else {
-                carritoAnadirView.mostrarMensaje("Producto con código " + codigo + " no encontrado.");
+                // Mensaje de advertencia
+                carritoAnadirView.mostrarMensaje("Producto con código " + codigo + " no encontrado.", JOptionPane.WARNING_MESSAGE);
                 carritoAnadirView.limpiarCamposProducto();
             }
         } catch (NumberFormatException ex) {
-            carritoAnadirView.mostrarMensaje("El código debe ser un número válido.");
+            // Mensaje de error
+            carritoAnadirView.mostrarMensaje("El código debe ser un número válido.", JOptionPane.ERROR_MESSAGE);
             carritoAnadirView.limpiarCamposProducto();
         }
     }
 
     private void guardarCarrito() {
         if (carrito.obtenerItems().isEmpty()) {
-            carritoAnadirView.mostrarMensaje("El carrito está vacío. Añada productos antes de guardar.");
+            // Mensaje de advertencia
+            carritoAnadirView.mostrarMensaje("El carrito está vacío. Añada productos antes de guardar.", JOptionPane.WARNING_MESSAGE);
             return;
         }
         carritoDAO.crear(carrito);
-        carritoAnadirView.mostrarMensaje("Carrito creado correctamente.");
+        // Mensaje de información
+        carritoAnadirView.mostrarMensaje("Carrito creado correctamente.", JOptionPane.INFORMATION_MESSAGE);
         System.out.println("Carritos guardados actualmente: " + carritoDAO.listarTodos());
         carritoAnadirView.limpiarCarritoCompleto();
         this.carrito = new Carrito();
@@ -101,7 +85,8 @@ public class CarritoController {
         String cantidadStr = carritoAnadirView.getCbxCantidad().getSelectedItem().toString();
 
         if (codigoStr.isEmpty()) {
-            carritoAnadirView.mostrarMensaje("Por favor, busque un producto por su código primero.");
+            // Mensaje de advertencia
+            carritoAnadirView.mostrarMensaje("Por favor, busque un producto por su código primero.", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -112,27 +97,32 @@ public class CarritoController {
             Producto producto = productoDAO.buscarPorCodigo(codigo);
 
             if (producto == null) {
-                carritoAnadirView.mostrarMensaje("Producto con código " + codigo + " no encontrado. Use el botón 'Buscar'.");
+                // Mensaje de error
+                carritoAnadirView.mostrarMensaje("Producto con código " + codigo + " no encontrado. Use el botón 'Buscar'.", JOptionPane.ERROR_MESSAGE);
                 carritoAnadirView.limpiarCamposProducto();
                 return;
             }
 
             if (cantidad <= 0) {
-                carritoAnadirView.mostrarMensaje("La cantidad debe ser mayor que cero.");
+                // Mensaje de advertencia
+                carritoAnadirView.mostrarMensaje("La cantidad debe ser mayor que cero.", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
             carrito.agregarProducto(producto, cantidad);
-            carritoAnadirView.mostrarMensaje("Producto '" + producto.getNombre() + "' añadido al carrito.");
+            // Mensaje de información
+            carritoAnadirView.mostrarMensaje("Producto '" + producto.getNombre() + "' añadido al carrito.", JOptionPane.INFORMATION_MESSAGE);
             carritoAnadirView.limpiarCamposProducto();
 
             cargarProductosEnTabla();
             mostrarTotales();
 
         } catch (NumberFormatException ex) {
-            carritoAnadirView.mostrarMensaje("Error en formato de código o cantidad. Asegúrese de que sean números válidos.");
+            // Mensaje de error
+            carritoAnadirView.mostrarMensaje("Error en formato de código o cantidad. Asegúrese de que sean números válidos.", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
-            carritoAnadirView.mostrarMensaje("Error al añadir producto al carrito: " + ex.getMessage());
+            // Mensaje de error
+            carritoAnadirView.mostrarMensaje("Error al añadir producto al carrito: " + ex.getMessage(), JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
     }
@@ -161,6 +151,7 @@ public class CarritoController {
     private void limpiarCarrito() {
         this.carrito = new Carrito();
         carritoAnadirView.limpiarCarritoCompleto();
-        carritoAnadirView.mostrarMensaje("Carrito limpiado.");
+        // Mensaje de información
+        carritoAnadirView.mostrarMensaje("Carrito limpiado.", JOptionPane.INFORMATION_MESSAGE);
     }
 }

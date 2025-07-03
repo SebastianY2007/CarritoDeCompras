@@ -13,13 +13,24 @@ public class Carrito {
 
     public Carrito(GregorianCalendar fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
+        this.items = new ArrayList<>(); // ¡CORRECCIÓN: Inicializar la lista de ítems!
     }
 
     public Carrito() {
-        items = new ArrayList<>();
+        this.items = new ArrayList<>(); // Ya estaba bien aquí, pero lo dejo explícito
     }
 
     public void agregarProducto(Producto producto, int cantidad) {
+        // Mejora opcional: Si el producto ya está en el carrito, actualiza la cantidad.
+        // Si prefieres añadir un nuevo ItemCarrito incluso si el producto ya existe,
+        // puedes eliminar este bucle y simplemente dejar la línea items.add(new ItemCarrito(producto, cantidad));
+        for (ItemCarrito item : items) {
+            if (item.getProducto().getCodigo() == producto.getCodigo()) {
+                item.setCantidad(item.getCantidad() + cantidad);
+                return; // Cantidad actualizada, salir del método
+            }
+        }
+        // Si el producto no se encontró en el carrito, añadirlo como un nuevo ítem
         items.add(new ItemCarrito(producto, cantidad));
     }
 
@@ -28,7 +39,7 @@ public class Carrito {
         while (it.hasNext()) {
             if (it.next().getProducto().getCodigo() == codigoProducto) {
                 it.remove();
-                break;
+                break; // Se asume que solo quieres eliminar la primera ocurrencia si hay duplicados
             }
         }
     }
@@ -42,7 +53,7 @@ public class Carrito {
         for (ItemCarrito item : items) {
             total += item.getProducto().getPrecio() * item.getCantidad();
         }
-        return total;
+        return total + calcularIVA(); // El total incluye el subtotal más el IVA
     }
 
     public List<ItemCarrito> obtenerItems() {
@@ -61,7 +72,6 @@ public class Carrito {
         this.codigo = codigo;
     }
 
-
     public double calcularSubtotal() {
         double subtotal = 0;
         for (ItemCarrito item : items) {
@@ -74,5 +84,12 @@ public class Carrito {
         double subtotal = calcularSubtotal();
         return subtotal * IVA;
     }
-}
 
+    public GregorianCalendar getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public void setFechaCreacion(GregorianCalendar fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
+}

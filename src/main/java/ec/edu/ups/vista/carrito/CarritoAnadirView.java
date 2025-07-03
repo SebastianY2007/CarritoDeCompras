@@ -1,6 +1,7 @@
-package ec.edu.ups.vista;
+package ec.edu.ups.vista.carrito;
 
 import javax.swing.*;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class CarritoAnadirView extends JInternalFrame {
@@ -102,8 +103,8 @@ public class CarritoAnadirView extends JInternalFrame {
         return tablaModelo;
     }
 
-    public void mostrarMensaje(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje);
+    public void mostrarMensaje(String mensaje, int tipoDeMensaje) {
+        JOptionPane.showMessageDialog(this, mensaje, "Mensaje del Sistema", tipoDeMensaje);
     }
 
     public void limpiarCamposProducto() {
