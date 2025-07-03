@@ -191,7 +191,8 @@ public class GestionDeProductosView extends JInternalFrame {
     }
 
     public void cargarDatos(List<Producto> listaProductos) {
-        modelo.setNumRows(0); // Limpia las filas existentes
+        // 'modelo' debe ser la variable de tu DefaultTableModel
+        modelo.setRowCount(0); // Limpia las filas existentes
 
         for (Producto producto : listaProductos) {
             Object[] fila = {

@@ -1,130 +1,116 @@
 package ec.edu.ups.vista.producto;
 
-import ec.edu.ups.util.MensajeInternacionalizacionHandler; // Importar el handler
-import javax.swing.JOptionPane;
+import ec.edu.ups.util.MensajeInternacionalizacionHandler;
+
 import javax.swing.*;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class ActualizarProductoView extends JInternalFrame {
+
+    // --- Componentes de la UI (Deben coincidir con tu .form) ---
     private JPanel panelPrincipal;
-    private JComboBox<String> cbxElegir; // Se recomienda especificar el tipo del JComboBox
+    private JComboBox<String> cbxElegir;
     private JTextField txtElegir;
     private JButton btnActualizar;
     private JButton btnCancelar;
-    private int idActual; // Usado para el ID del producto a actualizar
-    // private int codigoActual; // Este campo parece redundante si ya tienes idActual
 
-    private MensajeInternacionalizacionHandler mensajeInternacionalizacionHandler; // Instancia del handler
+    // --- Dependencias y Estado ---
+    private MensajeInternacionalizacionHandler mensajeHandler;
+    private ResourceBundle mensajes;
+    private int idActual; // Para guardar el ID del producto que se está editando
 
+    // Constructor vacío para el diseñador de UI
     public ActualizarProductoView() {
+        // Es importante que este constructor exista si el diseñador lo necesita,
+        // pero la inicialización principal se hará cuando se inyecte el handler.
+    }
+
+    // Constructor para la lógica de la aplicación
+    public ActualizarProductoView(MensajeInternacionalizacionHandler mensajeHandler) {
+        this.mensajeHandler = mensajeHandler;
+
         setContentPane(panelPrincipal);
-        setTitle("Actualizar Producto"); // Este título se actualizará con updateTexts
-        setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
-        setSize(500, 500);
         setClosable(true);
-        setIconifiable(true);
+        setMaximizable(true);
         setResizable(true);
+        setIconifiable(true);
+        setSize(400, 200);
+        setDefaultCloseOperation(JInternalFrame.HIDE_ON_CLOSE);
 
-        // Los ítems del JComboBox se añadirán y actualizarán en updateTexts()
-        // para que sean internacionalizados
+        // La configuración de textos se hará al final para evitar errores
+        SwingUtilities.invokeLater(this::updateTexts);
     }
 
-    // Setter para inyectar el MensajeInternacionalizacionHandler
-    public void setMensajeInternacionalizacionHandler(MensajeInternacionalizacionHandler mensajeInternacionalizacionHandler) {
-        this.mensajeInternacionalizacionHandler = mensajeInternacionalizacionHandler;
-        updateTexts(); // Llamar a updateTexts cuando se establece el handler
-    }
-
-    public void updateTexts() {
-        if (mensajeInternacionalizacionHandler != null) {
-            setTitle(mensajeInternacionalizacionHandler.get("actualizarProducto.titulo"));
-            btnActualizar.setText(mensajeInternacionalizacionHandler.get("actualizarProducto.btnActualizar"));
-            btnCancelar.setText(mensajeInternacionalizacionHandler.get("actualizarProducto.btnCancelar"));
-
-            // Limpiar y añadir los ítems del ComboBox con los textos internacionalizados
-            cbxElegir.removeAllItems();
-            cbxElegir.addItem(mensajeInternacionalizacionHandler.get("actualizarProducto.cbx.codigo"));
-            cbxElegir.addItem(mensajeInternacionalizacionHandler.get("actualizarProducto.cbx.nombre"));
-            cbxElegir.addItem(mensajeInternacionalizacionHandler.get("actualizarProducto.cbx.precio"));
-            // Podrías añadir más si hay otros campos en el futuro
-        }
-    }
-
-    public JPanel getPanelPrincipal() {
-        return panelPrincipal;
-    }
-
-    public void setPanelPrincipal(JPanel panelPrincipal) {
-        this.panelPrincipal = panelPrincipal;
-    }
-
+    // --- Getters para que el controlador acceda a los componentes ---
     public JComboBox<String> getCbxElegir() {
         return cbxElegir;
-    }
-
-    public void setCbxElegir(JComboBox<String> cbxElegir) {
-        this.cbxElegir = cbxElegir;
     }
 
     public JTextField getTxtElegir() {
         return txtElegir;
     }
 
-    public void setTxtElegir(JTextField txtElegir) {
-        this.txtElegir = txtElegir;
-    }
-
-    // Este método `actualizarProducto()` en la vista es una función vacía,
-    // la lógica de actualización está en el controlador. Podrías eliminarlo si no se usa.
-    public void actualizarProducto() {
-        // La lógica de actualización la maneja el controlador
-    }
-
-    public int getIdActual() {
-        return idActual;
-    }
-
-    public void setIdActual(int idActual) {
-        this.idActual = idActual;
-    }
-
-    // Este getter/setter para codigoActual parece redundante si ya tienes idActual
-    // y el controlador usa idActual como la referencia.
-    /*
-    public int getCodigoActual() {
-        return codigoActual;
-    }
-
-    public void setCodigoActual(int codigoActual) {
-        this.codigoActual = codigoActual;
-    }
-    */
-
     public JButton getBtnActualizar() {
         return btnActualizar;
-    }
-
-    public void setBtnActualizar(JButton btnActualizar) {
-        this.btnActualizar = btnActualizar;
     }
 
     public JButton getBtnCancelar() {
         return btnCancelar;
     }
 
-    public void setBtnCancelar(JButton btnCancelar) {
-        this.btnCancelar = btnCancelar;
+    public int getIdActual() {
+        return idActual;
     }
 
-    public void mostrarMensaje(String mensaje, int tipoDeMensaje) {
-        JOptionPane.showMessageDialog(this, mensaje, "Mensaje del Sistema", tipoDeMensaje);
+    // --- Setters ---
+    public void setMensajeInternacionalizacionHandler(MensajeInternacionalizacionHandler mensajeHandler) {
+        this.mensajeHandler = mensajeHandler;
+        updateTexts();
     }
 
+    public void setIdActual(int idActual) {
+        this.idActual = idActual;
+        // Limpiar campo de texto al cargar un nuevo producto
+        limpiarCampoElegir();
+    }
+
+    // --- Métodos de la Vista ---
     public void limpiarCampoElegir() {
         if (txtElegir != null) {
             txtElegir.setText("");
         }
-        if (cbxElegir != null && cbxElegir.getItemCount() > 0) {
-            cbxElegir.setSelectedIndex(0);
+    }
+
+    public void mostrarMensaje(String mensaje, int tipoMensaje) {
+        JOptionPane.showMessageDialog(this, mensaje, "Mensaje", tipoMensaje);
+    }
+
+    public void updateTexts() {
+        if (mensajeHandler == null) return; // Evitar error si el handler no está listo
+
+        mensajes = ResourceBundle.getBundle("mensajes", new Locale(mensajeHandler.getLenguajeActual(), mensajeHandler.getPaisActual()));
+
+        setTitle(mensajes.getString("actualizarProducto.titulo"));
+
+        btnActualizar.setText(mensajes.getString("actualizarProducto.boton.actualizar"));
+        btnCancelar.setText(mensajes.getString("actualizarProducto.boton.cancelar"));
+
+        // --- CORRECCIÓN: Lógica para llenar el JComboBox ---
+        if (cbxElegir != null) {
+            int selectedIndex = cbxElegir.getSelectedIndex();
+
+            cbxElegir.removeAllItems();
+            cbxElegir.addItem(mensajes.getString("actualizarProducto.opcion.codigo"));
+            cbxElegir.addItem(mensajes.getString("actualizarProducto.opcion.nombre"));
+            cbxElegir.addItem(mensajes.getString("actualizarProducto.opcion.precio"));
+
+            if (selectedIndex >= 0 && selectedIndex < cbxElegir.getItemCount()) {
+                cbxElegir.setSelectedIndex(selectedIndex);
+            }
         }
+
+        revalidate();
+        repaint();
     }
 }

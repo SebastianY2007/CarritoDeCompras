@@ -10,86 +10,96 @@ import java.util.ResourceBundle;
 
 public class GestionDeUsuariosView extends JInternalFrame {
 
-    // --- Componentes de la UI ---
+    // --- Componentes de la UI (Deben coincidir con tu .form) ---
     private JPanel panelPrincipal;
+    private JLabel lblNombre;
+    private JTextField txtNombre; // Este es el campo de texto para buscar
     private JTable tblUsuarios;
-    private JTextField txtNombre; // Asumo que este es tu campo de búsqueda
     private JButton btnBuscar;
     private JButton btnListar;
     private JButton btnEliminar;
     private JButton btnActualizar;
     private JButton btnAgregar;
-    private JLabel lblNombre; // Etiqueta para el campo de búsqueda
+    private JScrollPane scrollPane; // Asumiendo que la tabla está dentro de un JScrollPane
 
-    // --- Dependencias ---
+    // --- Dependencias y Modelo ---
     private DefaultTableModel modelo;
     private UsuarioController usuarioController;
-    private MensajeInternacionalizacionHandler mensajeInternacionalizacionHandler;
+    private MensajeInternacionalizacionHandler mensajeHandler;
     private ResourceBundle mensajes;
 
-    // Vistas que puede abrir
-    private AnadirUsuarioView anadirUsuarioView;
-    private ActualizarUsuarioView actualizarUsuarioView;
+    public GestionDeUsuariosView(MensajeInternacionalizacionHandler mensajeHandler) {
+        this.mensajeHandler = mensajeHandler;
 
-    public GestionDeUsuariosView(MensajeInternacionalizacionHandler msgHandler) {
-        this.mensajeInternacionalizacionHandler = msgHandler;
-        this.mensajes = ResourceBundle.getBundle("mensajes", new Locale(msgHandler.getLenguajeActual(), msgHandler.getPaisActual()));
-
-        // CORRECCIÓN: Se usa la clave "titulo" en lugar de "title"
-        setTitle(mensajes.getString("gestionUsuarios.titulo"));
-
+        // Configuración de la ventana interna
         setContentPane(panelPrincipal);
-        setSize(800, 600);
         setClosable(true);
         setMaximizable(true);
         setResizable(true);
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setIconifiable(true);
+        setSize(800, 600);
+        setDefaultCloseOperation(JInternalFrame.HIDE_ON_CLOSE); // Ocultar en lugar de cerrar
 
         // Configuración del modelo de la tabla
-        modelo = new DefaultTableModel();
+        configurarTabla();
+
+        // La configuración de textos se hará al final para evitar errores
+        SwingUtilities.invokeLater(this::updateTexts);
+    }
+
+    private void configurarTabla() {
+        modelo = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                // Hace que la tabla no sea editable
+                return false;
+            }
+        };
         tblUsuarios.setModel(modelo);
-
-        // Se llama a updateTexts() externamente después de que los componentes se inicialicen
     }
 
-    // --- Getters para el Controlador ---
+    // --- Getters para que el controlador pueda acceder a los componentes ---
     public JTextField getTxtBuscar() {
-        return txtNombre; // Devuelve el campo de texto correcto
+        return txtNombre;
     }
 
-    public JButton getBtnBuscar() { return btnBuscar; }
-    public JButton getBtnListar() { return btnListar; }
-    public JButton getBtnEliminar() { return btnEliminar; }
-    public JButton getBtnActualizar() { return btnActualizar; }
-    public JButton getBtnAgregar() { return btnAgregar; }
-    public JTable getTblUsuarios() { return tblUsuarios; }
-    public DefaultTableModel getModelo() { return modelo; }
+    public JButton getBtnBuscar() {
+        return btnBuscar;
+    }
 
-    // --- Setters para Inyección de Dependencias ---
+    public JButton getBtnListar() {
+        return btnListar;
+    }
+
+    public JButton getBtnEliminar() {
+        return btnEliminar;
+    }
+
+    public JButton getBtnActualizar() {
+        return btnActualizar;
+    }
+
+    public JButton getBtnAgregar() {
+        return btnAgregar;
+    }
+
+    public JTable getTblUsuarios() {
+        return tblUsuarios;
+    }
+
+    // --- Setters para inyección de dependencias ---
     public void setUsuarioController(UsuarioController usuarioController) {
         this.usuarioController = usuarioController;
     }
 
-    public void setMensajeInternacionalizacionHandler(MensajeInternacionalizacionHandler mensajeInternacionalizacionHandler) {
-        this.mensajeInternacionalizacionHandler = mensajeInternacionalizacionHandler;
+    public void setMensajeInternacionalizacionHandler(MensajeInternacionalizacionHandler mensajeHandler) {
+        this.mensajeHandler = mensajeHandler;
         updateTexts();
     }
 
-    public void setAnadirUsuarioView(AnadirUsuarioView anadirUsuarioView) {
-        this.anadirUsuarioView = anadirUsuarioView;
-    }
-
-    public void setActualizarUsuarioView(ActualizarUsuarioView actualizarUsuarioView) {
-        this.actualizarUsuarioView = actualizarUsuarioView;
-    }
-
-    // --- Métodos de la Vista ---
-    public void mostrarMensaje(String mensaje, int tipoMensaje) {
-        JOptionPane.showMessageDialog(this, mensaje, mensajes.getString("global.info"), tipoMensaje);
-    }
-
+    // --- Método para actualizar textos (Internacionalización) ---
     public void updateTexts() {
-        this.mensajes = ResourceBundle.getBundle("mensajes", new Locale(mensajeInternacionalizacionHandler.getLenguajeActual(), mensajeInternacionalizacionHandler.getPaisActual()));
+        mensajes = ResourceBundle.getBundle("mensajes", new Locale(mensajeHandler.getLenguajeActual(), mensajeHandler.getPaisActual()));
 
         setTitle(mensajes.getString("gestionUsuarios.titulo"));
 
@@ -97,7 +107,6 @@ public class GestionDeUsuariosView extends JInternalFrame {
             lblNombre.setText(mensajes.getString("gestionUsuarios.label.buscar"));
         }
 
-        // CORRECCIÓN: Se usa "boton" en lugar de "btn" o "button"
         btnBuscar.setText(mensajes.getString("gestionUsuarios.boton.buscar"));
         btnListar.setText(mensajes.getString("gestionUsuarios.boton.listar"));
         btnAgregar.setText(mensajes.getString("gestionUsuarios.boton.agregar"));
@@ -109,8 +118,7 @@ public class GestionDeUsuariosView extends JInternalFrame {
                 mensajes.getString("gestionUsuarios.tabla.username"),
                 mensajes.getString("gestionUsuarios.tabla.email"),
                 mensajes.getString("gestionUsuarios.tabla.rol"),
-                mensajes.getString("gestionUsuarios.tabla.nombre"),
-                mensajes.getString("gestionUsuarios.tabla.apellido")
+                mensajes.getString("gestionUsuarios.tabla.nombre")
         });
 
         revalidate();
