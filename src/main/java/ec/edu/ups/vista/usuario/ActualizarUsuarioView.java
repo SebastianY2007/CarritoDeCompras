@@ -1,6 +1,7 @@
 package ec.edu.ups.vista.usuario;
 
 import ec.edu.ups.controlador.UsuarioController;
+import ec.edu.ups.modelo.Usuario;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
 
 import javax.swing.*;
@@ -9,96 +10,105 @@ import java.util.ResourceBundle;
 
 public class ActualizarUsuarioView extends JInternalFrame {
 
-    // --- Componentes de la UI ---
-    // Estas variables DEBEN coincidir con el 'fieldName' de tu diseño.
+    // --- Componentes de la UI (Deben coincidir con tu .form) ---
     private JPanel panelPrincipal;
     private JComboBox<String> cbxElegir;
     private JTextField txtElegir;
     private JButton btnActualizar;
     private JButton btnCancelar;
 
-    // --- Dependencias ---
+    // --- Dependencias y Estado ---
     private UsuarioController usuarioController;
-    private MensajeInternacionalizacionHandler mensajeInternacionalizacionHandler;
+    private MensajeInternacionalizacionHandler mensajeHandler;
     private ResourceBundle mensajes;
-    private String usernameActual; // Para guardar el username del usuario que se está editando
+    private String usernameActual;
 
-    public ActualizarUsuarioView(MensajeInternacionalizacionHandler msgHandler) {
-        this.mensajeInternacionalizacionHandler = msgHandler;
-        this.mensajes = ResourceBundle.getBundle("mensajes", new Locale(msgHandler.getLenguajeActual(), msgHandler.getPaisActual()));
+    public ActualizarUsuarioView() {
+        // El constructor puede estar vacío si el diseñador de UI inicializa los componentes.
+        // La configuración se hará cuando se inyecte el mensajeHandler.
+    }
 
-        // CORRECCIÓN: Se usa la clave "titulo" en lugar de "title".
-        setTitle(mensajes.getString("actualizarUsuario.titulo"));
+    // Este constructor es necesario para que la lógica de LoginView funcione
+    public ActualizarUsuarioView(MensajeInternacionalizacionHandler mensajeHandler) {
+        this.mensajeHandler = mensajeHandler;
 
         setContentPane(panelPrincipal);
-        setSize(400, 200);
         setClosable(true);
         setMaximizable(true);
         setResizable(true);
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setIconifiable(true);
+        setSize(400, 200);
+        setDefaultCloseOperation(JInternalFrame.HIDE_ON_CLOSE);
 
-        // La llamada a updateTexts() se hará externamente para evitar NullPointerExceptions.
+        SwingUtilities.invokeLater(this::updateTexts);
     }
 
-    // --- Getters para el Controlador ---
-    public JComboBox<String> getCbxElegir() { return cbxElegir; }
-    public JTextField getTxtValorNuevo() { return txtElegir; } // Renombrado para más claridad
-    public JButton getBtnActualizar() { return btnActualizar; }
-    public JButton getBtnCancelar() { return btnCancelar; }
-    public String getUsernameActual() { return usernameActual; }
 
-    // --- Setters ---
+    // --- Getters para que el controlador acceda a los componentes ---
+    public JComboBox<String> getCbxElegir() {
+        return cbxElegir;
+    }
+
+    public JTextField getTxtValorNuevo() {
+        return txtElegir;
+    }
+
+    public JButton getBtnActualizar() {
+        return btnActualizar;
+    }
+
+    public JButton getBtnCancelar() {
+        return btnCancelar;
+    }
+
+    public String getUsernameActual() {
+        return usernameActual;
+    }
+
+    // --- Setters para inyección de dependencias ---
     public void setUsuarioController(UsuarioController usuarioController) {
         this.usuarioController = usuarioController;
     }
 
-    public void setMensajeInternacionalizacionHandler(MensajeInternacionalizacionHandler mensajeInternacionalizacionHandler) {
-        this.mensajeInternacionalizacionHandler = mensajeInternacionalizacionHandler;
+    public void setMensajeInternacionalizacionHandler(MensajeInternacionalizacionHandler mensajeHandler) {
+        this.mensajeHandler = mensajeHandler;
         updateTexts();
     }
 
     // --- Métodos de la Vista ---
-    public void cargarDatosUsuario(ec.edu.ups.modelo.Usuario usuario) {
+    public void cargarDatosUsuario(Usuario usuario) {
         this.usernameActual = usuario.getUsername();
-        // Opcional: podrías llenar el campo de texto con un valor inicial si lo deseas
-        // txtElegir.setText(usuario.getNombre());
-    }
-
-    public void limpiarCampos() {
-        cbxElegir.setSelectedIndex(0);
+        // Limpiar campos al cargar un nuevo usuario
         txtElegir.setText("");
-        usernameActual = null;
-    }
-
-    public void mostrarMensaje(String mensaje, int tipoMensaje) {
-        JOptionPane.showMessageDialog(this, mensaje, "Mensaje", tipoMensaje);
+        if (cbxElegir.getItemCount() > 0) {
+            cbxElegir.setSelectedIndex(0);
+        }
     }
 
     public void updateTexts() {
-        this.mensajes = ResourceBundle.getBundle("mensajes", new Locale(mensajeInternacionalizacionHandler.getLenguajeActual(), mensajeInternacionalizacionHandler.getPaisActual()));
+        if (mensajeHandler == null) return; // Evitar error si el handler no está listo
+
+        mensajes = ResourceBundle.getBundle("mensajes", new Locale(mensajeHandler.getLenguajeActual(), mensajeHandler.getPaisActual()));
 
         setTitle(mensajes.getString("actualizarUsuario.titulo"));
 
-        // CORRECCIÓN: Se eliminaron las referencias a las etiquetas que no existen.
-        // No hay etiquetas que actualizar en este diseño.
-
-        // Actualización de Botones
         btnActualizar.setText(mensajes.getString("actualizarUsuario.boton.actualizar"));
         btnCancelar.setText(mensajes.getString("actualizarUsuario.boton.cancelar"));
 
-        // Actualización de Opciones del ComboBox
+        // --- CORRECCIÓN: Lógica para llenar el JComboBox ---
         if (cbxElegir != null) {
+            // Guardar la selección actual para restaurarla después de traducir
             int selectedIndex = cbxElegir.getSelectedIndex();
 
+            // Limpiar y volver a llenar el ComboBox con los textos traducidos
             cbxElegir.removeAllItems();
             cbxElegir.addItem(mensajes.getString("actualizarUsuario.opcion.username"));
-            cbxElegir.addItem(mensajes.getString("actualizarUsuario.opcion.email"));
             cbxElegir.addItem(mensajes.getString("actualizarUsuario.opcion.contrasena"));
+            // NUEVO: Se añaden las opciones para Email y Rol
+            cbxElegir.addItem(mensajes.getString("actualizarUsuario.opcion.email"));
             cbxElegir.addItem(mensajes.getString("actualizarUsuario.opcion.rol"));
-            cbxElegir.addItem(mensajes.getString("actualizarUsuario.opcion.nombre"));
-            cbxElegir.addItem(mensajes.getString("actualizarUsuario.opcion.apellido"));
-            cbxElegir.addItem(mensajes.getString("actualizarUsuario.opcion.telefono"));
 
+            // Restaurar la selección si era válida
             if (selectedIndex >= 0 && selectedIndex < cbxElegir.getItemCount()) {
                 cbxElegir.setSelectedIndex(selectedIndex);
             }

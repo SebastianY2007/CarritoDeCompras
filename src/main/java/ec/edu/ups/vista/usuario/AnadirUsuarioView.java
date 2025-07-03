@@ -9,105 +9,88 @@ import java.util.ResourceBundle;
 
 public class AnadirUsuarioView extends JInternalFrame {
 
-    // --- Componentes de la UI ---
+    // --- Componentes de la UI (Deben coincidir con tu .form) ---
     private JPanel panelPrincipal;
-    private JLabel lblNombreUsuario;
+    private JLabel lblNombre; // Etiqueta "Nombre de Usuario:"
+    private JTextField txtNombreUsuario; // Campo para el username
     private JLabel lblContrasena;
-    private JLabel lblConfirmarContrasena;
-    private JLabel lblNombre;
-    private JLabel lblApellido;
-    private JLabel lblEmail;
-    private JLabel lblTelefono;
-    private JTextField txtNombreUsuario;
     private JPasswordField txtContrasena;
+    private JLabel lblConfirmarContrasena;
     private JPasswordField txtConfirmarContrasena;
-    private JTextField txtNombre;
-    private JTextField txtApellido;
-    private JTextField txtEmail;
-    private JTextField txtTelefono;
     private JButton btnAgregar;
     private JButton btnLimpiar;
-    private JButton btnCancelar;
 
     // --- Dependencias ---
     private UsuarioController usuarioController;
-    private MensajeInternacionalizacionHandler mensajeInternacionalizacionHandler;
+    private MensajeInternacionalizacionHandler mensajeHandler;
     private ResourceBundle mensajes;
 
-    public AnadirUsuarioView(MensajeInternacionalizacionHandler msgHandler) {
-        this.mensajeInternacionalizacionHandler = msgHandler;
-        // Se inicializa 'mensajes' para evitar NullPointerException en el setTitle
-        this.mensajes = ResourceBundle.getBundle("mensajes", new Locale(msgHandler.getLenguajeActual(), msgHandler.getPaisActual()));
+    public AnadirUsuarioView(MensajeInternacionalizacionHandler mensajeHandler) {
+        this.mensajeHandler = mensajeHandler;
 
-        setTitle(mensajes.getString("anadirUsuario.titulo"));
+        // Es importante que el panel principal exista en tu .form
         setContentPane(panelPrincipal);
-        setSize(500, 450);
         setClosable(true);
         setMaximizable(true);
         setResizable(true);
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setIconifiable(true);
+        setSize(400, 250);
+        setDefaultCloseOperation(JInternalFrame.HIDE_ON_CLOSE);
 
-        // La llamada a updateTexts() se ha eliminado del constructor para evitar errores.
+        // La configuración de textos se hará al final para evitar errores
+        SwingUtilities.invokeLater(this::updateTexts);
     }
 
-    // --- Getters para el controlador ---
-    public JTextField getTxtNombreUsuario() { return txtNombreUsuario; }
-    public JPasswordField getTxtContrasena() { return txtContrasena; }
-    public JPasswordField getTxtConfirmarContrasena() { return txtConfirmarContrasena; }
-    public JTextField getTxtEmail() { return txtEmail; }
-    public JTextField getTxtNombre() { return txtNombre; }
-    public JTextField getTxtApellido() { return txtApellido; }
-    public JTextField getTxtTelefono() { return txtTelefono; }
-    public JButton getBtnAgregar() { return btnAgregar; }
-    public JButton getBtnLimpiar() { return btnLimpiar; }
-    public JButton getBtnCancelar() { return btnCancelar; }
+    // --- Getters para que el controlador acceda a los componentes ---
+    public JTextField getTxtNombreUsuario() {
+        // Asumiendo que el campo de texto para el username se llama 'txtNombreUsuario' en tu .form
+        return txtNombreUsuario;
+    }
 
-    // --- Setters para inyectar dependencias ---
+    public JPasswordField getTxtContrasena() {
+        return txtContrasena;
+    }
+
+    public JPasswordField getTxtConfirmarContrasena() {
+        return txtConfirmarContrasena;
+    }
+
+    public JButton getBtnAgregar() {
+        return btnAgregar;
+    }
+
+    public JButton getBtnLimpiar() {
+        return btnLimpiar;
+    }
+
+    // --- Setters para inyección de dependencias ---
     public void setUsuarioController(UsuarioController usuarioController) {
         this.usuarioController = usuarioController;
     }
 
-    public void setMensajeInternacionalizacionHandler(MensajeInternacionalizacionHandler mensajeInternacionalizacionHandler) {
-        this.mensajeInternacionalizacionHandler = mensajeInternacionalizacionHandler;
-        // CORRECCIÓN: Se eliminó la llamada a updateTexts() de aquí.
-        // Este método se llama demasiado pronto durante la inicialización.
-        // La llamada inicial a updateTexts() se debe hacer desde la clase Main.
+    public void setMensajeInternacionalizacionHandler(MensajeInternacionalizacionHandler mensajeHandler) {
+        this.mensajeHandler = mensajeHandler;
+        updateTexts();
     }
 
     // --- Métodos de la Vista ---
     public void limpiarCampos() {
-        txtNombreUsuario.setText("");
-        txtContrasena.setText("");
-        txtConfirmarContrasena.setText("");
-        txtEmail.setText("");
-        txtNombre.setText("");
-        txtApellido.setText("");
-        txtTelefono.setText("");
-    }
-
-    public void mostrarMensaje(String mensaje, int tipoMensaje) {
-        // Se asume que tienes una clave "global.info" para el título del diálogo
-        JOptionPane.showMessageDialog(this, mensaje, mensajes.getString("global.info"), tipoMensaje);
+        if (txtNombreUsuario != null) txtNombreUsuario.setText("");
+        if (txtContrasena != null) txtContrasena.setText("");
+        if (txtConfirmarContrasena != null) txtConfirmarContrasena.setText("");
     }
 
     public void updateTexts() {
-        this.mensajes = ResourceBundle.getBundle("mensajes", new Locale(mensajeInternacionalizacionHandler.getLenguajeActual(), mensajeInternacionalizacionHandler.getPaisActual()));
+        mensajes = ResourceBundle.getBundle("mensajes", new Locale(mensajeHandler.getLenguajeActual(), mensajeHandler.getPaisActual()));
 
         setTitle(mensajes.getString("anadirUsuario.titulo"));
 
-        // Actualización de Etiquetas (JLabel)
-        lblNombreUsuario.setText(mensajes.getString("anadirUsuario.label.nombreUsuario"));
-        lblContrasena.setText(mensajes.getString("anadirUsuario.label.contrasena"));
-        lblConfirmarContrasena.setText(mensajes.getString("anadirUsuario.label.confirmarContrasena"));
-        lblNombre.setText(mensajes.getString("anadirUsuario.label.nombre"));
-        lblApellido.setText(mensajes.getString("anadirUsuario.label.apellido"));
-        lblEmail.setText(mensajes.getString("anadirUsuario.label.email"));
-        lblTelefono.setText(mensajes.getString("anadirUsuario.label.telefono"));
+        if (lblNombre != null) lblNombre.setText(mensajes.getString("anadirUsuario.label.nombreUsuario"));
+        if (lblContrasena != null) lblContrasena.setText(mensajes.getString("anadirUsuario.label.contrasena"));
+        if (lblConfirmarContrasena != null) lblConfirmarContrasena.setText(mensajes.getString("anadirUsuario.label.confirmarContrasena"));
 
-        // Actualización de Botones (JButton)
-        btnAgregar.setText(mensajes.getString("anadirUsuario.boton.agregar"));
-        btnLimpiar.setText(mensajes.getString("anadirUsuario.boton.limpiar"));
-        btnCancelar.setText(mensajes.getString("anadirUsuario.boton.cancelar"));
+        if (btnAgregar != null) btnAgregar.setText(mensajes.getString("anadirUsuario.boton.agregar"));
+        if (btnLimpiar != null) btnLimpiar.setText(mensajes.getString("anadirUsuario.boton.limpiar"));
 
         revalidate();
         repaint();

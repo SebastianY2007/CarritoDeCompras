@@ -10,310 +10,200 @@ import ec.edu.ups.util.MensajeInternacionalizacionHandler;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class UsuarioController {
-    private UsuarioDAO usuarioDAO;
-    private AnadirUsuarioView anadirUsuarioView;
-    private GestionDeUsuariosView gestionDeUsuariosView;
-    private ActualizarUsuarioView actualizarUsuarioView;
-    private JDesktopPane desktopPane;
-    private MensajeInternacionalizacionHandler mensajeInternacionalizacionHandler;
 
-    public UsuarioController(UsuarioDAO usuarioDAO, AnadirUsuarioView anadirUsuarioView,
-                             GestionDeUsuariosView gestionDeUsuariosView, ActualizarUsuarioView actualizarUsuarioView,
-                             JDesktopPane desktopPane, MensajeInternacionalizacionHandler mensajeInternacionalizacionHandler) {
+    // --- Vistas que controla ---
+    private GestionDeUsuariosView gestionDeUsuariosView;
+    private AnadirUsuarioView anadirUsuarioView;
+    private ActualizarUsuarioView actualizarUsuarioView;
+
+    // --- Modelo ---
+    private UsuarioDAO usuarioDAO;
+
+    // --- Utilidades ---
+    private JDesktopPane desktopPane;
+    private MensajeInternacionalizacionHandler mensajeHandler;
+
+    public UsuarioController(UsuarioDAO usuarioDAO, GestionDeUsuariosView gestionDeUsuariosView, AnadirUsuarioView anadirUsuarioView, ActualizarUsuarioView actualizarUsuarioView, JDesktopPane desktopPane, MensajeInternacionalizacionHandler mensajeHandler) {
         this.usuarioDAO = usuarioDAO;
-        this.anadirUsuarioView = anadirUsuarioView;
         this.gestionDeUsuariosView = gestionDeUsuariosView;
+        this.anadirUsuarioView = anadirUsuarioView;
         this.actualizarUsuarioView = actualizarUsuarioView;
         this.desktopPane = desktopPane;
-        this.mensajeInternacionalizacionHandler = mensajeInternacionalizacionHandler;
+        this.mensajeHandler = mensajeHandler;
 
-        if (this.anadirUsuarioView != null) {
-            this.anadirUsuarioView.setUsuarioController(this);
-            this.anadirUsuarioView.setMensajeInternacionalizacionHandler(mensajeInternacionalizacionHandler);
-        }
-        if (this.gestionDeUsuariosView != null) {
-            this.gestionDeUsuariosView.setUsuarioController(this);
-            this.gestionDeUsuariosView.setMensajeInternacionalizacionHandler(mensajeInternacionalizacionHandler);
-            this.gestionDeUsuariosView.setAnadirUsuarioView(this.anadirUsuarioView);
-            this.gestionDeUsuariosView.setActualizarUsuarioView(this.actualizarUsuarioView);
-        }
-        if (this.actualizarUsuarioView != null) {
-            this.actualizarUsuarioView.setUsuarioController(this);
-            // Asegurarse de que ActualizarUsuarioView tenga este setter
-            this.actualizarUsuarioView.setMensajeInternacionalizacionHandler(mensajeInternacionalizacionHandler);
-        }
+        if (this.gestionDeUsuariosView != null) this.gestionDeUsuariosView.setUsuarioController(this);
+        if (this.anadirUsuarioView != null) this.anadirUsuarioView.setUsuarioController(this);
+        if (this.actualizarUsuarioView != null) this.actualizarUsuarioView.setUsuarioController(this);
 
-        setupAnadirUsuarioViewListeners();
-        setupActualizarUsuarioViewListeners();
-        setupGestionDeUsuariosViewListeners();
+        addListeners();
     }
 
-    private void setupAnadirUsuarioViewListeners() {
+    private void addListeners() {
+        if (gestionDeUsuariosView != null) {
+            gestionDeUsuariosView.getBtnBuscar().addActionListener(e -> buscarUsuario());
+            gestionDeUsuariosView.getBtnListar().addActionListener(e -> listarUsuarios());
+            gestionDeUsuariosView.getBtnEliminar().addActionListener(e -> eliminarUsuario());
+            gestionDeUsuariosView.getBtnActualizar().addActionListener(e -> abrirVentanaActualizar());
+            gestionDeUsuariosView.getBtnAgregar().addActionListener(e -> abrirVentanaAnadir());
+        }
+
         if (anadirUsuarioView != null) {
-            anadirUsuarioView.getBtnAgregar().addActionListener(e -> agregarUsuarioDesdeVista());
+            anadirUsuarioView.getBtnAgregar().addActionListener(e -> anadirUsuario());
             anadirUsuarioView.getBtnLimpiar().addActionListener(e -> anadirUsuarioView.limpiarCampos());
         }
-    }
 
-    private void setupActualizarUsuarioViewListeners() {
         if (actualizarUsuarioView != null) {
-            actualizarUsuarioView.getBtnActualizar().addActionListener(e -> actualizarUsuarioDesdeVista());
-            actualizarUsuarioView.getBtnCancelar().addActionListener(e -> {
-                actualizarUsuarioView.dispose();
-                actualizarUsuarioView.limpiarCampos();
-            });
+            actualizarUsuarioView.getBtnActualizar().addActionListener(e -> actualizarUsuario());
+            actualizarUsuarioView.getBtnCancelar().addActionListener(e -> actualizarUsuarioView.dispose());
         }
     }
 
-    private void setupGestionDeUsuariosViewListeners() {
-        if (gestionDeUsuariosView != null) {
-            gestionDeUsuariosView.getBtnListar().addActionListener(e -> listarUsuarios());
-            gestionDeUsuariosView.getBtnBuscar().addActionListener(e -> {
-                String username = gestionDeUsuariosView.getTxtBuscar().getText().trim();
-                if (!username.isEmpty()) {
-                    Usuario foundUser = buscarUsuario(username);
-                    DefaultTableModel model = gestionDeUsuariosView.getModelo();
-                    model.setRowCount(0);
-                    if (foundUser != null) {
-                        model.addRow(new Object[]{
-                                foundUser.getUsername(),
-                                foundUser.getCorreoElectronico(),
-                                foundUser.getRol().name(),
-                                foundUser.getNombre(),
-                        });
-                    } else {
-                        gestionDeUsuariosView.mostrarMensaje(mensajeInternacionalizacionHandler.get("gestionUsuarios.mensaje.usuarioNoEncontrado"), JOptionPane.WARNING_MESSAGE);
-                    }
-                } else {
-                    gestionDeUsuariosView.mostrarMensaje(mensajeInternacionalizacionHandler.get("gestionUsuarios.mensaje.ingreseUsuarioBuscar"), JOptionPane.WARNING_MESSAGE);
-                }
-            });
-
-            gestionDeUsuariosView.getBtnEliminar().addActionListener(e -> {
-                int selectedRow = gestionDeUsuariosView.getTblUsuarios().getSelectedRow();
-                if (selectedRow >= 0) {
-                    String username = (String) gestionDeUsuariosView.getModelo().getValueAt(selectedRow, 0);
-                    eliminarUsuario(username);
-                } else {
-                    gestionDeUsuariosView.mostrarMensaje(mensajeInternacionalizacionHandler.get("gestionUsuarios.mensaje.seleccioneUsuarioEliminar"), JOptionPane.WARNING_MESSAGE);
-                }
-            });
-
-            gestionDeUsuariosView.getBtnActualizar().addActionListener(e -> {
-                int selectedRow = gestionDeUsuariosView.getTblUsuarios().getSelectedRow();
-                if (selectedRow >= 0) {
-                    String username = (String) gestionDeUsuariosView.getModelo().getValueAt(selectedRow, 0);
-                    Usuario usuarioAActualizar = buscarUsuario(username);
-                    if (usuarioAActualizar != null) {
-                        if (actualizarUsuarioView != null) {
-                            actualizarUsuarioView.cargarDatosUsuario(usuarioAActualizar);
-                            if (desktopPane != null && !actualizarUsuarioView.isVisible()) {
-                                desktopPane.add(actualizarUsuarioView);
-                                actualizarUsuarioView.setVisible(true);
-                            }
-                            actualizarUsuarioView.toFront();
-                        } else {
-                            gestionDeUsuariosView.mostrarMensaje(mensajeInternacionalizacionHandler.get("gestionUsuarios.mensaje.vistaActualizarNoInicializada"), JOptionPane.ERROR_MESSAGE);
-                        }
-                    } else {
-                        gestionDeUsuariosView.mostrarMensaje(mensajeInternacionalizacionHandler.get("gestionUsuarios.mensaje.errorCargarDatosActualizar"), JOptionPane.ERROR_MESSAGE);
-                    }
-                } else {
-                    gestionDeUsuariosView.mostrarMensaje(mensajeInternacionalizacionHandler.get("gestionUsuarios.mensaje.seleccioneUsuarioActualizar"), JOptionPane.WARNING_MESSAGE);
-                }
-            });
-
-            gestionDeUsuariosView.getBtnAgregar().addActionListener(e -> {
-                if (anadirUsuarioView != null) {
-                    if (desktopPane != null && !anadirUsuarioView.isVisible()) {
-                        desktopPane.add(anadirUsuarioView);
-                        anadirUsuarioView.setVisible(true);
-                    }
-                    anadirUsuarioView.toFront();
-                    anadirUsuarioView.limpiarCampos();
-                } else {
-                    gestionDeUsuariosView.mostrarMensaje(mensajeInternacionalizacionHandler.get("gestionUsuarios.mensaje.vistaAnadirNoInicializada"), JOptionPane.ERROR_MESSAGE);
-                }
-            });
-        }
-    }
-
-    public void agregarUsuarioDesdeVista() {
+    // --- Lógica de la Vista de Añadir ---
+    public void anadirUsuario() {
         String username = anadirUsuarioView.getTxtNombreUsuario().getText().trim();
-        String password = new String(anadirUsuarioView.getTxtContrasena().getPassword());
-        String confirmPassword = new String(anadirUsuarioView.getTxtConfirmarContrasena().getPassword());
-        String nombre = anadirUsuarioView.getTxtNombre().getText().trim();
-        String apellido = anadirUsuarioView.getTxtApellido().getText().trim();
-        String email = anadirUsuarioView.getTxtEmail().getText().trim();
-        String telefono = anadirUsuarioView.getTxtTelefono().getText().trim();
+        String contrasena = new String(anadirUsuarioView.getTxtContrasena().getPassword()).trim();
+        String confirmarContrasena = new String(anadirUsuarioView.getTxtConfirmarContrasena().getPassword()).trim();
 
-        if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() ||
-                nombre.isEmpty() || apellido.isEmpty() || email.isEmpty() || telefono.isEmpty()) {
-            anadirUsuarioView.mostrarMensaje(mensajeInternacionalizacionHandler.get("anadirUsuario.mensaje.camposObligatorios"), JOptionPane.WARNING_MESSAGE);
+        if (username.isEmpty() || contrasena.isEmpty()) {
+            JOptionPane.showMessageDialog(anadirUsuarioView, "El nombre de usuario y la contraseña son obligatorios.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
-        if (!password.equals(confirmPassword)) {
-            anadirUsuarioView.mostrarMensaje(mensajeInternacionalizacionHandler.get("anadirUsuario.mensaje.contrasenasNoCoinciden"), JOptionPane.ERROR_MESSAGE);
+        if (!contrasena.equals(confirmarContrasena)) {
+            JOptionPane.showMessageDialog(anadirUsuarioView, "Las contraseñas no coinciden.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
         if (usuarioDAO.buscarPorUsername(username) != null) {
-            anadirUsuarioView.mostrarMensaje(mensajeInternacionalizacionHandler.get("anadirUsuario.mensaje.usuarioExiste"), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(anadirUsuarioView, "El nombre de usuario ya existe.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        Usuario nuevoUsuario = new Usuario(username, password, email, nombre);
-        nuevoUsuario.setTelefono(telefono);
+        Usuario nuevoUsuario = new Usuario(username, contrasena, "", username);
         nuevoUsuario.setRol(Rol.USUARIO);
+        usuarioDAO.crear(nuevoUsuario);
 
-        try { // Manteniendo el try-catch
-            usuarioDAO.crear(nuevoUsuario);
-            anadirUsuarioView.mostrarMensaje(mensajeInternacionalizacionHandler.get("anadirUsuario.mensaje.exito"), JOptionPane.INFORMATION_MESSAGE);
-            anadirUsuarioView.limpiarCampos();
-            anadirUsuarioView.dispose();
-            listarUsuarios();
-        } catch (Exception e) {
-            anadirUsuarioView.mostrarMensaje(mensajeInternacionalizacionHandler.get("anadirUsuario.mensaje.errorAgregar") + e.getMessage(), JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
+        JOptionPane.showMessageDialog(anadirUsuarioView, "Usuario añadido exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        anadirUsuarioView.dispose();
+        listarUsuarios();
+    }
+
+    // --- Lógica de la Vista de Gestión ---
+    public void listarUsuarios() {
+        List<Usuario> usuarios = usuarioDAO.listarTodos();
+        DefaultTableModel model = (DefaultTableModel) gestionDeUsuariosView.getTblUsuarios().getModel();
+        model.setRowCount(0);
+        for (Usuario usuario : usuarios) {
+            model.addRow(new Object[]{usuario.getUsername(), usuario.getCorreoElectronico(), usuario.getRol().name(), usuario.getNombre()});
         }
     }
 
-    public Usuario buscarUsuario(String username) {
-        return usuarioDAO.buscarPorUsername(username);
+    public void abrirVentanaAnadir() {
+        if (anadirUsuarioView != null) {
+            anadirUsuarioView.limpiarCampos();
+            mostrarVentana(anadirUsuarioView);
+        }
     }
 
-    public void actualizarUsuarioDesdeVista() {
+    // --- Lógica para los botones que faltaban ---
+
+    public void buscarUsuario() {
+        String username = gestionDeUsuariosView.getTxtBuscar().getText().trim();
+        if (username.isEmpty()) {
+            JOptionPane.showMessageDialog(gestionDeUsuariosView, "Por favor, ingrese un nombre de usuario para buscar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        Usuario usuario = usuarioDAO.buscarPorUsername(username);
+        DefaultTableModel model = (DefaultTableModel) gestionDeUsuariosView.getTblUsuarios().getModel();
+        model.setRowCount(0);
+        if (usuario != null) {
+            model.addRow(new Object[]{usuario.getUsername(), usuario.getCorreoElectronico(), usuario.getRol().name(), usuario.getNombre()});
+        } else {
+            JOptionPane.showMessageDialog(gestionDeUsuariosView, "Usuario no encontrado.", "Búsqueda", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
+    public void eliminarUsuario() {
+        int selectedRow = gestionDeUsuariosView.getTblUsuarios().getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(gestionDeUsuariosView, "Por favor, seleccione un usuario de la tabla para eliminar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        String username = (String) gestionDeUsuariosView.getTblUsuarios().getValueAt(selectedRow, 0);
+        int confirm = JOptionPane.showConfirmDialog(gestionDeUsuariosView, "¿Está seguro de que desea eliminar al usuario '" + username + "'?", "Confirmar Eliminación", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            usuarioDAO.eliminar(username);
+            listarUsuarios();
+            JOptionPane.showMessageDialog(gestionDeUsuariosView, "Usuario eliminado exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
+    public void abrirVentanaActualizar() {
+        int selectedRow = gestionDeUsuariosView.getTblUsuarios().getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(gestionDeUsuariosView, "Por favor, seleccione un usuario.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        String username = (String) gestionDeUsuariosView.getTblUsuarios().getValueAt(selectedRow, 0);
+        Usuario usuario = usuarioDAO.buscarPorUsername(username);
+
+        if (usuario != null && actualizarUsuarioView != null) {
+            actualizarUsuarioView.cargarDatosUsuario(usuario);
+            mostrarVentana(actualizarUsuarioView);
+        }
+    }
+
+    public void actualizarUsuario() {
         String usernameOriginal = actualizarUsuarioView.getUsernameActual();
-        String campo = (String) actualizarUsuarioView.getCbxElegir().getSelectedItem();
+        if (usernameOriginal == null) {
+            JOptionPane.showMessageDialog(actualizarUsuarioView, "No hay un usuario cargado para actualizar.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String campoSeleccionado = (String) actualizarUsuarioView.getCbxElegir().getSelectedItem();
         String nuevoValor = actualizarUsuarioView.getTxtValorNuevo().getText().trim();
 
-        if (usernameOriginal == null || usernameOriginal.isEmpty()) {
-            actualizarUsuarioView.mostrarMensaje(mensajeInternacionalizacionHandler.get("actualizarUsuario.mensaje.noUsuarioSeleccionado"), JOptionPane.WARNING_MESSAGE);
-            return;
-        }
         if (nuevoValor.isEmpty()) {
-            actualizarUsuarioView.mostrarMensaje(mensajeInternacionalizacionHandler.get("actualizarUsuario.mensaje.valorVacio"), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(actualizarUsuarioView, "El nuevo valor no puede estar vacío.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        Usuario usuarioAActualizar = usuarioDAO.buscarPorUsername(usernameOriginal);
-        if (usuarioAActualizar == null) {
-            actualizarUsuarioView.mostrarMensaje(mensajeInternacionalizacionHandler.get("actualizarUsuario.mensaje.usuarioNoEncontrado"), JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+        Usuario usuario = usuarioDAO.buscarPorUsername(usernameOriginal);
+        ResourceBundle mensajes = ResourceBundle.getBundle("mensajes", new Locale(mensajeHandler.getLenguajeActual(), mensajeHandler.getPaisActual()));
 
-        try { // Manteniendo el try-catch
-            String campoUsername = mensajeInternacionalizacionHandler.get("actualizarUsuario.campo.username");
-            String campoEmail = mensajeInternacionalizacionHandler.get("actualizarUsuario.campo.email");
-            String campoContrasena = mensajeInternacionalizacionHandler.get("actualizarUsuario.campo.contrasena");
-            String campoRol = mensajeInternacionalizacionHandler.get("actualizarUsuario.campo.rol");
-            String campoNombre = mensajeInternacionalizacionHandler.get("actualizarUsuario.campo.nombre");
-            String campoApellido = mensajeInternacionalizacionHandler.get("actualizarUsuario.campo.apellido");
-            String campoTelefono = mensajeInternacionalizacionHandler.get("actualizarUsuario.campo.telefono");
-
-            if (campo.equals(campoUsername)) {
-                if (usuarioDAO.buscarPorUsername(nuevoValor) != null && !nuevoValor.equals(usernameOriginal)) {
-                    actualizarUsuarioView.mostrarMensaje(mensajeInternacionalizacionHandler.get("actualizarUsuario.mensaje.nuevoUsuarioExiste"), JOptionPane.WARNING_MESSAGE);
-                    return;
-                }
-                usuarioAActualizar.setUsername(nuevoValor);
-
-            } else if (campo.equals(campoEmail)) {
-                usuarioAActualizar.setCorreoElectronico(nuevoValor);
-            } else if (campo.equals(campoContrasena)) {
-                usuarioAActualizar.setContrasena(nuevoValor);
-            } else if (campo.equals(campoRol)) {
-                try {
-                    Rol nuevoRol = Rol.valueOf(nuevoValor.toUpperCase());
-                    usuarioAActualizar.setRol(nuevoRol);
-                } catch (IllegalArgumentException e) {
-                    actualizarUsuarioView.mostrarMensaje(mensajeInternacionalizacionHandler.get("actualizarUsuario.mensaje.rolInvalido"), JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-            } else if (campo.equals(campoNombre)) {
-                usuarioAActualizar.setNombre(nuevoValor);
-            } else if (campo.equals(campoTelefono)) {
-                usuarioAActualizar.setTelefono(nuevoValor);
+        if (campoSeleccionado.equals(mensajes.getString("actualizarUsuario.opcion.username"))) {
+            usuario.setUsername(nuevoValor);
+        } else if (campoSeleccionado.equals(mensajes.getString("actualizarUsuario.opcion.contrasena"))) {
+            usuario.setContrasena(nuevoValor);
+        } else if (campoSeleccionado.equals(mensajes.getString("actualizarUsuario.opcion.email"))) {
+            usuario.setCorreoElectronico(nuevoValor);
+        } else if (campoSeleccionado.equals(mensajes.getString("actualizarUsuario.opcion.rol"))) {
+            String rolUpper = nuevoValor.toUpperCase();
+            if (rolUpper.equals("USUARIO") || rolUpper.equals("ADMINISTRADOR")) {
+                usuario.setRol(Rol.valueOf(rolUpper));
             } else {
-                actualizarUsuarioView.mostrarMensaje(mensajeInternacionalizacionHandler.get("actualizarUsuario.mensaje.campoNoReconocido"), JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(actualizarUsuarioView, "Rol inválido. Ingrese USUARIO o ADMINISTRADOR.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-
-            usuarioDAO.actualizar(usuarioAActualizar);
-            actualizarUsuarioView.mostrarMensaje(mensajeInternacionalizacionHandler.get("actualizarUsuario.mensaje.exito"), JOptionPane.INFORMATION_MESSAGE);
-            actualizarUsuarioView.dispose();
-            actualizarUsuarioView.limpiarCampos();
-            listarUsuarios();
-        } catch (Exception e) {
-            actualizarUsuarioView.mostrarMensaje(mensajeInternacionalizacionHandler.get("actualizarUsuario.mensaje.errorActualizar") + e.getMessage(), JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
         }
+
+        usuarioDAO.actualizar(usuario);
+
+        JOptionPane.showMessageDialog(actualizarUsuarioView, "Usuario actualizado exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        actualizarUsuarioView.dispose();
+        listarUsuarios();
     }
 
-    public void eliminarUsuario(String username) {
-        int confirm = JOptionPane.showConfirmDialog(gestionDeUsuariosView,
-                mensajeInternacionalizacionHandler.get("gestionUsuarios.confirmarEliminar.pregunta") + username + "?",
-                mensajeInternacionalizacionHandler.get("gestionUsuarios.confirmarEliminar.titulo"),
-                JOptionPane.YES_NO_OPTION);
-        if (confirm == JOptionPane.YES_OPTION) {
-            try { // Manteniendo el try-catch
-                usuarioDAO.eliminar(username);
-                gestionDeUsuariosView.mostrarMensaje(mensajeInternacionalizacionHandler.get("gestionUsuarios.mensaje.usuarioEliminado"), JOptionPane.INFORMATION_MESSAGE);
-                listarUsuarios();
-            } catch (Exception e) {
-                gestionDeUsuariosView.mostrarMensaje(mensajeInternacionalizacionHandler.get("gestionUsuarios.mensaje.errorEliminar") + e.getMessage(), JOptionPane.ERROR_MESSAGE);
-                e.printStackTrace();
+    private void mostrarVentana(JInternalFrame frame) {
+        if (frame != null) {
+            if (!frame.isVisible()) {
+                desktopPane.add(frame);
+                frame.setVisible(true);
             }
-        }
-    }
-
-    public void listarUsuarios() {
-        DefaultTableModel model = gestionDeUsuariosView.getModelo();
-        model.setRowCount(0);
-
-        List<Usuario> usuarios = usuarioDAO.listarTodos();
-        for (Usuario usuario : usuarios) {
-            model.addRow(new Object[]{
-                    usuario.getUsername(),
-                    usuario.getCorreoElectronico(),
-                    usuario.getRol().name(),
-                    usuario.getNombre(),
-            });
-        }
-        if (usuarios.isEmpty()) {
-            gestionDeUsuariosView.mostrarMensaje(mensajeInternacionalizacionHandler.get("gestionUsuarios.mensaje.noUsuarios"), JOptionPane.INFORMATION_MESSAGE);
-        }
-    }
-
-    public AnadirUsuarioView getAnadirUsuarioView() {
-        return anadirUsuarioView;
-    }
-
-    public GestionDeUsuariosView getGestionDeUsuariosView() {
-        return gestionDeUsuariosView;
-    }
-
-    public ActualizarUsuarioView getActualizarUsuarioView() {
-        return actualizarUsuarioView;
-    }
-
-    // El método autenticarUsuario que solicitaste
-    public Usuario autenticarUsuario(String username, String password) {
-        // 1. Buscar el usuario por nombre de usuario
-        Usuario usuario = usuarioDAO.buscarPorUsername(username); // Asume que UsuarioDAO tiene este método 'buscarPorUsername'
-
-        // 2. Verificar si el usuario existe y si la contraseña coincide
-        // CORRECCIÓN: Usar getContrasena() en lugar de getPassword() si ese es el getter en tu modelo Usuario
-        if (usuario != null && usuario.getContrasena().equals(password)) {
-            return usuario; // Autenticación exitosa
-        } else {
-            return null; // Autenticación fallida
+            frame.toFront();
         }
     }
 }

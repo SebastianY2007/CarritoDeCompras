@@ -25,11 +25,11 @@ public class LoginView extends JFrame {
 
     // --- Componentes de la UI ---
     private JPanel panelPrincipal;
-    private JTextField txtUsername;
+    private JTextField txtUsuario;
     private JPasswordField txtContrasena;
     private JButton btnIniciarSesion;
     private JButton btnRegistrarse;
-    private JButton btnOlvido;
+    private JButton btnOlvidoContrasena;
     private JComboBox<String> cbxIdioma;
 
     // --- Dependencias ---
@@ -44,79 +44,89 @@ public class LoginView extends JFrame {
         this.preguntaSeguridadDAO = preguntaSeguridadDAO;
         this.mensajeHandler = mensajeHandler;
 
-        setTitle("Inicio de Sesión");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setContentPane(panelPrincipal);
         setSize(600, 400);
         setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        configurarSelectorDeIdioma();
-        addEventListeners();
-        updateTexts();
+        SwingUtilities.invokeLater(() -> {
+            setupListeners();
+            configurarSelectorDeIdioma();
+            updateTexts();
+        });
     }
 
-    private void addEventListeners() {
-        btnIniciarSesion.addActionListener(e -> autenticarUsuario());
+    private void setupListeners() {
+        btnIniciarSesion.addActionListener(e -> iniciarSesion());
         btnRegistrarse.addActionListener(e -> abrirRegistro());
-        btnOlvido.addActionListener(e -> abrirRecuperarCuenta());
+        btnOlvidoContrasena.addActionListener(e -> abrirRecuperarCuenta());
     }
 
-    private void autenticarUsuario() {
-        String username = txtUsername.getText();
-        String password = new String(txtContrasena.getPassword());
+    private void iniciarSesion() {
+        String username = txtUsuario.getText().trim();
+        String password = new String(txtContrasena.getPassword()).trim();
 
         if (username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Usuario y contraseña no pueden estar vacíos.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Por favor, complete todos los campos.", "Advertencia", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        Usuario usuario = usuarioDAO.buscarPorUsername(username);
-
-        if (usuario != null && usuario.getContrasena().equals(password)) {
-            JOptionPane.showMessageDialog(this, mensajeHandler.getMensajes().getString("login.mensaje.exito"), "Éxito", JOptionPane.INFORMATION_MESSAGE);
-            iniciarAplicacionPrincipal(usuario);
+        Usuario usuarioAutenticado = usuarioDAO.buscarPorUsername(username);
+        if (usuarioAutenticado != null && usuarioAutenticado.getContrasena().equals(password)) {
+            this.setVisible(false);
+            iniciarAplicacionPrincipal(usuarioAutenticado);
         } else {
             JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos.", "Error de Autenticación", JOptionPane.ERROR_MESSAGE);
-            limpiarCampos();
         }
     }
 
+    /**
+     * CORREGIDO: Este método ahora es el responsable de construir y conectar toda la aplicación principal.
+     */
     private void iniciarAplicacionPrincipal(Usuario usuarioAutenticado) {
         this.dispose();
 
+        // 1. Crear todas las vistas internas
         AnadirProductoView anadirProductoView = new AnadirProductoView(mensajeHandler);
         GestionDeProductosView gestionProductosView = new GestionDeProductosView(mensajeHandler);
-        ActualizarProductoView actualizarProductoView = new ActualizarProductoView();
+        ActualizarProductoView actualizarProductoView = new ActualizarProductoView(mensajeHandler);
         AnadirUsuarioView anadirUsuarioView = new AnadirUsuarioView(mensajeHandler);
         GestionDeUsuariosView gestionUsuariosView = new GestionDeUsuariosView(mensajeHandler);
         ActualizarUsuarioView actualizarUsuarioView = new ActualizarUsuarioView(mensajeHandler);
         CarritoAnadirView carritoAnadirView = new CarritoAnadirView();
 
+        // 2. Crear la ventana principal
         MenuPrincipalView menuPrincipal = new MenuPrincipalView(usuarioAutenticado, mensajeHandler, this);
         JDesktopPane desktopPanePrincipal = menuPrincipal.getjDesktopPane();
 
-        new UsuarioController(usuarioDAO, anadirUsuarioView, gestionUsuariosView, actualizarUsuarioView, desktopPanePrincipal, mensajeHandler);
-        new ProductoController(productoDAO, anadirProductoView, gestionProductosView, carritoAnadirView, desktopPanePrincipal);
+        // 3. Crear los controladores, pasándoles las vistas que manejarán
+        // CORRECCIÓN: Se añade el 'mensajeHandler' al constructor de ProductoController.
+        ProductoController productoController = new ProductoController(
+                productoDAO, anadirProductoView, gestionProductosView, actualizarProductoView,
+                carritoAnadirView, desktopPanePrincipal, mensajeHandler
+        );
 
+        UsuarioController usuarioController = new UsuarioController(
+                usuarioDAO, gestionUsuariosView, anadirUsuarioView, actualizarUsuarioView,
+                desktopPanePrincipal, mensajeHandler
+        );
+
+        // 4. Inyectar las vistas y los controladores en la MenuPrincipalView
         menuPrincipal.setGestionDeProductosView(gestionProductosView);
-        menuPrincipal.setAnadirProductoView(anadirProductoView);
+        menuPrincipal.setProductoController(productoController);
 
+        menuPrincipal.setGestionDeUsuariosView(gestionUsuariosView);
+        menuPrincipal.setUsuarioController(usuarioController);
+
+        // 5. Mostrar la ventana principal ya configurada
         menuPrincipal.setVisible(true);
     }
 
-    /**
-     * CORREGIDO: Ahora crea y muestra la ventana de Registro,
-     * pasándole todas las dependencias que necesita para funcionar.
-     */
     private void abrirRegistro() {
         RegistroView registroView = new RegistroView(usuarioDAO, preguntaSeguridadDAO, mensajeHandler);
         registroView.setVisible(true);
     }
 
-    /**
-     * CORREGIDO: Ahora crea y muestra la ventana de Recuperar Cuenta,
-     * pasándole todas las dependencias que necesita para funcionar.
-     */
     private void abrirRecuperarCuenta() {
         RecuperarCuentaView recuperarCuentaView = new RecuperarCuentaView(usuarioDAO, preguntaSeguridadDAO, mensajeHandler);
         recuperarCuentaView.setVisible(true);
@@ -126,10 +136,9 @@ public class LoginView extends JFrame {
         cbxIdioma.addItem("Español");
         cbxIdioma.addItem("English");
         cbxIdioma.addItem("Français");
-
         cbxIdioma.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
-                String idiomaSeleccionado = (String) e.getItem();
+                String idiomaSeleccionado = (String) cbxIdioma.getSelectedItem();
                 switch (idiomaSeleccionado) {
                     case "English":
                         mensajeHandler.setLenguaje("en", "US");
@@ -137,7 +146,7 @@ public class LoginView extends JFrame {
                     case "Français":
                         mensajeHandler.setLenguaje("fr", "FR");
                         break;
-                    default:
+                    default: // Español
                         mensajeHandler.setLenguaje("es", "EC");
                         break;
                 }
@@ -147,15 +156,15 @@ public class LoginView extends JFrame {
     }
 
     public void updateTexts() {
-        ResourceBundle mensajes = mensajeHandler.getMensajes();
+        ResourceBundle mensajes = ResourceBundle.getBundle("mensajes", new Locale(mensajeHandler.getLenguajeActual(), mensajeHandler.getPaisActual()));
         setTitle(mensajes.getString("login.titulo"));
         btnIniciarSesion.setText(mensajes.getString("login.boton.iniciar"));
         btnRegistrarse.setText(mensajes.getString("login.boton.registrar"));
-        btnOlvido.setText(mensajes.getString("login.boton.olvido"));
+        btnOlvidoContrasena.setText(mensajes.getString("login.boton.olvido"));
     }
 
     public void limpiarCampos() {
-        txtUsername.setText("");
+        txtUsuario.setText("");
         txtContrasena.setText("");
     }
 }
