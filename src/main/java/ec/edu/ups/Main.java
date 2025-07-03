@@ -1,58 +1,32 @@
 package ec.edu.ups;
 
-import ec.edu.ups.dao.CarritoDAO;
 import ec.edu.ups.dao.ProductoDAO;
+import ec.edu.ups.dao.PreguntaSeguridadDAO;
 import ec.edu.ups.dao.UsuarioDAO;
-import ec.edu.ups.dao.impl.CarritoDAOMemoria;
 import ec.edu.ups.dao.impl.ProductoDAOMemoria;
+import ec.edu.ups.dao.impl.PreguntaSeguridadDAOMemoria;
 import ec.edu.ups.dao.impl.UsuarioDAOMemoria;
-import ec.edu.ups.modelo.Usuario;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
-import ec.edu.ups.vista.*;
+import ec.edu.ups.vista.registro.LoginView;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.List;
+import javax.swing.SwingUtilities;
 
 public class Main {
+
     public static void main(String[] args) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                UsuarioDAO usuarioDAO = new UsuarioDAOMemoria() {
-                    @Override
-                    public List<Usuario> listarPorRol() {
-                        return List.of();
-                    }
-                };
-                ProductoDAO productoDAO = new ProductoDAOMemoria();
-                CarritoDAO carritoDAO = new CarritoDAOMemoria();
+        SwingUtilities.invokeLater(() -> {
+            // 1. Inicialización de DAOs y Handler
+            UsuarioDAO usuarioDAO = new UsuarioDAOMemoria();
+            ProductoDAO productoDAO = new ProductoDAOMemoria();
+            PreguntaSeguridadDAO preguntaSeguridadDAO = new PreguntaSeguridadDAOMemoria(); // DAO necesario
+            MensajeInternacionalizacionHandler mensajeHandler = new MensajeInternacionalizacionHandler();
+            mensajeHandler.setLenguaje("es", "EC");
 
-                MensajeInternacionalizacionHandler mensajeInternacionalizacionHandler = new MensajeInternacionalizacionHandler();
-                mensajeInternacionalizacionHandler.setLenguaje("es", "EC");
+            // 2. Creación de la LoginView, pasándole todas las dependencias
+            LoginView loginView = new LoginView(usuarioDAO, productoDAO, preguntaSeguridadDAO, mensajeHandler);
 
-                LoginView loginView = new LoginView();
-                loginView.inicializarEventos(usuarioDAO, productoDAO, carritoDAO, mensajeInternacionalizacionHandler);
-
-                loginView.addWindowListener(new WindowAdapter() {
-                    @Override
-                    public void windowClosed(WindowEvent e) {
-                        if (!loginView.isVisible()) {
-                            if (!loginView.isDisplayable()) {
-                                System.out.println("LoginView cerrado. Terminando aplicación.");
-                                System.exit(0);
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void windowClosing(WindowEvent e) {
-                        System.out.println("Ventana de Login cerrada. Saliendo de la aplicación.");
-                        System.exit(0);
-                    }
-                });
-
-                loginView.setVisible(true);
-            }
+            // 3. Mostrar la ventana de login
+            loginView.setVisible(true);
         });
     }
 }
