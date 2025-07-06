@@ -1,20 +1,30 @@
 package ec.edu.ups.vista.registro;
 
+import ec.edu.ups.controlador.CarritoController;
 import ec.edu.ups.controlador.ProductoController;
 import ec.edu.ups.controlador.UsuarioController;
+import ec.edu.ups.dao.CarritoDAO;
 import ec.edu.ups.dao.ProductoDAO;
 import ec.edu.ups.dao.PreguntaSeguridadDAO;
 import ec.edu.ups.dao.UsuarioDAO;
 import ec.edu.ups.modelo.Usuario;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
 import ec.edu.ups.vista.MenuPrincipalView;
-import ec.edu.ups.vista.carrito.CarritoAnadirView;
+import ec.edu.ups.vista.carrito.CrearCarritoView;
+import ec.edu.ups.vista.carrito.GestionarCarritoAdministradorView;
+import ec.edu.ups.vista.carrito.GestionarCarritoUsuarioView;
 import ec.edu.ups.vista.producto.ActualizarProductoView;
 import ec.edu.ups.vista.producto.AnadirProductoView;
 import ec.edu.ups.vista.producto.GestionDeProductosView;
 import ec.edu.ups.vista.usuario.ActualizarUsuarioView;
 import ec.edu.ups.vista.usuario.AnadirUsuarioView;
 import ec.edu.ups.vista.usuario.GestionDeUsuariosView;
+
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import javax.swing.*;
 import java.awt.event.ItemEvent;
@@ -23,7 +33,6 @@ import java.util.ResourceBundle;
 
 public class LoginView extends JFrame {
 
-    // --- Componentes de la UI ---
     private JPanel panelPrincipal;
     private JTextField txtUsuario;
     private JPasswordField txtContrasena;
@@ -32,23 +41,22 @@ public class LoginView extends JFrame {
     private JButton btnOlvidoContrasena;
     private JComboBox<String> cbxIdioma;
 
-    // --- Dependencias ---
     private UsuarioDAO usuarioDAO;
     private ProductoDAO productoDAO;
+    private CarritoDAO carritoDAO;
     private PreguntaSeguridadDAO preguntaSeguridadDAO;
     private MensajeInternacionalizacionHandler mensajeHandler;
 
-    public LoginView(UsuarioDAO usuarioDAO, ProductoDAO productoDAO, PreguntaSeguridadDAO preguntaSeguridadDAO, MensajeInternacionalizacionHandler mensajeHandler) {
+    public LoginView(UsuarioDAO usuarioDAO, ProductoDAO productoDAO, CarritoDAO carritoDAO, PreguntaSeguridadDAO preguntaSeguridadDAO, MensajeInternacionalizacionHandler mensajeHandler) {
         this.usuarioDAO = usuarioDAO;
         this.productoDAO = productoDAO;
+        this.carritoDAO = carritoDAO;
         this.preguntaSeguridadDAO = preguntaSeguridadDAO;
         this.mensajeHandler = mensajeHandler;
-
         setContentPane(panelPrincipal);
         setSize(600, 400);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
         SwingUtilities.invokeLater(() -> {
             setupListeners();
             configurarSelectorDeIdioma();
@@ -65,60 +73,59 @@ public class LoginView extends JFrame {
     private void iniciarSesion() {
         String username = txtUsuario.getText().trim();
         String password = new String(txtContrasena.getPassword()).trim();
-
         if (username.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Por favor, complete todos los campos.", "Advertencia", JOptionPane.WARNING_MESSAGE);
             return;
         }
-
         Usuario usuarioAutenticado = usuarioDAO.buscarPorUsername(username);
         if (usuarioAutenticado != null && usuarioAutenticado.getContrasena().equals(password)) {
-            this.setVisible(false);
             iniciarAplicacionPrincipal(usuarioAutenticado);
         } else {
             JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos.", "Error de Autenticación", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    /**
-     * CORREGIDO: Este método ahora es el responsable de construir y conectar toda la aplicación principal.
-     */
     private void iniciarAplicacionPrincipal(Usuario usuarioAutenticado) {
-        this.dispose();
-
-        // 1. Crear todas las vistas internas
         AnadirProductoView anadirProductoView = new AnadirProductoView(mensajeHandler);
         GestionDeProductosView gestionProductosView = new GestionDeProductosView(mensajeHandler);
         ActualizarProductoView actualizarProductoView = new ActualizarProductoView(mensajeHandler);
         AnadirUsuarioView anadirUsuarioView = new AnadirUsuarioView(mensajeHandler);
         GestionDeUsuariosView gestionUsuariosView = new GestionDeUsuariosView(mensajeHandler);
         ActualizarUsuarioView actualizarUsuarioView = new ActualizarUsuarioView(mensajeHandler);
-        CarritoAnadirView carritoAnadirView = new CarritoAnadirView();
+        CrearCarritoView crearCarritoView = new CrearCarritoView();
+        GestionarCarritoUsuarioView gestionarCarritoUsuarioView = new GestionarCarritoUsuarioView();
+        GestionarCarritoAdministradorView gestionarCarritoAdminView = new GestionarCarritoAdministradorView();
 
-        // 2. Crear la ventana principal
         MenuPrincipalView menuPrincipal = new MenuPrincipalView(usuarioAutenticado, mensajeHandler, this);
         JDesktopPane desktopPanePrincipal = menuPrincipal.getjDesktopPane();
 
-        // 3. Crear los controladores, pasándoles las vistas que manejarán
-        // CORRECCIÓN: Se añade el 'mensajeHandler' al constructor de ProductoController.
         ProductoController productoController = new ProductoController(
                 productoDAO, anadirProductoView, gestionProductosView, actualizarProductoView,
-                carritoAnadirView, desktopPanePrincipal, mensajeHandler
+                crearCarritoView, desktopPanePrincipal, mensajeHandler
         );
-
         UsuarioController usuarioController = new UsuarioController(
                 usuarioDAO, gestionUsuariosView, anadirUsuarioView, actualizarUsuarioView,
                 desktopPanePrincipal, mensajeHandler
         );
+        CarritoController carritoController = new CarritoController(this.carritoDAO, productoDAO, crearCarritoView, gestionarCarritoUsuarioView, gestionarCarritoAdminView);
 
-        // 4. Inyectar las vistas y los controladores en la MenuPrincipalView
-        menuPrincipal.setGestionDeProductosView(gestionProductosView);
+        productoController.initListeners();
+        usuarioController.initListeners();
+        carritoController.setUsuarioAutenticado(usuarioAutenticado);
+        carritoController.initListeners();
+
         menuPrincipal.setProductoController(productoController);
-
-        menuPrincipal.setGestionDeUsuariosView(gestionUsuariosView);
+        menuPrincipal.setGestionDeProductosView(gestionProductosView);
         menuPrincipal.setUsuarioController(usuarioController);
+        menuPrincipal.setGestionDeUsuariosView(gestionUsuariosView);
+        menuPrincipal.setCarritoController(carritoController);
+        menuPrincipal.setCrearCarritoView(crearCarritoView);
+        menuPrincipal.setGestionarCarritoUsuarioView(gestionarCarritoUsuarioView);
+        menuPrincipal.setGestionarCarritoAdminView(gestionarCarritoAdminView);
 
-        // 5. Mostrar la ventana principal ya configurada
+        menuPrincipal.configurarAccesoPorRol();
+        menuPrincipal.updateTexts();
+        this.setVisible(false);
         menuPrincipal.setVisible(true);
     }
 
@@ -128,8 +135,86 @@ public class LoginView extends JFrame {
     }
 
     private void abrirRecuperarCuenta() {
-        RecuperarCuentaView recuperarCuentaView = new RecuperarCuentaView(usuarioDAO, preguntaSeguridadDAO, mensajeHandler);
-        recuperarCuentaView.setVisible(true);
+        String username = JOptionPane.showInputDialog(
+                this,
+                "Por favor, ingrese su nombre de usuario:",
+                "Recuperar Contraseña",
+                JOptionPane.QUESTION_MESSAGE
+        );
+
+        if (username == null || username.trim().isEmpty()) {
+            return;
+        }
+
+        Usuario usuarioARecuperar = usuarioDAO.buscarPorUsername(username.trim());
+
+        if (usuarioARecuperar == null || usuarioARecuperar.getPreguntaSeguridad1() == null || usuarioARecuperar.getPreguntaSeguridad1().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Usuario no encontrado o sin preguntas de seguridad.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        List<Map.Entry<String, String>> preguntas = new ArrayList<>();
+        preguntas.add(new AbstractMap.SimpleEntry<>(usuarioARecuperar.getPreguntaSeguridad1(), usuarioARecuperar.getRespuestaSeguridad1()));
+        preguntas.add(new AbstractMap.SimpleEntry<>(usuarioARecuperar.getPreguntaSeguridad2(), usuarioARecuperar.getRespuestaSeguridad2()));
+        preguntas.add(new AbstractMap.SimpleEntry<>(usuarioARecuperar.getPreguntaSeguridad3(), usuarioARecuperar.getRespuestaSeguridad3()));
+        Collections.shuffle(preguntas);
+
+        boolean respuestaCorrecta = false;
+        for (Map.Entry<String, String> par : preguntas) {
+            String pregunta = par.getKey();
+            String respuestaCorrectaEncriptada = par.getValue();
+
+            String respuestaUsuario = JOptionPane.showInputDialog(
+                    this,
+                    pregunta,
+                    "Pregunta de Seguridad",
+                    JOptionPane.QUESTION_MESSAGE
+            );
+
+            if (respuestaUsuario == null) {
+                return;
+            }
+
+            if (respuestaUsuario.trim().equalsIgnoreCase(respuestaCorrectaEncriptada)) {
+                respuestaCorrecta = true;
+                break;
+            }
+        }
+
+        if (respuestaCorrecta) {
+            JPanel panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+            JPasswordField pwdNueva = new JPasswordField(15);
+            JPasswordField pwdConfirmar = new JPasswordField(15);
+            panel.add(new JLabel("Nueva Contraseña:"));
+            panel.add(pwdNueva);
+            panel.add(Box.createVerticalStrut(15));
+            panel.add(new JLabel("Confirmar Contraseña:"));
+            panel.add(pwdConfirmar);
+
+            int option = JOptionPane.showConfirmDialog(
+                    this,
+                    panel,
+                    "Cambiar Contraseña",
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.PLAIN_MESSAGE
+            );
+
+            if (option == JOptionPane.OK_OPTION) {
+                String nueva = new String(pwdNueva.getPassword());
+                String confirmacion = new String(pwdConfirmar.getPassword());
+
+                if (nueva.isEmpty() || !nueva.equals(confirmacion)) {
+                    JOptionPane.showMessageDialog(this, "Las contraseñas no coinciden o están vacías.", "Error", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    usuarioARecuperar.setContrasena(nueva);
+                    usuarioDAO.actualizar(usuarioARecuperar);
+                    JOptionPane.showMessageDialog(this, "Contraseña actualizada exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Ha fallado todas las preguntas. No puede recuperar la contraseña.", "Acceso Denegado", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void configurarSelectorDeIdioma() {
@@ -146,7 +231,7 @@ public class LoginView extends JFrame {
                     case "Français":
                         mensajeHandler.setLenguaje("fr", "FR");
                         break;
-                    default: // Español
+                    default:
                         mensajeHandler.setLenguaje("es", "EC");
                         break;
                 }

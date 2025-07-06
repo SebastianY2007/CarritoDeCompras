@@ -17,9 +17,8 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class RegistroView extends JFrame {
-    // --- Componentes de la UI (Ajustados para coincidir con tu .form) ---
     private JPanel panelPrincipal;
-    private JLabel lblNombre; // La única etiqueta que parece tener un 'fieldName'
+    private JLabel lblNombre;
     private JTextField txtNombre;
     private JTextField txtUsuario;
     private JPasswordField txtContrasena;
@@ -36,9 +35,7 @@ public class RegistroView extends JFrame {
     private JComboBox<String> cbxMes;
     private JComboBox<Integer> cbxAnio;
     private JButton btnRegistrarse;
-    // CORRECCIÓN: Se eliminaron las variables para JLabels y JButtons que no existen en el diseño.
 
-    // --- Dependencias ---
     private UsuarioDAO usuarioDAO;
     private PreguntaSeguridadDAO preguntaSeguridadDAO;
     private MensajeInternacionalizacionHandler mensajeInternacionalizacionHandler;
@@ -98,7 +95,7 @@ public class RegistroView extends JFrame {
         String contrasena = new String(txtContrasena.getPassword()).trim();
         String confirmar = new String(txtConfirmar.getPassword()).trim();
         String nombre = txtNombre.getText().trim();
-        String apellido = ""; // CORRECCIÓN: Se usa un string vacío ya que no hay campo de apellido.
+        String apellido = "";
         String correoElectronico = txtCorreo.getText().trim();
         String telefono = txtTelefono.getText().trim();
         Integer dia = (Integer) cbxDia.getSelectedItem();
@@ -226,7 +223,6 @@ public class RegistroView extends JFrame {
         txtContrasena.setText("");
         txtConfirmar.setText("");
         txtNombre.setText("");
-        // CORRECCIÓN: Se eliminó la limpieza del txtApellido
         txtCorreo.setText("");
         txtTelefono.setText("");
         cbxDia.setSelectedIndex(0);
@@ -241,15 +237,10 @@ public class RegistroView extends JFrame {
         this.mensajes = ResourceBundle.getBundle("mensajes", new Locale(mensajeInternacionalizacionHandler.getLenguajeActual(), mensajeInternacionalizacionHandler.getPaisActual()));
         setTitle(mensajes.getString("registro.title"));
 
-        // Actualizar etiquetas
-        // CORRECCIÓN: Se eliminaron las llamadas a setText para las etiquetas que no existen.
-        // Solo se actualiza lblNombre, que sí parece existir en tu diseño.
         lblNombre.setText(mensajes.getString("registro.label.nombre"));
 
-        // Actualizar botones
         btnRegistrarse.setText(mensajes.getString("registro.boton.registrar"));
 
-        // Recargar ComboBoxes con textos actualizados
         cargarPreguntasSeguridad();
         setupFechaNacimientoComboBoxes();
 

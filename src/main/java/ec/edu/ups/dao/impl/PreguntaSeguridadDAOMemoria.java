@@ -12,7 +12,6 @@ public class PreguntaSeguridadDAOMemoria implements PreguntaSeguridadDAO {
     private Map<Integer, PreguntaSeguridad> preguntas = new HashMap<>();
     private int nextId = 1;
 
-    // Precargar las preguntas actualizadas
     public PreguntaSeguridadDAOMemoria() {
         create(new PreguntaSeguridad(nextId++, "¿Cuál era el nombre de tu primera mascota de la infancia?"));
         create(new PreguntaSeguridad(nextId++, "¿Cuál es el segundo nombre de tu madre?"));
@@ -28,11 +27,11 @@ public class PreguntaSeguridadDAOMemoria implements PreguntaSeguridadDAO {
 
     @Override
     public void create(PreguntaSeguridad pregunta) {
-        if (pregunta.getId() == 0) { // Si el ID no está establecido, asigna uno nuevo
+        if (pregunta.getId() == 0) {
             pregunta.setId(nextId++);
         }
         preguntas.put(pregunta.getId(), pregunta);
-        System.out.println("DEBUG: Pregunta de seguridad creada: " + pregunta.getPregunta()); // Mensaje para depuración
+        System.out.println("DEBUG: Pregunta de seguridad creada: " + pregunta.getPregunta());
     }
 
     @Override
@@ -44,7 +43,7 @@ public class PreguntaSeguridadDAOMemoria implements PreguntaSeguridadDAO {
     public void update(PreguntaSeguridad pregunta) {
         if (preguntas.containsKey(pregunta.getId())) {
             preguntas.put(pregunta.getId(), pregunta);
-            System.out.println("DEBUG: Pregunta de seguridad actualizada: " + pregunta.getPregunta()); // Mensaje para depuración
+            System.out.println("DEBUG: Pregunta de seguridad actualizada: " + pregunta.getPregunta());
         } else {
             System.out.println("DEBUG: No se encontró la pregunta con ID " + pregunta.getId() + " para actualizar.");
         }
@@ -54,7 +53,7 @@ public class PreguntaSeguridadDAOMemoria implements PreguntaSeguridadDAO {
     public void delete(int id) {
         PreguntaSeguridad removed = preguntas.remove(id);
         if (removed != null) {
-            System.out.println("DEBUG: Pregunta de seguridad eliminada: " + removed.getPregunta()); // Mensaje para depuración
+            System.out.println("DEBUG: Pregunta de seguridad eliminada: " + removed.getPregunta());
         } else {
             System.out.println("DEBUG: No se encontró la pregunta con ID " + id + " para eliminar.");
         }
@@ -65,13 +64,12 @@ public class PreguntaSeguridadDAOMemoria implements PreguntaSeguridadDAO {
         return new ArrayList<>(preguntas.values());
     }
 
-    // Método adicional para buscar por texto de pregunta, útil para la UI
     public PreguntaSeguridad findByQuestionText(String questionText) {
         for (PreguntaSeguridad pregunta : preguntas.values()) {
             if (pregunta.getPregunta().equals(questionText)) {
                 return pregunta;
             }
         }
-        return null; // No encontrada
+        return null;
     }
 }

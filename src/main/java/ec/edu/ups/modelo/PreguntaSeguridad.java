@@ -12,7 +12,6 @@ public class PreguntaSeguridad {
         this.pregunta = pregunta;
     }
 
-    // Getters
     public int getId() {
         return id;
     }
@@ -21,7 +20,6 @@ public class PreguntaSeguridad {
         return pregunta;
     }
 
-    // Setters
     public void setId(int id) {
         this.id = id;
     }
@@ -30,7 +28,6 @@ public class PreguntaSeguridad {
         this.pregunta = pregunta;
     }
 
-    // Opcional: Para facilitar la depuración
     @Override
     public String toString() {
         return "PreguntaSeguridad{" +
@@ -39,7 +36,6 @@ public class PreguntaSeguridad {
                 '}';
     }
 
-    // Opcional: Para comparar objetos por ID si los pones en colecciones que lo necesiten
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
