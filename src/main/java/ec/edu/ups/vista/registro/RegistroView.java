@@ -132,7 +132,7 @@ public class RegistroView extends JFrame {
         }
 
         int numeroMes = obtenerNumeroMes(mesStr);
-        Usuario nuevoUsuario = new Usuario(username, contrasena, correoElectronico, nombre, apellido, telefono, dia, numeroMes, anio, Rol.USUARIO, pregunta1, respuesta1, pregunta2, respuesta2, pregunta3, respuesta3);
+        Usuario nuevoUsuario = new Usuario(username, contrasena, correoElectronico, telefono, dia, numeroMes, anio, Rol.USUARIO, pregunta1, respuesta1, pregunta2, respuesta2, pregunta3, respuesta3);
         usuarioDAO.crear(nuevoUsuario);
         mostrarMensaje(mensajes.getString("registro.mensaje.exito"), "Registro Exitoso", JOptionPane.INFORMATION_MESSAGE);
         limpiarCampos();

@@ -49,10 +49,10 @@ public class UsuarioController {
     public void listarUsuarios() {
         List<Usuario> usuarios = usuarioDAO.listarTodos();
         DefaultTableModel model = (DefaultTableModel) gestionDeUsuariosView.getTblUsuarios().getModel();
-        model.setColumnIdentifiers(new Object[]{"Username", "Email", "Rol", "Nombre"});
+        model.setColumnIdentifiers(new Object[]{"Username", "Email", "Rol"});
         model.setRowCount(0);
         for (Usuario u : usuarios) {
-            model.addRow(new Object[]{u.getUsername(), u.getCorreoElectronico(), u.getRol().name(), u.getNombre()});
+            model.addRow(new Object[]{u.getUsername(), u.getCorreoElectronico(), u.getRol().name()});
         }
     }
 
@@ -66,7 +66,7 @@ public class UsuarioController {
         DefaultTableModel model = (DefaultTableModel) gestionDeUsuariosView.getTblUsuarios().getModel();
         model.setRowCount(0);
         if (usuario != null) {
-            model.addRow(new Object[]{usuario.getUsername(), usuario.getCorreoElectronico(), usuario.getRol().name(), usuario.getNombre()});
+            model.addRow(new Object[]{usuario.getUsername(), usuario.getCorreoElectronico(), usuario.getRol().name()});
         } else {
             JOptionPane.showMessageDialog(gestionDeUsuariosView, "Usuario no encontrado.", "Búsqueda", JOptionPane.INFORMATION_MESSAGE);
         }
@@ -95,7 +95,7 @@ public class UsuarioController {
             return;
         }
 
-        Usuario nuevoUsuario = new Usuario(username, password, "email@por.defecto", "Nombre por defecto");
+        Usuario nuevoUsuario = new Usuario(username, password, "email@por.defecto");
         nuevoUsuario.setRol(Rol.USUARIO);
 
         usuarioDAO.crear(nuevoUsuario);

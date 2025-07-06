@@ -17,19 +17,19 @@ public class UsuarioDAOMemoria implements UsuarioDAO {
     public UsuarioDAOMemoria() {
         this.usuariosMap = new HashMap<>();
 
-        Usuario a = new Usuario("a", "a", "a@example.com", "Administrador");
+        Usuario a = new Usuario("a", "a", "a@example.com");
         a.setRol(Rol.ADMINISTRADOR);
         crear(a);
 
-        Usuario admin = new Usuario("admin", "admin", "admin@example.com", "Administrador");
+        Usuario admin = new Usuario("admin", "admin", "admin@example.com");
         admin.setRol(Rol.ADMINISTRADOR);
         crear(admin);
 
-        Usuario usuario1 = new Usuario("usuario1", "user123", "usuario1@example.com", "Juan Pérez");
+        Usuario usuario1 = new Usuario("usuario1", "user123", "usuario1@example.com");
         usuario1.setRol(Rol.USUARIO);
         crear(usuario1);
 
-        Usuario usuario2 = new Usuario("z", "z", "ana.gomez@example.com", "Ana Gómez");
+        Usuario usuario2 = new Usuario("z", "z", "ana.gomez@example.com");
         usuario2.setRol(Rol.USUARIO);
         crear(usuario2);
     }

@@ -98,11 +98,21 @@ public class GestionDeUsuariosView extends JInternalFrame {
             lblNombre.setText(mensajes.getString("gestionUsuarios.label.buscar"));
         }
 
-        btnBuscar.setText(mensajes.getString("gestionUsuarios.boton.buscar"));
-        btnListar.setText(mensajes.getString("gestionUsuarios.boton.listar"));
-        btnAgregar.setText(mensajes.getString("gestionUsuarios.boton.agregar"));
-        btnActualizar.setText(mensajes.getString("gestionUsuarios.boton.actualizar"));
-        btnEliminar.setText(mensajes.getString("gestionUsuarios.boton.eliminar"));
+        if (btnBuscar != null) {
+            btnBuscar.setText(mensajes.getString("gestionUsuarios.boton.buscar"));
+        }
+        if (btnListar != null) {
+            btnListar.setText(mensajes.getString("gestionUsuarios.boton.listar"));
+        }
+        if (btnAgregar != null) {
+            btnAgregar.setText(mensajes.getString("gestionUsuarios.boton.agregar"));
+        }
+        if (btnActualizar != null) {
+            btnActualizar.setText(mensajes.getString("gestionUsuarios.boton.actualizar"));
+        }
+        if (btnEliminar != null) {
+            btnEliminar.setText(mensajes.getString("gestionUsuarios.boton.eliminar"));
+        }
 
         modelo.setColumnIdentifiers(new Object[]{
                 mensajes.getString("gestionUsuarios.tabla.username"),

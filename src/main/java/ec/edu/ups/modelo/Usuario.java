@@ -4,7 +4,6 @@ public class Usuario {
     private String username;
     private String contrasena;
     private String correoElectronico;
-    private String nombre;
     private String telefono;
     private int diaNacimiento;
     private int mesNacimiento;
@@ -21,15 +20,14 @@ public class Usuario {
     public Usuario(){
     }
 
-    public Usuario(String username, String contrasena, String correoElectronico, String nombre) {
+    public Usuario(String username, String contrasena, String correoElectronico) {
         this.username = username;
         this.contrasena = contrasena;
         this.correoElectronico = correoElectronico;
-        this.nombre = nombre;
         this.rol = Rol.USUARIO;
     }
 
-    public Usuario(String username, String contrasena, String correoElectronico, String nombre, String apellido,
+    public Usuario(String username, String contrasena, String correoElectronico,
                    String telefono, int diaNacimiento, int mesNacimiento, int anioNacimiento, Rol rol,
                    String preguntaSeguridad1, String respuestaSeguridad1,
                    String preguntaSeguridad2, String respuestaSeguridad2,
@@ -37,7 +35,6 @@ public class Usuario {
         this.username = username;
         this.contrasena = contrasena;
         this.correoElectronico = correoElectronico;
-        this.nombre = nombre;
         this.telefono = telefono;
         this.diaNacimiento = diaNacimiento;
         this.mesNacimiento = mesNacimiento;
@@ -76,14 +73,6 @@ public class Usuario {
 
     public void setCorreoElectronico(String correoElectronico) {
         this.correoElectronico = correoElectronico;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
     }
 
     public String getTelefono() {
@@ -180,7 +169,6 @@ public class Usuario {
                 "username='" + username + '\'' +
                 ", contrasena='" + contrasena + '\'' +
                 ", correoElectronico='" + correoElectronico + '\'' +
-                ", nombre='" + nombre + '\'' +
                 ", telefono='" + telefono + '\'' +
                 ", diaNacimiento=" + diaNacimiento +
                 ", mesNacimiento=" + mesNacimiento +
