@@ -28,9 +28,9 @@ public class MenuPrincipalView extends JFrame {
     private ResourceBundle mensajes;
 
     private JMenuBar menuBar;
-    private JMenu menuProductos, menuUsuarios, menuCarrito, menuIdiomas, menuSalir;
+    private JMenu menuProductos, menuUsuarios, menuCarrito, menuMasOpciones;
     private JMenuItem menuItemGestionarProductos, menuItemGestionarUsuarios, menuItemCrearCarrito,
-            menuItemGestionarCarritos, menuItemCerrarSesion, menuItemSalirAplicacion;
+            menuItemGestionarCarritos, menuItemCerrarSesion, menuItemSalirAplicacion, menuItemCambiarContrasena;
     private JDesktopPane jDesktopPane;
 
     private GestionDeProductosView gestionDeProductosView;
@@ -88,15 +88,14 @@ public class MenuPrincipalView extends JFrame {
         menuCarrito.add(menuItemGestionarCarritos);
         menuBar.add(menuCarrito);
 
-        menuIdiomas = new JMenu();
-        menuBar.add(menuIdiomas);
-
-        menuSalir = new JMenu();
+        menuMasOpciones = new JMenu();
+        menuItemCambiarContrasena = new JMenuItem();
         menuItemCerrarSesion = new JMenuItem();
         menuItemSalirAplicacion = new JMenuItem();
-        menuSalir.add(menuItemCerrarSesion);
-        menuSalir.add(menuItemSalirAplicacion);
-        menuBar.add(menuSalir);
+        menuMasOpciones.add(menuItemCambiarContrasena);
+        menuMasOpciones.add(menuItemCerrarSesion);
+        menuMasOpciones.add(menuItemSalirAplicacion);
+        menuBar.add(menuMasOpciones);
 
         setJMenuBar(menuBar);
 
@@ -157,7 +156,8 @@ public class MenuPrincipalView extends JFrame {
         menuItemCrearCarrito.setText(mensajes.getString("principal.carrito.crear"));
         menuItemGestionarCarritos.setText(mensajes.getString("principal.carrito.gestionar"));
 
-        menuSalir.setText(mensajes.getString("principal.menu.salir"));
+        menuMasOpciones.setText("...");
+        menuItemCambiarContrasena.setText(mensajes.getString("principal.menu.cambiar.contrasena"));
         menuItemCerrarSesion.setText(mensajes.getString("principal.menu.salir.sesion"));
         menuItemSalirAplicacion.setText(mensajes.getString("principal.menu.salir.sistema"));
 
