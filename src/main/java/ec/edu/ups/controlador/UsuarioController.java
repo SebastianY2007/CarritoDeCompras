@@ -94,6 +94,10 @@ public class UsuarioController {
             JOptionPane.showMessageDialog(anadirUsuarioView, "Las contraseñas no coinciden.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
+        if (usuarioDAO.buscarPorUsername(username) != null) {
+            JOptionPane.showMessageDialog(anadirUsuarioView, "El nombre de usuario ya existe.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
         Usuario nuevoUsuario = new Usuario(username, password, "email@por.defecto");
         nuevoUsuario.setRol(Rol.USUARIO);
@@ -159,40 +163,73 @@ public class UsuarioController {
         String campo = (String) actualizarUsuarioView.getCbxCampo().getSelectedItem();
         String nuevoValor = actualizarUsuarioView.getTxtNuevoValor().getText();
 
-        if (nuevoValor.trim().isEmpty()) {
+        if (nuevoValor.trim().isEmpty() && !campo.equalsIgnoreCase("Contraseña")) {
             JOptionPane.showMessageDialog(actualizarUsuarioView, "El nuevo valor no puede estar vacío.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        if (campo.equalsIgnoreCase("Nombre de Usuario")) {
-            if (usuarioDAO.buscarPorUsername(nuevoValor) != null) {
-                JOptionPane.showMessageDialog(actualizarUsuarioView, "El nuevo nombre de usuario ya existe.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            usuarioDAO.eliminar(usuarioParaActualizar.getUsername());
-            usuarioParaActualizar.setUsername(nuevoValor);
-            usuarioDAO.crear(usuarioParaActualizar);
-
-        } else if (campo.equalsIgnoreCase("Email")) {
-            usuarioParaActualizar.setCorreoElectronico(nuevoValor);
-            usuarioDAO.actualizar(usuarioParaActualizar);
-
-        } else if (campo.equalsIgnoreCase("Rol")) {
-            String rolIngresado = nuevoValor.toUpperCase();
-            if (rolIngresado.equals("USUARIO")) {
-                usuarioParaActualizar.setRol(Rol.USUARIO);
+        switch (campo.toLowerCase()) {
+            case "nombre de usuario":
+                if (usuarioDAO.buscarPorUsername(nuevoValor) != null && !nuevoValor.equals(usuarioParaActualizar.getUsername())) {
+                    JOptionPane.showMessageDialog(actualizarUsuarioView, "El nuevo nombre de usuario ya existe.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                usuarioDAO.eliminar(usuarioParaActualizar.getUsername());
+                usuarioParaActualizar.setUsername(nuevoValor);
+                usuarioDAO.crear(usuarioParaActualizar);
+                break;
+            case "email":
+                usuarioParaActualizar.setCorreoElectronico(nuevoValor);
                 usuarioDAO.actualizar(usuarioParaActualizar);
-            } else if (rolIngresado.equals("ADMINISTRADOR")) {
-                usuarioParaActualizar.setRol(Rol.ADMINISTRADOR);
-                usuarioDAO.actualizar(usuarioParaActualizar);
-            } else {
-                JOptionPane.showMessageDialog(actualizarUsuarioView, "Rol no válido. Ingrese 'USUARIO' o 'ADMINISTRADOR'.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+                break;
+            case "rol":
+                try {
+                    Rol nuevoRol = Rol.valueOf(nuevoValor.toUpperCase());
+                    usuarioParaActualizar.setRol(nuevoRol);
+                    usuarioDAO.actualizar(usuarioParaActualizar);
+                } catch (IllegalArgumentException e) {
+                    JOptionPane.showMessageDialog(actualizarUsuarioView, "Rol no válido. Ingrese 'USUARIO' o 'ADMINISTRADOR'.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                break;
+            case "contraseña":
+                if (nuevoValor.length() < 8 && !nuevoValor.isEmpty()) {
+                    JOptionPane.showMessageDialog(actualizarUsuarioView, "La contraseña debe tener al menos 8 caracteres.", "Contraseña Débil", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                if (!nuevoValor.isEmpty()){
+                    usuarioParaActualizar.setContrasena(nuevoValor);
+                    usuarioDAO.actualizar(usuarioParaActualizar);
+                } else {
+                    JOptionPane.showMessageDialog(actualizarUsuarioView, "No se realizaron cambios en la contraseña (campo vacío).", "Aviso", JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
+                break;
         }
 
         JOptionPane.showMessageDialog(actualizarUsuarioView, "Usuario actualizado exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
         actualizarUsuarioView.dispose();
         listarUsuarios();
+    }
+
+    public boolean actualizarContrasena(String username, String nuevaContrasena) throws Exception {
+        if (nuevaContrasena == null || nuevaContrasena.trim().isEmpty()) {
+            throw new Exception("La contraseña no puede estar vacía.");
+        }
+        if (nuevaContrasena.length() < 3) {
+            throw new Exception("La contraseña debe tener al menos 3 caracteres.");
+        }
+
+        Usuario usuario = usuarioDAO.buscarPorUsername(username);
+
+        if (usuario != null) {
+            usuario.setContrasena(nuevaContrasena);
+
+            usuarioDAO.actualizar(usuario);
+
+            return true;
+        }
+
+        return false;
     }
 }

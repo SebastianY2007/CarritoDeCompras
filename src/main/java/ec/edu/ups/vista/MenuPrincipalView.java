@@ -10,6 +10,7 @@ import ec.edu.ups.vista.carrito.CrearCarritoView;
 import ec.edu.ups.vista.carrito.GestionarCarritoAdministradorView;
 import ec.edu.ups.vista.carrito.GestionarCarritoUsuarioView;
 import ec.edu.ups.vista.producto.GestionDeProductosView;
+import ec.edu.ups.vista.registro.CambiarContrasena;
 import ec.edu.ups.vista.registro.LoginView;
 import ec.edu.ups.vista.usuario.GestionDeUsuariosView;
 
@@ -62,9 +63,7 @@ public class MenuPrincipalView extends JFrame {
 
     private void initComponents() {
         jDesktopPane = new FondoDesktopPane();
-
         jDesktopPane.setBackground(new Color(230, 240, 255));
-
         setContentPane(jDesktopPane);
     }
 
@@ -105,6 +104,8 @@ public class MenuPrincipalView extends JFrame {
         menuItemGestionarCarritos.addActionListener(e -> abrirGestionCarritos());
         menuItemCerrarSesion.addActionListener(e -> cerrarSesion());
         menuItemSalirAplicacion.addActionListener(e -> salirDeAplicacion());
+
+        menuItemCambiarContrasena.addActionListener(e -> abrirCambiarContrasena());
     }
 
     private void abrirVentanaInterna(JInternalFrame frame) {
@@ -139,6 +140,15 @@ public class MenuPrincipalView extends JFrame {
             abrirVentanaInterna(gestionarCarritoAdminView);
         } else if (usuarioAutenticado.getRol() == Rol.USUARIO) {
             abrirVentanaInterna(gestionarCarritoUsuarioView);
+        }
+    }
+
+    private void abrirCambiarContrasena() {
+        if (usuarioController != null && usuarioAutenticado != null) {
+            CambiarContrasena vista = new CambiarContrasena(this.usuarioController, this.usuarioAutenticado, this.mensajeHandler);
+            vista.setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(this, "Error: No se puede abrir la ventana de cambio de contraseña.", "Error de Componentes", JOptionPane.ERROR_MESSAGE);
         }
     }
 
