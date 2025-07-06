@@ -8,6 +8,7 @@ import ec.edu.ups.modelo.PreguntaSeguridad;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Calendar;
@@ -241,15 +242,16 @@ public class RegistroView extends JFrame {
 
     public void updateTexts() {
         this.mensajes = ResourceBundle.getBundle("mensajes", new Locale(mensajeInternacionalizacionHandler.getLenguajeActual(), mensajeInternacionalizacionHandler.getPaisActual()));
+
         setTitle(mensajes.getString("registro.title"));
 
         lblNombre.setText(mensajes.getString("registro.label.nombre"));
-
         lblCorreo.setText(mensajes.getString("registro.label.email"));
         lblTelefono.setText(mensajes.getString("registro.label.telefono"));
         lblUsername.setText(mensajes.getString("registro.label.username"));
         lblContrasena.setText(mensajes.getString("registro.label.contrasena"));
         lblConfirmarContrasena.setText(mensajes.getString("registro.label.confirmarContrasena"));
+        lblPreguntas.setText(mensajes.getString("registro.label.preguntasSeguridad"));
         btnRegistrarse.setText(mensajes.getString("registro.boton.registrar"));
 
         cargarPreguntasSeguridad();
@@ -257,5 +259,27 @@ public class RegistroView extends JFrame {
 
         revalidate();
         repaint();
+
+        configurarIconos();
+    }
+
+    private ImageIcon redimensionarIcono(ImageIcon icono, int ancho, int alto) {
+        Image imagen = icono.getImage();
+        Image imagenRedimensionada = imagen.getScaledInstance(ancho, alto, java.awt.Image.SCALE_SMOOTH);
+        return new ImageIcon(imagenRedimensionada);
+    }
+
+    private void configurarIconos() {
+        java.net.URL urlIconoRegistrar = getClass().getResource("/icons/icono_registrarse.png");
+
+        if (urlIconoRegistrar != null) {
+            ImageIcon iconoOriginal = new ImageIcon(urlIconoRegistrar);
+
+            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
+
+            btnRegistrarse.setIcon(iconoAjustado);
+        } else {
+            System.err.println("Icono no encontrado: /icons/icono_registrarse.png");
+        }
     }
 }
