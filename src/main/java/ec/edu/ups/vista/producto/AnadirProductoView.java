@@ -7,7 +7,6 @@ import java.util.ResourceBundle;
 
 public class AnadirProductoView extends JInternalFrame {
 
-    // --- Componentes de la UI (Deben coincidir con tu .form) ---
     private JPanel panelPrincipal;
     private JLabel codigoLabel;
     private JLabel nombreLabel;
@@ -18,7 +17,6 @@ public class AnadirProductoView extends JInternalFrame {
     private JButton btnAgregar;
     private JButton btnLimpiar;
 
-    // --- Dependencias ---
     private MensajeInternacionalizacionHandler mensajeHandler;
     private ResourceBundle mensajes;
 
@@ -32,11 +30,9 @@ public class AnadirProductoView extends JInternalFrame {
         setIconifiable(true);
         setResizable(true);
 
-        // La configuración de textos se hará al final para evitar errores
         SwingUtilities.invokeLater(this::updateTexts);
     }
 
-    // --- Getters para que el controlador acceda a los componentes ---
     public JTextField getTxtCodigo() {
         return txtCodigo;
     }
@@ -57,7 +53,6 @@ public class AnadirProductoView extends JInternalFrame {
         return btnLimpiar;
     }
 
-    // --- Métodos de la Vista ---
     public void limpiarCampos() {
         txtCodigo.setText("");
         txtNombre.setText("");

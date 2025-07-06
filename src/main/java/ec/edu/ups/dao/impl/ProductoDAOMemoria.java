@@ -2,113 +2,89 @@ package ec.edu.ups.dao.impl;
 
 import ec.edu.ups.dao.ProductoDAO;
 import ec.edu.ups.modelo.Producto;
-
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ProductoDAOMemoria implements ProductoDAO {
 
-    private List<Producto> productos;
+    private Map<Integer, Producto> productosMap;
 
     public ProductoDAOMemoria() {
-        productos = new ArrayList<Producto>();
+        this.productosMap = new HashMap<>();
+        crear(new Producto(1, "Laptop Gamer", 1200.00));
+        crear(new Producto(2, "Mouse Inalámbrico", 25.50));
+        crear(new Producto(3, "Teclado Mecánico", 85.00));
+        crear(new Producto(4, "Monitor 24 pulgadas", 210.00));
     }
 
     @Override
     public void crear(Producto producto) {
-        productos.add(producto);
+        productosMap.put(producto.getCodigo(), producto);
     }
 
     @Override
     public Producto buscarPorCodigo(int codigo) {
-        for (Producto producto : productos) {
-            if (producto.getCodigo() == codigo) {
-                return producto;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public boolean actualizarCodigo(int codigoOriginal, int nuevoCodigo) {
-
-        for (Producto p : productos) {
-            if (p.getCodigo() == nuevoCodigo) {
-                if (nuevoCodigo != codigoOriginal) {
-                    return false;
-                }
-            }
-        }
-
-        for (Producto producto : productos) {
-            if (producto.getCodigo() == codigoOriginal) {
-                producto.setCodigo(nuevoCodigo);
-                return true;
-            }
-        }
-        return false;
+        return productosMap.get(codigo);
     }
 
     @Override
     public List<Producto> buscarPorNombre(String nombre) {
-        List<Producto> productosEncontrados = new ArrayList<>();
-        for (Producto producto : productos) {
-            if (producto.getNombre().startsWith(nombre)) {
-                productosEncontrados.add(producto);
-            }
-        }
-        return productosEncontrados;
+        return productosMap.values().stream()
+                .filter(p -> p.getNombre().toLowerCase().contains(nombre.toLowerCase()))
+                .collect(Collectors.toList());
     }
 
     @Override
     public void actualizar(Producto producto) {
-        for (int i = 0; i < productos.size(); i++) {
-            if (productos.get(i).getCodigo() == producto.getCodigo()) {
-                productos.set(i, producto);
-                return;
-            }
+        if (productosMap.containsKey(producto.getCodigo())) {
+            productosMap.put(producto.getCodigo(), producto);
         }
     }
-
-    @Override
-    public boolean actualizarNombre(int id, String nuevoNombre) {
-        for (Producto producto : productos) {
-            if (producto.getCodigo() == id) {
-                producto.setNombre(nuevoNombre);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean actualizarPrecio(int id, double nuevoPrecio) {
-        for (Producto producto : productos) {
-            if (producto.getCodigo() == id) {
-                producto.setPrecio(nuevoPrecio);
-                return true;
-            }
-        }
-        return false;
-    }
-
 
     @Override
     public boolean eliminar(int codigo) {
-        Iterator<Producto> iterator = productos.iterator();
-        while (iterator.hasNext()) {
-            Producto producto = iterator.next();
-            if (producto.getCodigo() == codigo) {
-                iterator.remove();
-                return true;
-            }
-        }
-        return false;
+        return productosMap.remove(codigo) != null;
     }
 
     @Override
     public List<Producto> listarTodos() {
-        return new ArrayList<>(productos);
+        return new ArrayList<>(productosMap.values());
+    }
+
+    @Override
+    public boolean actualizarNombre(int productoId, String nuevoValorStr) {
+        Producto p = buscarPorCodigo(productoId);
+        if (p != null) {
+            p.setNombre(nuevoValorStr);
+            actualizar(p);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean actualizarCodigo(int codigoOriginal, int nuevoCodigo) {
+        Producto p = buscarPorCodigo(codigoOriginal);
+        if (p != null) {
+            productosMap.remove(codigoOriginal);
+            p.setCodigo(nuevoCodigo);
+            crear(p);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean actualizarPrecio(int productoId, double nuevoPrecio) {
+        Producto p = buscarPorCodigo(productoId);
+        if (p != null) {
+            p.setPrecio(nuevoPrecio);
+            actualizar(p);
+            return true;
+        }
+        return false;
     }
 }
