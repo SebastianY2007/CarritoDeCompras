@@ -14,6 +14,7 @@ import ec.edu.ups.vista.registro.LoginView;
 import ec.edu.ups.vista.usuario.GestionDeUsuariosView;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Locale;
@@ -60,7 +61,10 @@ public class MenuPrincipalView extends JFrame {
     }
 
     private void initComponents() {
-        jDesktopPane = new JDesktopPane();
+        jDesktopPane = new FondoDesktopPane();
+
+        jDesktopPane.setBackground(new Color(230, 240, 255));
+
         setContentPane(jDesktopPane);
     }
 

@@ -2,14 +2,14 @@ package ec.edu.ups.modelo;
 
 public class PreguntaSeguridad {
     private int id;
-    private String pregunta;
+    private String clavePregunta;
 
     public PreguntaSeguridad() {
     }
 
-    public PreguntaSeguridad(int id, String pregunta) {
+    public PreguntaSeguridad(int id, String clavePregunta) {
         this.id = id;
-        this.pregunta = pregunta;
+        this.clavePregunta = clavePregunta;
     }
 
     public int getId() {
@@ -17,22 +17,22 @@ public class PreguntaSeguridad {
     }
 
     public String getPregunta() {
-        return pregunta;
+        return clavePregunta;
     }
 
     public void setId(int id) {
         this.id = id;
     }
 
-    public void setPregunta(String pregunta) {
-        this.pregunta = pregunta;
+    public void setPregunta(String clavePregunta) {
+        this.clavePregunta = clavePregunta;
     }
 
     @Override
     public String toString() {
         return "PreguntaSeguridad{" +
                 "id=" + id +
-                ", pregunta='" + pregunta + '\'' +
+                ", pregunta='" + clavePregunta + '\'' +
                 '}';
     }
 

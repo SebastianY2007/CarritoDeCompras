@@ -6,6 +6,7 @@ import ec.edu.ups.modelo.Rol;
 import ec.edu.ups.modelo.Usuario;
 import ec.edu.ups.modelo.PreguntaSeguridad;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
+import ec.edu.ups.modelo.PreguntaSeguridadRenderer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,11 +27,11 @@ public class RegistroView extends JFrame {
     private JPasswordField txtConfirmar;
     private JTextField txtCorreo;
     private JTextField txtTelefono;
-    private JComboBox<String> cbxP1;
+    private JComboBox<Object> cbxP1;
     private JTextField txtP1;
-    private JComboBox<String> cbxP2;
+    private JComboBox<Object> cbxP2;
     private JTextField txtP2;
-    private JComboBox<String> cbxP3;
+    private JComboBox<Object> cbxP3;
     private JTextField txtP3;
     private JComboBox<Integer> cbxDia;
     private JComboBox<String> cbxMes;
@@ -43,6 +44,9 @@ public class RegistroView extends JFrame {
     private JLabel lblContrasena;
     private JLabel lblConfirmarContrasena;
     private JLabel lblPreguntas;
+
+    private List<PreguntaSeguridad> todasLasPreguntas;
+    private PreguntaSeguridadRenderer renderer;
 
     private UsuarioDAO usuarioDAO;
     private PreguntaSeguridadDAO preguntaSeguridadDAO;
@@ -58,7 +62,7 @@ public class RegistroView extends JFrame {
 
         setTitle(mensajes.getString("registro.title"));
         setContentPane(panelPrincipal);
-        setSize(600, 700);
+        setSize(700, 900);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
@@ -147,21 +151,77 @@ public class RegistroView extends JFrame {
     }
 
     private void cargarPreguntasSeguridad() {
-        List<PreguntaSeguridad> preguntasDisponibles = preguntaSeguridadDAO.findAll();
+        this.todasLasPreguntas = preguntaSeguridadDAO.findAll();
+        this.renderer = new PreguntaSeguridadRenderer(this.mensajes);
 
+        cbxP1.setRenderer(renderer);
+        cbxP2.setRenderer(renderer);
+        cbxP3.setRenderer(renderer);
+
+        cbxP1.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                actualizarOpcionesCbx2();
+            }
+        });
+
+        cbxP2.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                actualizarOpcionesCbx3();
+            }
+        });
+
+        actualizarOpcionesCbx1();
+    }
+
+    private void actualizarOpcionesCbx1() {
         cbxP1.removeAllItems();
-        cbxP2.removeAllItems();
-        cbxP3.removeAllItems();
-
         String placeholder = mensajes.getString(MENSAJE_SELECCIONE_PREGUNTA_KEY);
         cbxP1.addItem(placeholder);
-        cbxP2.addItem(placeholder);
-        cbxP3.addItem(placeholder);
+        for (PreguntaSeguridad pregunta : todasLasPreguntas) {
+            cbxP1.addItem(pregunta);
+        }
+        cbxP2.removeAllItems();
+        cbxP2.setEnabled(false);
+        cbxP3.removeAllItems();
+        cbxP3.setEnabled(false);
+    }
 
-        for (PreguntaSeguridad pregunta : preguntasDisponibles) {
-            cbxP1.addItem(pregunta.getPregunta());
-            cbxP2.addItem(pregunta.getPregunta());
-            cbxP3.addItem(pregunta.getPregunta());
+    private void actualizarOpcionesCbx2() {
+        Object seleccionP1 = cbxP1.getSelectedItem();
+        cbxP2.removeAllItems();
+        cbxP3.removeAllItems();
+        cbxP3.setEnabled(false);
+
+        if (seleccionP1 instanceof PreguntaSeguridad) {
+            cbxP2.setEnabled(true);
+            String placeholder = mensajes.getString(MENSAJE_SELECCIONE_PREGUNTA_KEY);
+            cbxP2.addItem(placeholder);
+            for (PreguntaSeguridad pregunta : todasLasPreguntas) {
+                if (!pregunta.equals(seleccionP1)) {
+                    cbxP2.addItem(pregunta);
+                }
+            }
+        } else {
+            cbxP2.setEnabled(false);
+        }
+    }
+
+    private void actualizarOpcionesCbx3() {
+        Object seleccionP1 = cbxP1.getSelectedItem();
+        Object seleccionP2 = cbxP2.getSelectedItem();
+        cbxP3.removeAllItems();
+
+        if (seleccionP2 instanceof PreguntaSeguridad) {
+            cbxP3.setEnabled(true);
+            String placeholder = mensajes.getString(MENSAJE_SELECCIONE_PREGUNTA_KEY);
+            cbxP3.addItem(placeholder);
+            for (PreguntaSeguridad pregunta : todasLasPreguntas) {
+                if (!pregunta.equals(seleccionP1) && !pregunta.equals(seleccionP2)) {
+                    cbxP3.addItem(pregunta);
+                }
+            }
+        } else {
+            cbxP3.setEnabled(false);
         }
     }
 

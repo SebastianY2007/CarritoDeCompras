@@ -13,16 +13,16 @@ public class PreguntaSeguridadDAOMemoria implements PreguntaSeguridadDAO {
     private int nextId = 1;
 
     public PreguntaSeguridadDAOMemoria() {
-        create(new PreguntaSeguridad(nextId++, "¿Cuál era el nombre de tu primera mascota de la infancia?"));
-        create(new PreguntaSeguridad(nextId++, "¿Cuál es el segundo nombre de tu madre?"));
-        create(new PreguntaSeguridad(nextId++, "¿En qué ciudad conociste a tu mejor amigo/a?"));
-        create(new PreguntaSeguridad(nextId++, "¿Cómo se llamaba tu escuela primaria?"));
-        create(new PreguntaSeguridad(nextId++, "¿Cuál fue el primer concierto al que asististe?"));
-        create(new PreguntaSeguridad(nextId++, "¿En qué ciudad se conocieron tus padres?"));
-        create(new PreguntaSeguridad(nextId++, "¿Cuál es tu película favorita de todos los tiempos?"));
-        create(new PreguntaSeguridad(nextId++, "Si pudieras tener un superpoder, ¿cuál sería?"));
-        create(new PreguntaSeguridad(nextId++, "¿Qué canción te sabes de memoria?"));
-        create(new PreguntaSeguridad(nextId++, "¿Cuál es el mejor consejo que te han dado?"));
+        create(new PreguntaSeguridad(0, "pregunta.mascota"));
+        create(new PreguntaSeguridad(0, "pregunta.madre"));
+        create(new PreguntaSeguridad(0, "pregunta.amigo"));
+        create(new PreguntaSeguridad(0, "pregunta.escuela"));
+        create(new PreguntaSeguridad(0, "pregunta.concierto"));
+        create(new PreguntaSeguridad(0, "pregunta.padres"));
+        create(new PreguntaSeguridad(0, "pregunta.pelicula"));
+        create(new PreguntaSeguridad(0, "pregunta.superpoder"));
+        create(new PreguntaSeguridad(0, "pregunta.cancion"));
+        create(new PreguntaSeguridad(0, "pregunta.consejo"));
     }
 
     @Override
