@@ -16,4 +16,5 @@ public class CambiarContrasena {
     private JLabel lblNombre;
     private JLabel lblRol;
     private JLabel lblCorreoElectronico;
+    private JButton btnCambiar;
 }
