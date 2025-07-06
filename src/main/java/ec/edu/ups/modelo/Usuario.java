@@ -1,18 +1,15 @@
 package ec.edu.ups.modelo;
 
-// Asegúrate de que el paquete sea el correcto
-// import ec.edu.ups.modelo.Rol; // Asegúrate de tener el enum Rol
-
 public class Usuario {
     private String username;
     private String contrasena;
     private String correoElectronico;
-    private String nombre; // Cambiado de nombreCompleto a nombre
+    private String nombre;
     private String telefono;
     private int diaNacimiento;
-    private int mesNacimiento; // Número del mes (1-12)
+    private int mesNacimiento;
     private int anioNacimiento;
-    private Rol rol; // Enum Rol
+    private Rol rol;
 
     private String preguntaSeguridad1;
     private String respuestaSeguridad1;
@@ -22,21 +19,16 @@ public class Usuario {
     private String respuestaSeguridad3;
 
     public Usuario(){
-        // Constructor vacío necesario para algunos frameworks o si se construyen objetos paso a paso
     }
 
-    // Constructor básico para autenticación o creación simple (usado en DAOMemoria para inicializar)
-    // Se recomienda asignar un rol por defecto si no se especifica
     public Usuario(String username, String contrasena, String correoElectronico, String nombre) {
         this.username = username;
         this.contrasena = contrasena;
         this.correoElectronico = correoElectronico;
         this.nombre = nombre;
-        this.rol = Rol.USUARIO; // Rol por defecto, se puede cambiar luego con setRol()
+        this.rol = Rol.USUARIO;
     }
 
-
-    // Constructor completo para el registro (incluye todos los datos que pusiste en RegistroView)
     public Usuario(String username, String contrasena, String correoElectronico, String nombre, String apellido,
                    String telefono, int diaNacimiento, int mesNacimiento, int anioNacimiento, Rol rol,
                    String preguntaSeguridad1, String respuestaSeguridad1,
@@ -62,7 +54,6 @@ public class Usuario {
     public Usuario(String username, String contrasena, String correoElectronico, String nombre, String telefono, Integer dia, int numeroMes, Integer anio, Rol rol, String pregunta1, String respuesta1, String pregunta2, String respuesta2, String pregunta3, String respuesta3) {
     }
 
-    // --- GETTERS y SETTERS ---
     public String getUsername() {
         return username;
     }
@@ -87,11 +78,11 @@ public class Usuario {
         this.correoElectronico = correoElectronico;
     }
 
-    public String getNombre() { // Nuevo getter
+    public String getNombre() {
         return nombre;
     }
 
-    public void setNombre(String nombre) { // Nuevo setter
+    public void setNombre(String nombre) {
         this.nombre = nombre;
     }
 

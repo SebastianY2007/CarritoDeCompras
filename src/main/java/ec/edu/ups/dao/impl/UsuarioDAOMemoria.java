@@ -1,107 +1,84 @@
 package ec.edu.ups.dao.impl;
 
-import ec.edu.ups.dao.UsuarioDAO; // Asegúrate de que apunte a la interfaz corregida
+import ec.edu.ups.dao.UsuarioDAO;
 import ec.edu.ups.modelo.Rol;
 import ec.edu.ups.modelo.Usuario;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class UsuarioDAOMemoria implements UsuarioDAO {
 
-    private Map<String, Usuario> usuarios; // Usando Map para eficiencia
+    private final Map<String, Usuario> usuariosMap;
 
     public UsuarioDAOMemoria() {
-        usuarios = new HashMap<>();
-        // ¡IMPORTANTE! Las llamadas a new Usuario() deben coincidir con el constructor de Usuario.java
-        // Usamos el constructor: Usuario(username, contrasena, correoElectronico, nombre, apellido)
-        // Y luego asignamos el rol si es diferente del predeterminado.
+        this.usuariosMap = new HashMap<>();
 
-        // Usuario Administrador
+        Usuario a = new Usuario("a", "a", "a@example.com", "Administrador");
+        a.setRol(Rol.ADMINISTRADOR);
+        crear(a);
+
         Usuario admin = new Usuario("admin", "admin", "admin@example.com", "Administrador");
-        admin.setRol(Rol.ADMINISTRADOR); // Aseguramos que el rol sea ADMINISTRADOR
-        crear(admin); // Usamos el método 'crear' para añadirlo al mapa
+        admin.setRol(Rol.ADMINISTRADOR);
+        crear(admin);
 
-        // Otro usuario Administrador (si es necesario para pruebas)
-        Usuario aUser = new Usuario("a", "a", "a@example.com", "NombreA");
-        aUser.setRol(Rol.ADMINISTRADOR);
-        crear(aUser);
+        Usuario usuario1 = new Usuario("usuario1", "user123", "usuario1@example.com", "Juan Pérez");
+        usuario1.setRol(Rol.USUARIO);
+        crear(usuario1);
 
-        // Usuario Normal
-        Usuario normalUser = new Usuario("user", "12345", "user@example.com", "Usuario");
-        normalUser.setRol(Rol.USUARIO); // El rol por defecto del constructor es USUARIO, pero lo asignamos explícitamente para claridad
-        crear(normalUser);
+        Usuario usuario2 = new Usuario("z", "z", "ana.gomez@example.com", "Ana Gómez");
+        usuario2.setRol(Rol.USUARIO);
+        crear(usuario2);
     }
 
     @Override
-    public List<Usuario> listarPorRol() {
-        // Devuelve todos los usuarios con rol USUARIO (como se definió en el constructor de Usuario y en Rol.java)
-        List<Usuario> lista = new ArrayList<>();
-        for (Usuario usuario : usuarios.values()) {
-            if (usuario.getRol() == Rol.USUARIO) {
-                lista.add(usuario);
-            }
-        }
-        return lista;
+    public void crear(Usuario usuario) {
+        usuariosMap.put(usuario.getUsername(), usuario);
+    }
+
+    @Override
+    public Usuario buscarPorUsername(String username) {
+        return usuariosMap.get(username);
     }
 
     @Override
     public Usuario autenticar(String username, String contrasenia) {
-        Usuario usuario = usuarios.get(username);
-        if(usuario != null && usuario.getContrasena().equals(contrasenia)){
+        Usuario usuario = buscarPorUsername(username);
+        if (usuario != null && usuario.getContrasena().equals(contrasenia)) {
             return usuario;
         }
         return null;
     }
 
     @Override
-    public void crear(Usuario usuario) {
-        if (usuarios.containsKey(usuario.getUsername())) {
-            System.out.println("Error: El usuario " + usuario.getUsername() + " ya existe.");
-            return;
+    public void actualizar(Usuario usuario) {
+        if (usuariosMap.containsKey(usuario.getUsername())) {
+            usuariosMap.put(usuario.getUsername(), usuario);
         }
-        usuarios.put(usuario.getUsername(), usuario);
-    }
-
-    @Override
-    public Usuario buscarPorUsername(String username) {
-        return usuarios.get(username);
     }
 
     @Override
     public void eliminar(String username) {
-        if (!usuarios.containsKey(username)) {
-            System.out.println("Error: El usuario " + username + " no existe para eliminar.");
-            return;
-        }
-        usuarios.remove(username);
-    }
-
-    @Override
-    public void actualizar(Usuario usuario) {
-        if (!usuarios.containsKey(usuario.getUsername())) {
-            System.out.println("Error: El usuario " + usuario.getUsername() + " no existe para actualizar.");
-            return;
-        }
-        usuarios.put(usuario.getUsername(), usuario);
+        usuariosMap.remove(username);
     }
 
     @Override
     public List<Usuario> listarTodos() {
-        return new ArrayList<>(usuarios.values());
+        return new ArrayList<>(usuariosMap.values());
     }
 
     @Override
     public List<Usuario> listarPorRol(Rol rol) {
-        List<Usuario> usuariosEncontrados = new ArrayList<>();
-        for (Usuario usuario : usuarios.values()) {
-            if (usuario.getRol().equals(rol)) {
-                usuariosEncontrados.add(usuario);
-            }
-        }
-        return usuariosEncontrados;
+        return usuariosMap.values().stream()
+                .filter(usuario -> usuario.getRol() == rol)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Usuario> listarPorRol() {
+        return listarTodos();
     }
 }

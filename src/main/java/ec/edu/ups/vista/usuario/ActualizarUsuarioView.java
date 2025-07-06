@@ -1,34 +1,23 @@
 package ec.edu.ups.vista.usuario;
 
-import ec.edu.ups.controlador.UsuarioController;
-import ec.edu.ups.modelo.Usuario;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
-
 import javax.swing.*;
+import java.awt.event.ItemEvent;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class ActualizarUsuarioView extends JInternalFrame {
 
-    // --- Componentes de la UI (Deben coincidir con tu .form) ---
     private JPanel panelPrincipal;
-    private JComboBox<String> cbxElegir;
-    private JTextField txtElegir;
+    private JComboBox<String> cbxCampo;
+    private JTextField txtNuevoValor;
     private JButton btnActualizar;
     private JButton btnCancelar;
+    private JLabel lblCampoAActualizar;
+    private JLabel lblNuevoValor;
 
-    // --- Dependencias y Estado ---
-    private UsuarioController usuarioController;
     private MensajeInternacionalizacionHandler mensajeHandler;
-    private ResourceBundle mensajes;
-    private String usernameActual;
 
-    public ActualizarUsuarioView() {
-        // El constructor puede estar vacío si el diseñador de UI inicializa los componentes.
-        // La configuración se hará cuando se inyecte el mensajeHandler.
-    }
-
-    // Este constructor es necesario para que la lógica de LoginView funcione
     public ActualizarUsuarioView(MensajeInternacionalizacionHandler mensajeHandler) {
         this.mensajeHandler = mensajeHandler;
 
@@ -40,17 +29,21 @@ public class ActualizarUsuarioView extends JInternalFrame {
         setSize(400, 200);
         setDefaultCloseOperation(JInternalFrame.HIDE_ON_CLOSE);
 
+        cbxCampo.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                txtNuevoValor.setText("");
+            }
+        });
+
         SwingUtilities.invokeLater(this::updateTexts);
     }
 
-
-    // --- Getters para que el controlador acceda a los componentes ---
-    public JComboBox<String> getCbxElegir() {
-        return cbxElegir;
+    public JComboBox<String> getCbxCampo() {
+        return cbxCampo;
     }
 
-    public JTextField getTxtValorNuevo() {
-        return txtElegir;
+    public JTextField getTxtNuevoValor() {
+        return txtNuevoValor;
     }
 
     public JButton getBtnActualizar() {
@@ -61,56 +54,32 @@ public class ActualizarUsuarioView extends JInternalFrame {
         return btnCancelar;
     }
 
-    public String getUsernameActual() {
-        return usernameActual;
-    }
-
-    // --- Setters para inyección de dependencias ---
-    public void setUsuarioController(UsuarioController usuarioController) {
-        this.usuarioController = usuarioController;
-    }
-
     public void setMensajeInternacionalizacionHandler(MensajeInternacionalizacionHandler mensajeHandler) {
         this.mensajeHandler = mensajeHandler;
         updateTexts();
     }
 
-    // --- Métodos de la Vista ---
-    public void cargarDatosUsuario(Usuario usuario) {
-        this.usernameActual = usuario.getUsername();
-        // Limpiar campos al cargar un nuevo usuario
-        txtElegir.setText("");
-        if (cbxElegir.getItemCount() > 0) {
-            cbxElegir.setSelectedIndex(0);
-        }
-    }
-
     public void updateTexts() {
-        if (mensajeHandler == null) return; // Evitar error si el handler no está listo
+        if (mensajeHandler == null) return;
 
-        mensajes = ResourceBundle.getBundle("mensajes", new Locale(mensajeHandler.getLenguajeActual(), mensajeHandler.getPaisActual()));
+        ResourceBundle mensajes = ResourceBundle.getBundle("mensajes", new Locale(mensajeHandler.getLenguajeActual(), mensajeHandler.getPaisActual()));
 
         setTitle(mensajes.getString("actualizarUsuario.titulo"));
-
+        lblCampoAActualizar.setText(mensajes.getString("actualizarUsuario.label.seleccionar"));
+        lblNuevoValor.setText(mensajes.getString("actualizarUsuario.label.nuevoValor"));
         btnActualizar.setText(mensajes.getString("actualizarUsuario.boton.actualizar"));
         btnCancelar.setText(mensajes.getString("actualizarUsuario.boton.cancelar"));
 
-        // --- CORRECCIÓN: Lógica para llenar el JComboBox ---
-        if (cbxElegir != null) {
-            // Guardar la selección actual para restaurarla después de traducir
-            int selectedIndex = cbxElegir.getSelectedIndex();
+        if (cbxCampo != null) {
+            int selectedIndex = cbxCampo.getSelectedIndex();
 
-            // Limpiar y volver a llenar el ComboBox con los textos traducidos
-            cbxElegir.removeAllItems();
-            cbxElegir.addItem(mensajes.getString("actualizarUsuario.opcion.username"));
-            cbxElegir.addItem(mensajes.getString("actualizarUsuario.opcion.contrasena"));
-            // NUEVO: Se añaden las opciones para Email y Rol
-            cbxElegir.addItem(mensajes.getString("actualizarUsuario.opcion.email"));
-            cbxElegir.addItem(mensajes.getString("actualizarUsuario.opcion.rol"));
+            cbxCampo.removeAllItems();
+            cbxCampo.addItem(mensajes.getString("actualizarUsuario.opcion.username"));
+            cbxCampo.addItem(mensajes.getString("actualizarUsuario.opcion.email"));
+            cbxCampo.addItem(mensajes.getString("actualizarUsuario.opcion.rol"));
 
-            // Restaurar la selección si era válida
-            if (selectedIndex >= 0 && selectedIndex < cbxElegir.getItemCount()) {
-                cbxElegir.setSelectedIndex(selectedIndex);
+            if (selectedIndex >= 0 && selectedIndex < cbxCampo.getItemCount()) {
+                cbxCampo.setSelectedIndex(selectedIndex);
             }
         }
 

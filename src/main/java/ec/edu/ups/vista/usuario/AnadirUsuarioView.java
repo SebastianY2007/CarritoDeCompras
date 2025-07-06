@@ -9,10 +9,9 @@ import java.util.ResourceBundle;
 
 public class AnadirUsuarioView extends JInternalFrame {
 
-    // --- Componentes de la UI (Deben coincidir con tu .form) ---
     private JPanel panelPrincipal;
-    private JLabel lblNombre; // Etiqueta "Nombre de Usuario:"
-    private JTextField txtNombreUsuario; // Campo para el username
+    private JLabel lblNombre;
+    private JTextField txtNombreUsuario;
     private JLabel lblContrasena;
     private JPasswordField txtContrasena;
     private JLabel lblConfirmarContrasena;
@@ -20,7 +19,6 @@ public class AnadirUsuarioView extends JInternalFrame {
     private JButton btnAgregar;
     private JButton btnLimpiar;
 
-    // --- Dependencias ---
     private UsuarioController usuarioController;
     private MensajeInternacionalizacionHandler mensajeHandler;
     private ResourceBundle mensajes;
@@ -28,7 +26,6 @@ public class AnadirUsuarioView extends JInternalFrame {
     public AnadirUsuarioView(MensajeInternacionalizacionHandler mensajeHandler) {
         this.mensajeHandler = mensajeHandler;
 
-        // Es importante que el panel principal exista en tu .form
         setContentPane(panelPrincipal);
         setClosable(true);
         setMaximizable(true);
@@ -37,13 +34,10 @@ public class AnadirUsuarioView extends JInternalFrame {
         setSize(400, 250);
         setDefaultCloseOperation(JInternalFrame.HIDE_ON_CLOSE);
 
-        // La configuración de textos se hará al final para evitar errores
         SwingUtilities.invokeLater(this::updateTexts);
     }
 
-    // --- Getters para que el controlador acceda a los componentes ---
     public JTextField getTxtNombreUsuario() {
-        // Asumiendo que el campo de texto para el username se llama 'txtNombreUsuario' en tu .form
         return txtNombreUsuario;
     }
 
@@ -63,7 +57,6 @@ public class AnadirUsuarioView extends JInternalFrame {
         return btnLimpiar;
     }
 
-    // --- Setters para inyección de dependencias ---
     public void setUsuarioController(UsuarioController usuarioController) {
         this.usuarioController = usuarioController;
     }
@@ -73,7 +66,6 @@ public class AnadirUsuarioView extends JInternalFrame {
         updateTexts();
     }
 
-    // --- Métodos de la Vista ---
     public void limpiarCampos() {
         if (txtNombreUsuario != null) txtNombreUsuario.setText("");
         if (txtContrasena != null) txtContrasena.setText("");
