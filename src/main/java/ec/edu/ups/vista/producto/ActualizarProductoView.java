@@ -3,6 +3,8 @@ package ec.edu.ups.vista.producto;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -31,6 +33,13 @@ public class ActualizarProductoView extends JInternalFrame {
         setIconifiable(true);
         setSize(400, 200);
         setDefaultCloseOperation(JInternalFrame.HIDE_ON_CLOSE);
+
+        btnActualizar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                limpiarCampoElegir();
+            }
+        });
 
         SwingUtilities.invokeLater(this::updateTexts);
     }
@@ -82,8 +91,13 @@ public class ActualizarProductoView extends JInternalFrame {
 
         setTitle(mensajes.getString("actualizarProducto.titulo"));
 
-        btnActualizar.setText(mensajes.getString("actualizarProducto.boton.actualizar"));
-        btnCancelar.setText(mensajes.getString("actualizarProducto.boton.cancelar"));
+        if (btnActualizar != null) {
+            btnActualizar.setText(mensajes.getString("actualizarProducto.boton.actualizar"));
+        }
+        if (btnCancelar != null) {
+            btnCancelar.setText(mensajes.getString("actualizarProducto.boton.cancelar"));
+        }
+
 
         if (cbxElegir != null) {
             int selectedIndex = cbxElegir.getSelectedIndex();
