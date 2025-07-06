@@ -1,6 +1,10 @@
 package ec.edu.ups.vista.carrito;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import ec.edu.ups.util.MensajeInternacionalizacionHandler;
 
 public class CrearCarritoView extends JInternalFrame {
     private JPanel panelPrincipal;
@@ -15,6 +19,16 @@ public class CrearCarritoView extends JInternalFrame {
     private JLabel txtSubtotal;
     private JLabel txtIVA;
     private JLabel txtTotal;
+    private JLabel lblCodigo;
+    private JLabel lblNombre;
+    private JLabel lblPrecio;
+    private JLabel lblCantidad;
+    private JLabel lblSubtotal;
+    private JLabel lblIVA;
+    private JLabel lblTotal;
+    private MensajeInternacionalizacionHandler mensajeInternacionalizacionHandler;
+    private ResourceBundle mensajes;
+    private DefaultTableModel tableModel;
 
     public CrearCarritoView() {
         setTitle("Crear Carrito");
@@ -31,16 +45,114 @@ public class CrearCarritoView extends JInternalFrame {
         }
     }
 
-    public JPanel getPanelPrincipal() { return panelPrincipal; }
-    public JTextField getTxtCodigo() { return txtCodigo; }
-    public JButton getBtnBuscar() { return btnBuscar; }
-    public JComboBox<Integer> getCbxCantidad() { return cbxCantidad; }
-    public JButton getBtnAgregar() { return btnAgregar; }
-    public JTable getTblProductos() { return tblProductos; }
-    public JButton getBtnCrearCarrito() { return btnCrearCarrito; }
-    public JLabel getTxtNombre() { return txtNombre; }
-    public JLabel getTxtPrecio() { return txtPrecio; }
-    public JLabel getTxtSubtotal() { return txtSubtotal; }
-    public JLabel getTxtIVA() { return txtIVA; }
-    public JLabel getTxtTotal() { return txtTotal; }
+    private void configurarTabla() {
+        tableModel = new DefaultTableModel();
+        tblProductos.setModel(tableModel);
+    }
+
+    public void updateTexts() {
+        this.mensajes = ResourceBundle.getBundle("mensajes", new Locale(mensajeInternacionalizacionHandler.getLenguajeActual(), mensajeInternacionalizacionHandler.getPaisActual()));
+
+        setTitle(mensajes.getString("carrito.crear.titulo"));
+        lblCodigo.setText(mensajes.getString("carrito.label.codigo"));
+        lblCantidad.setText(mensajes.getString("carrito.label.cantidad"));
+        lblNombre.setText(mensajes.getString("carrito.label.nombre"));
+        lblPrecio.setText(mensajes.getString("carrito.label.precio"));
+        lblSubtotal.setText(mensajes.getString("carrito.label.subtotal"));
+        lblIVA.setText(mensajes.getString("carrito.label.iva"));
+        lblTotal.setText(mensajes.getString("carrito.label.total"));
+
+        btnBuscar.setText(mensajes.getString("carrito.boton.buscar"));
+        btnAgregar.setText(mensajes.getString("carrito.boton.anadir"));
+        btnCrearCarrito.setText(mensajes.getString("carrito.boton.guardar"));
+
+        tableModel.setColumnIdentifiers(new Object[]{
+                mensajes.getString("carrito.tabla.codigo"),
+                mensajes.getString("carrito.tabla.nombre"),
+                mensajes.getString("carrito.tabla.precioUnitario"),
+                mensajes.getString("carrito.tabla.cantidad"),
+                mensajes.getString("carrito.tabla.subtotal")
+        });
+
+
+        revalidate();
+        repaint();
+    }
+
+
+    public JPanel getPanelPrincipal() {
+        return panelPrincipal;
+    }
+
+    public JTextField getTxtCodigo() {
+        return txtCodigo;
+    }
+
+    public JButton getBtnBuscar() {
+        return btnBuscar;
+    }
+
+    public JComboBox<Integer> getCbxCantidad() {
+        return cbxCantidad;
+    }
+
+    public JButton getBtnAgregar() {
+        return btnAgregar;
+    }
+
+    public JTable getTblProductos() {
+        return tblProductos;
+    }
+
+    public JButton getBtnCrearCarrito() {
+        return btnCrearCarrito;
+    }
+
+    public JLabel getTxtNombre() {
+        return txtNombre;
+    }
+
+    public JLabel getTxtPrecio() {
+        return txtPrecio;
+    }
+
+    public JLabel getTxtSubtotal() {
+        return txtSubtotal;
+    }
+
+    public JLabel getTxtIVA() {
+        return txtIVA;
+    }
+
+    public JLabel getTxtTotal() {
+        return txtTotal;
+    }
+
+    public JLabel getLblCodigo() {
+        return lblCodigo;
+    }
+
+    public JLabel getLblNombre() {
+        return lblNombre;
+    }
+
+    public JLabel getLblPrecio() {
+        return lblPrecio;
+    }
+
+    public JLabel getLblCantidad() {
+        return lblCantidad;
+    }
+
+    public JLabel getLblSubtotal() {
+        return lblSubtotal;
+    }
+
+    public JLabel getLblIVA() {
+        return lblIVA;
+    }
+
+    public JLabel getLblTotal() {
+        return lblTotal;
+    }
 }

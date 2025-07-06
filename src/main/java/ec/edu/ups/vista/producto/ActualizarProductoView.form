@@ -6,7 +6,7 @@
       <xy x="20" y="20" width="500" height="400"/>
     </constraints>
     <properties/>
-    <border type="line" title="Actualizar Producto" title-justification="2">
+    <border type="line" title-justification="2">
       <font size="14" style="1"/>
       <color color="-16777216"/>
     </border>

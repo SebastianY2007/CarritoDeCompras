@@ -29,8 +29,7 @@ public class MenuPrincipalView extends JFrame {
     private JMenuBar menuBar;
     private JMenu menuProductos, menuUsuarios, menuCarrito, menuIdiomas, menuSalir;
     private JMenuItem menuItemGestionarProductos, menuItemGestionarUsuarios, menuItemCrearCarrito,
-            menuItemGestionarCarritos, menuItemIdiomaEspanol, menuItemIdiomaIngles, menuItemIdiomaFrances,
-            menuItemCerrarSesion, menuItemSalirAplicacion;
+            menuItemGestionarCarritos, menuItemCerrarSesion, menuItemSalirAplicacion;
     private JDesktopPane jDesktopPane;
 
     private GestionDeProductosView gestionDeProductosView;
@@ -86,12 +85,6 @@ public class MenuPrincipalView extends JFrame {
         menuBar.add(menuCarrito);
 
         menuIdiomas = new JMenu();
-        menuItemIdiomaEspanol = new JMenuItem();
-        menuItemIdiomaIngles = new JMenuItem();
-        menuItemIdiomaFrances = new JMenuItem();
-        menuIdiomas.add(menuItemIdiomaEspanol);
-        menuIdiomas.add(menuItemIdiomaIngles);
-        menuIdiomas.add(menuItemIdiomaFrances);
         menuBar.add(menuIdiomas);
 
         menuSalir = new JMenu();
@@ -107,9 +100,6 @@ public class MenuPrincipalView extends JFrame {
         menuItemGestionarUsuarios.addActionListener(e -> abrirGestionDeUsuarios());
         menuItemCrearCarrito.addActionListener(e -> abrirCrearCarrito());
         menuItemGestionarCarritos.addActionListener(e -> abrirGestionCarritos());
-        menuItemIdiomaEspanol.addActionListener(e -> cambiarIdioma("es", "EC"));
-        menuItemIdiomaIngles.addActionListener(e -> cambiarIdioma("en", "US"));
-        menuItemIdiomaFrances.addActionListener(e -> cambiarIdioma("fr", "FR"));
         menuItemCerrarSesion.addActionListener(e -> cerrarSesion());
         menuItemSalirAplicacion.addActionListener(e -> salirDeAplicacion());
     }
@@ -162,11 +152,6 @@ public class MenuPrincipalView extends JFrame {
         menuCarrito.setText(mensajes.getString("principal.menu.carrito"));
         menuItemCrearCarrito.setText(mensajes.getString("principal.carrito.crear"));
         menuItemGestionarCarritos.setText(mensajes.getString("principal.carrito.gestionar"));
-
-        menuIdiomas.setText(mensajes.getString("principal.menu.idioma"));
-        menuItemIdiomaEspanol.setText(mensajes.getString("principal.idioma.es"));
-        menuItemIdiomaIngles.setText(mensajes.getString("principal.idioma.en"));
-        menuItemIdiomaFrances.setText(mensajes.getString("principal.idioma.fr"));
 
         menuSalir.setText(mensajes.getString("principal.menu.salir"));
         menuItemCerrarSesion.setText(mensajes.getString("principal.menu.salir.sesion"));

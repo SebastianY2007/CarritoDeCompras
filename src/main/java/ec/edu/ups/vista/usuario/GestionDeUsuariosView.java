@@ -1,11 +1,8 @@
 package ec.edu.ups.vista.usuario;
 
-import ec.edu.ups.controlador.UsuarioController;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class GestionDeUsuariosView extends JInternalFrame {
@@ -19,15 +16,12 @@ public class GestionDeUsuariosView extends JInternalFrame {
     private JButton btnEliminar;
     private JButton btnActualizar;
     private JButton btnAgregar;
-    private JScrollPane scrollPane;
 
-    private DefaultTableModel modelo;
-    private UsuarioController usuarioController;
+    private DefaultTableModel tableModel;
     private MensajeInternacionalizacionHandler mensajeHandler;
-    private ResourceBundle mensajes;
 
-    public GestionDeUsuariosView(MensajeInternacionalizacionHandler mensajeHandler) {
-        this.mensajeHandler = mensajeHandler;
+    public GestionDeUsuariosView(MensajeInternacionalizacionHandler handler) {
+        this.mensajeHandler = handler;
 
         setContentPane(panelPrincipal);
         setClosable(true);
@@ -38,22 +32,52 @@ public class GestionDeUsuariosView extends JInternalFrame {
         setDefaultCloseOperation(JInternalFrame.HIDE_ON_CLOSE);
 
         configurarTabla();
-
-        SwingUtilities.invokeLater(this::updateTexts);
+        updateTexts();
     }
 
     private void configurarTabla() {
-        modelo = new DefaultTableModel() {
+        tableModel = new DefaultTableModel() {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
-        tblUsuarios.setModel(modelo);
+        tblUsuarios.setModel(tableModel);
     }
 
-    public JTextField getTxtBuscar() {
+    public void updateTexts() {
+        ResourceBundle mensajes = mensajeHandler.getMensajes();
+
+        setTitle(mensajes.getString("gestionUsuarios.titulo"));
+        lblNombre.setText(mensajes.getString("gestionUsuarios.label.buscar"));
+        btnBuscar.setText(mensajes.getString("global.boton.buscar"));
+        btnListar.setText(mensajes.getString("global.boton.listar"));
+        btnAgregar.setText(mensajes.getString("global.boton.agregar"));
+        btnActualizar.setText(mensajes.getString("global.boton.actualizar"));
+        btnEliminar.setText(mensajes.getString("global.boton.eliminar"));
+
+        tableModel.setColumnIdentifiers(new Object[]{
+                mensajes.getString("gestionUsuarios.tabla.username"),
+                mensajes.getString("gestionUsuarios.tabla.email"),
+                mensajes.getString("gestionUsuarios.tabla.rol"),
+                mensajes.getString("gestionUsuarios.tabla.nombre")
+        });
+    }
+
+    public JPanel getPanelPrincipal() {
+        return panelPrincipal;
+    }
+
+    public JLabel getLblNombre() {
+        return lblNombre;
+    }
+
+    public JTextField getTxtNombre() {
         return txtNombre;
+    }
+
+    public JTable getTblUsuarios() {
+        return tblUsuarios;
     }
 
     public JButton getBtnBuscar() {
@@ -76,51 +100,11 @@ public class GestionDeUsuariosView extends JInternalFrame {
         return btnAgregar;
     }
 
-    public JTable getTblUsuarios() {
-        return tblUsuarios;
+    public DefaultTableModel getTableModel() {
+        return tableModel;
     }
 
-    public void setUsuarioController(UsuarioController usuarioController) {
-        this.usuarioController = usuarioController;
-    }
-
-    public void setMensajeInternacionalizacionHandler(MensajeInternacionalizacionHandler mensajeHandler) {
-        this.mensajeHandler = mensajeHandler;
-        updateTexts();
-    }
-
-    public void updateTexts() {
-        mensajes = ResourceBundle.getBundle("mensajes", new Locale(mensajeHandler.getLenguajeActual(), mensajeHandler.getPaisActual()));
-
-        setTitle(mensajes.getString("gestionUsuarios.titulo"));
-
-        if (lblNombre != null) {
-            lblNombre.setText(mensajes.getString("gestionUsuarios.label.buscar"));
-        }
-
-        if (btnBuscar != null) {
-            btnBuscar.setText(mensajes.getString("gestionUsuarios.boton.buscar"));
-        }
-        if (btnListar != null) {
-            btnListar.setText(mensajes.getString("gestionUsuarios.boton.listar"));
-        }
-        if (btnAgregar != null) {
-            btnAgregar.setText(mensajes.getString("gestionUsuarios.boton.agregar"));
-        }
-        if (btnActualizar != null) {
-            btnActualizar.setText(mensajes.getString("gestionUsuarios.boton.actualizar"));
-        }
-        if (btnEliminar != null) {
-            btnEliminar.setText(mensajes.getString("gestionUsuarios.boton.eliminar"));
-        }
-
-        modelo.setColumnIdentifiers(new Object[]{
-                mensajes.getString("gestionUsuarios.tabla.username"),
-                mensajes.getString("gestionUsuarios.tabla.email"),
-                mensajes.getString("gestionUsuarios.tabla.rol")
-        });
-
-        revalidate();
-        repaint();
+    public MensajeInternacionalizacionHandler getMensajeHandler() {
+        return mensajeHandler;
     }
 }

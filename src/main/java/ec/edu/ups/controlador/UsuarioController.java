@@ -57,7 +57,7 @@ public class UsuarioController {
     }
 
     private void buscarUsuarioPorUsername() {
-        String username = gestionDeUsuariosView.getTxtBuscar().getText();
+        String username = gestionDeUsuariosView.getTxtNombre().getText();
         if (username.trim().isEmpty()) {
             listarUsuarios();
             return;

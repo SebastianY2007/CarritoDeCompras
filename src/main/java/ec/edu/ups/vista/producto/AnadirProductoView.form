@@ -8,7 +8,7 @@
     <properties>
       <background color="-1"/>
     </properties>
-    <border type="line" title="Ingrese los datos del producto" title-justification="2">
+    <border type="line" title-justification="2">
       <font size="14" style="1"/>
       <color color="-16777216"/>
     </border>
@@ -21,7 +21,7 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="245b4" class="javax.swing.JLabel" binding="codigoLabel">
+          <component id="245b4" class="javax.swing.JLabel" binding="lblCodigo">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -37,7 +37,7 @@
             </constraints>
             <properties/>
           </component>
-          <component id="a6185" class="javax.swing.JLabel" binding="nombreLabel">
+          <component id="a6185" class="javax.swing.JLabel" binding="lblNombre">
             <constraints>
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -45,7 +45,7 @@
               <text value="Nombre:"/>
             </properties>
           </component>
-          <component id="cddc8" class="javax.swing.JLabel" binding="precioLabel">
+          <component id="cddc8" class="javax.swing.JLabel" binding="lblPrecio">
             <constraints>
               <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>

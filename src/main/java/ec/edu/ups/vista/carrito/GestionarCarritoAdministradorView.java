@@ -1,11 +1,19 @@
 package ec.edu.ups.vista.carrito;
 
+import ec.edu.ups.util.MensajeInternacionalizacionHandler;
+
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class GestionarCarritoAdministradorView extends JInternalFrame {
     private JPanel panelPrincipal;
     private JTable tblCarritos;
     private JButton btnListar;
+    private MensajeInternacionalizacionHandler mensajeInternacionalizacionHandler;
+    private ResourceBundle mensajes;
+    private DefaultTableModel tableModel;
 
     public GestionarCarritoAdministradorView() {
         setTitle("Gestion de Carritos (Administrador)");
@@ -16,6 +24,28 @@ public class GestionarCarritoAdministradorView extends JInternalFrame {
         setIconifiable(true);
         setMaximizable(true);
         setResizable(true);
+    }
+
+    private void configurarTabla() {
+        tableModel = new DefaultTableModel();
+        tblCarritos.setModel(tableModel);
+    }
+
+    public void updateTexts() {
+        this.mensajes = ResourceBundle.getBundle("mensajes", new Locale(mensajeInternacionalizacionHandler.getLenguajeActual(), mensajeInternacionalizacionHandler.getPaisActual()));
+
+        setTitle(mensajes.getString("carrito.gestionarAdmin.titulo"));
+        btnListar.setText(mensajes.getString("global.boton.listar"));
+
+        tableModel.setColumnIdentifiers(new Object[]{
+                mensajes.getString("carrito.gestionarAdmin.tabla.codigo"),
+                mensajes.getString("carrito.gestionarAdmin.tabla.usuario"),
+                mensajes.getString("carrito.gestionarAdmin.tabla.fecha"),
+                mensajes.getString("carrito.gestionarAdmin.tabla.total")
+        });
+
+        revalidate();
+        repaint();
     }
 
     public JPanel getPanelPrincipal() {

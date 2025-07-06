@@ -35,6 +35,13 @@ public class RegistroView extends JFrame {
     private JComboBox<String> cbxMes;
     private JComboBox<Integer> cbxAnio;
     private JButton btnRegistrarse;
+    private JLabel lblFecha;
+    private JLabel lblCorreo;
+    private JLabel lblTelefono;
+    private JLabel lblUsername;
+    private JLabel lblContrasena;
+    private JLabel lblConfirmarContrasena;
+    private JLabel lblPreguntas;
 
     private UsuarioDAO usuarioDAO;
     private PreguntaSeguridadDAO preguntaSeguridadDAO;
@@ -95,7 +102,6 @@ public class RegistroView extends JFrame {
         String contrasena = new String(txtContrasena.getPassword()).trim();
         String confirmar = new String(txtConfirmar.getPassword()).trim();
         String nombre = txtNombre.getText().trim();
-        String apellido = "";
         String correoElectronico = txtCorreo.getText().trim();
         String telefono = txtTelefono.getText().trim();
         Integer dia = (Integer) cbxDia.getSelectedItem();
@@ -239,6 +245,11 @@ public class RegistroView extends JFrame {
 
         lblNombre.setText(mensajes.getString("registro.label.nombre"));
 
+        lblCorreo.setText(mensajes.getString("registro.label.email"));
+        lblTelefono.setText(mensajes.getString("registro.label.telefono"));
+        lblUsername.setText(mensajes.getString("registro.label.username"));
+        lblContrasena.setText(mensajes.getString("registro.label.contrasena"));
+        lblConfirmarContrasena.setText(mensajes.getString("registro.label.confirmarContrasena"));
         btnRegistrarse.setText(mensajes.getString("registro.boton.registrar"));
 
         cargarPreguntasSeguridad();

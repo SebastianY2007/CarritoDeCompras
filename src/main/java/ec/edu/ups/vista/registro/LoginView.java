@@ -40,6 +40,8 @@ public class LoginView extends JFrame {
     private JButton btnRegistrarse;
     private JButton btnOlvidoContrasena;
     private JComboBox<String> cbxIdioma;
+    private JLabel lblUsuario;
+    private JLabel lblContrasena;
 
     private UsuarioDAO usuarioDAO;
     private ProductoDAO productoDAO;
@@ -246,6 +248,8 @@ public class LoginView extends JFrame {
         btnIniciarSesion.setText(mensajes.getString("login.boton.iniciar"));
         btnRegistrarse.setText(mensajes.getString("login.boton.registrar"));
         btnOlvidoContrasena.setText(mensajes.getString("login.boton.olvido"));
+        lblUsuario.setText(mensajes.getString("login.label.username"));
+        lblContrasena.setText(mensajes.getString("login.label.password"));
     }
 
     public void limpiarCampos() {

@@ -8,7 +8,7 @@
     <properties>
       <background color="-1"/>
     </properties>
-    <border type="line" title="Gestion de Productos" title-justification="2">
+    <border type="line" title-justification="2">
       <font size="14" style="1"/>
     </border>
     <children>

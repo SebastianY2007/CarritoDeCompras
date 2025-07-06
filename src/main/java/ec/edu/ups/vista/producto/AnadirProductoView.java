@@ -2,15 +2,14 @@ package ec.edu.ups.vista.producto;
 
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
 import javax.swing.*;
-import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class AnadirProductoView extends JInternalFrame {
 
     private JPanel panelPrincipal;
-    private JLabel codigoLabel;
-    private JLabel nombreLabel;
-    private JLabel precioLabel;
+    private JLabel lblCodigo;
+    private JLabel lblNombre;
+    private JLabel lblPrecio;
     private JTextField txtCodigo;
     private JTextField txtNombre;
     private JTextField txtPrecio;
@@ -18,10 +17,9 @@ public class AnadirProductoView extends JInternalFrame {
     private JButton btnLimpiar;
 
     private MensajeInternacionalizacionHandler mensajeHandler;
-    private ResourceBundle mensajes;
 
-    public AnadirProductoView(MensajeInternacionalizacionHandler mensajeHandler) {
-        this.mensajeHandler = mensajeHandler;
+    public AnadirProductoView(MensajeInternacionalizacionHandler handler) {
+        this.mensajeHandler = handler;
 
         setContentPane(panelPrincipal);
         setDefaultCloseOperation(JInternalFrame.HIDE_ON_CLOSE);
@@ -30,7 +28,18 @@ public class AnadirProductoView extends JInternalFrame {
         setIconifiable(true);
         setResizable(true);
 
-        SwingUtilities.invokeLater(this::updateTexts);
+        updateTexts();
+    }
+
+    public void updateTexts() {
+        ResourceBundle mensajes = mensajeHandler.getMensajes();
+
+        setTitle(mensajes.getString("anadirProducto.titulo"));
+        lblCodigo.setText(mensajes.getString("anadirProducto.label.codigo"));
+        lblNombre.setText(mensajes.getString("anadirProducto.label.nombre"));
+        lblPrecio.setText(mensajes.getString("anadirProducto.label.precio"));
+        btnAgregar.setText(mensajes.getString("global.boton.agregar"));
+        btnLimpiar.setText(mensajes.getString("global.boton.limpiar"));
     }
 
     public JTextField getTxtCodigo() {
@@ -51,30 +60,5 @@ public class AnadirProductoView extends JInternalFrame {
 
     public JButton getBtnLimpiar() {
         return btnLimpiar;
-    }
-
-    public void limpiarCampos() {
-        txtCodigo.setText("");
-        txtNombre.setText("");
-        txtPrecio.setText("");
-    }
-
-    public void mostrarMensaje(String mensaje, int tipoDeMensaje) {
-        JOptionPane.showMessageDialog(this, mensaje, "Mensaje del Sistema", tipoDeMensaje);
-    }
-
-    public void updateTexts() {
-        if (mensajeHandler == null) return;
-        mensajes = ResourceBundle.getBundle("mensajes", new Locale(mensajeHandler.getLenguajeActual(), mensajeHandler.getPaisActual()));
-
-        setTitle(mensajes.getString("anadirProducto.titulo"));
-        codigoLabel.setText(mensajes.getString("anadirProducto.label.codigo"));
-        nombreLabel.setText(mensajes.getString("anadirProducto.label.nombre"));
-        precioLabel.setText(mensajes.getString("anadirProducto.label.precio"));
-        btnAgregar.setText(mensajes.getString("anadirProducto.boton.agregar"));
-        btnLimpiar.setText(mensajes.getString("anadirProducto.boton.limpiar"));
-
-        revalidate();
-        repaint();
     }
 }
