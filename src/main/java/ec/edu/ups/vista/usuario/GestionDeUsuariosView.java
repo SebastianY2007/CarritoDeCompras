@@ -3,6 +3,7 @@ package ec.edu.ups.vista.usuario;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.util.ResourceBundle;
 
 public class GestionDeUsuariosView extends JInternalFrame {
@@ -33,6 +34,71 @@ public class GestionDeUsuariosView extends JInternalFrame {
 
         configurarTabla();
         updateTexts();
+        configurarIconos();
+    }
+
+    private ImageIcon redimensionarIcono(ImageIcon icono, int ancho, int alto) {
+        Image imagen = icono.getImage();
+        Image imagenRedimensionada = imagen.getScaledInstance(ancho, alto, java.awt.Image.SCALE_SMOOTH);
+        return new ImageIcon(imagenRedimensionada);
+    }
+
+    private void configurarIconos() {
+        java.net.URL urlIconoAgregar = getClass().getResource("/icons/icono_agregar_usuario.png");
+        java.net.URL urlIconoEliminar = getClass().getResource("/icons/icono_basurero.png");
+        java.net.URL urlIconoActualizar = getClass().getResource("/icons/icono_modificar.png");
+        java.net.URL urlIconoBuscar = getClass().getResource("/icons/icono_buscar_usuario.png");
+        java.net.URL urlIconoListar = getClass().getResource("/icons/icono_listar.png");
+
+        if (urlIconoAgregar != null) {
+            ImageIcon iconoOriginal = new ImageIcon(urlIconoAgregar);
+
+            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
+
+            btnAgregar.setIcon(iconoAjustado);
+        } else {
+            System.err.println("Icono no encontrado: /icons/icono_agregar_usuario.png");
+        }
+
+        if (urlIconoEliminar != null) {
+            ImageIcon iconoOriginal = new ImageIcon(urlIconoEliminar);
+
+            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
+
+            btnEliminar.setIcon(iconoAjustado);
+        } else {
+            System.err.println("Icono no encontrado: /icons/icono_basurero.png");
+        }
+
+        if (urlIconoActualizar != null) {
+            ImageIcon iconoOriginal = new ImageIcon(urlIconoActualizar);
+
+            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
+
+            btnActualizar.setIcon(iconoAjustado);
+        } else {
+            System.err.println("Icono no encontrado: /icons/icono_modificar.png");
+        }
+
+        if (urlIconoBuscar != null) {
+            ImageIcon iconoOriginal = new ImageIcon(urlIconoBuscar);
+
+            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
+
+            btnBuscar.setIcon(iconoAjustado);
+        } else {
+            System.err.println("Icono no encontrado: /icons/icono_buscar_usuario.png");
+        }
+
+        if (urlIconoListar != null) {
+            ImageIcon iconoOriginal = new ImageIcon(urlIconoListar);
+
+            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
+
+            btnListar.setIcon(iconoAjustado);
+        } else {
+            System.err.println("Icono no encontrado: /icons/icono_listar.png");
+        }
     }
 
     private void configurarTabla() {

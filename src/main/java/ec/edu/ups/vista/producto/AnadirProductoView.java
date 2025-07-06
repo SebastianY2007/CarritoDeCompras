@@ -2,6 +2,7 @@ package ec.edu.ups.vista.producto;
 
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
 import javax.swing.*;
+import java.awt.*;
 import java.util.ResourceBundle;
 
 public class AnadirProductoView extends JInternalFrame {
@@ -29,6 +30,38 @@ public class AnadirProductoView extends JInternalFrame {
         setResizable(true);
 
         updateTexts();
+        configurarIconos();
+    }
+
+    private ImageIcon redimensionarIcono(ImageIcon icono, int ancho, int alto) {
+        Image imagen = icono.getImage();
+        Image imagenRedimensionada = imagen.getScaledInstance(ancho, alto, java.awt.Image.SCALE_SMOOTH);
+        return new ImageIcon(imagenRedimensionada);
+    }
+
+    private void configurarIconos() {
+        java.net.URL urlIconoAgregar = getClass().getResource("/icons/icono_agregar_producto.png");
+        java.net.URL urlIconoEliminar = getClass().getResource("/icons/icono_limpiar.png");
+
+        if (urlIconoAgregar != null) {
+            ImageIcon iconoOriginal = new ImageIcon(urlIconoAgregar);
+
+            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
+
+            btnAgregar.setIcon(iconoAjustado);
+        } else {
+            System.err.println("Icono no encontrado: /icons/icono_agregar_producto.png");
+        }
+
+        if (urlIconoEliminar != null) {
+            ImageIcon iconoOriginal = new ImageIcon(urlIconoEliminar);
+
+            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
+
+            btnLimpiar.setIcon(iconoAjustado);
+        } else {
+            System.err.println("Icono no encontrado: /icons/icono_limpiar.png");
+        }
     }
 
     public void updateTexts() {

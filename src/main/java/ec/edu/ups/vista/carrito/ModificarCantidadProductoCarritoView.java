@@ -1,6 +1,7 @@
 package ec.edu.ups.vista.carrito;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.Locale;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
 import java.util.ResourceBundle;
@@ -23,6 +24,38 @@ public class ModificarCantidadProductoCarritoView extends JDialog {
 
         for (int i = 1; i <= 20; i++) {
             cbxCantidad.addItem(i);
+        }
+        configurarIconos();
+    }
+
+    private ImageIcon redimensionarIcono(ImageIcon icono, int ancho, int alto) {
+        Image imagen = icono.getImage();
+        Image imagenRedimensionada = imagen.getScaledInstance(ancho, alto, java.awt.Image.SCALE_SMOOTH);
+        return new ImageIcon(imagenRedimensionada);
+    }
+
+    private void configurarIconos() {
+        java.net.URL urlIconoGuardar = getClass().getResource("/icons/icono_guardar.png");
+        java.net.URL urlIconoCancelar = getClass().getResource("/icons/icono_cancelar.png");
+
+        if (urlIconoGuardar != null) {
+            ImageIcon iconoOriginal = new ImageIcon(urlIconoGuardar);
+
+            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
+
+            btnGuardar.setIcon(iconoAjustado);
+        } else {
+            System.err.println("Icono no encontrado: /icons/icono_guardar.png");
+        }
+
+        if (urlIconoCancelar != null) {
+            ImageIcon iconoOriginal = new ImageIcon(urlIconoCancelar);
+
+            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
+
+            btnCancelar.setIcon(iconoAjustado);
+        } else {
+            System.err.println("Icono no encontrado: /icons/icono_cancelar.png");
         }
     }
 

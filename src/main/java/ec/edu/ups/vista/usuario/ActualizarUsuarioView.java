@@ -37,6 +37,38 @@ public class ActualizarUsuarioView extends JInternalFrame {
         });
 
         updateTexts();
+        configurarIconos();
+    }
+
+    private ImageIcon redimensionarIcono(ImageIcon icono, int ancho, int alto) {
+        Image imagen = icono.getImage();
+        Image imagenRedimensionada = imagen.getScaledInstance(ancho, alto, java.awt.Image.SCALE_SMOOTH);
+        return new ImageIcon(imagenRedimensionada);
+    }
+
+    private void configurarIconos() {
+        java.net.URL urlIconoActualizar = getClass().getResource("/icons/icono_modificar.png");
+        java.net.URL urlIconoCancelar = getClass().getResource("/icons/icono_cancelar.png");
+
+        if (urlIconoActualizar != null) {
+            ImageIcon iconoOriginal = new ImageIcon(urlIconoActualizar);
+
+            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
+
+            btnActualizar.setIcon(iconoAjustado);
+        } else {
+            System.err.println("Icono no encontrado: /icons/icono_modificar.png");
+        }
+
+        if (urlIconoCancelar != null) {
+            ImageIcon iconoOriginal = new ImageIcon(urlIconoCancelar);
+
+            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
+
+            btnCancelar.setIcon(iconoAjustado);
+        } else {
+            System.err.println("Icono no encontrado: /icons/icono_cancelar.png");
+        }
     }
 
     private void configurarLayout() {

@@ -1,6 +1,7 @@
 package ec.edu.ups.vista.carrito;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
@@ -32,6 +33,50 @@ public class AgregarProductoCarritoView extends JDialog {
 
         for (int i = 1; i <= 20; i++) {
             cbxCantidad.addItem(i);
+        }
+
+        configurarIconos();
+    }
+
+    private ImageIcon redimensionarIcono(ImageIcon icono, int ancho, int alto) {
+        Image imagen = icono.getImage();
+        Image imagenRedimensionada = imagen.getScaledInstance(ancho, alto, java.awt.Image.SCALE_SMOOTH);
+        return new ImageIcon(imagenRedimensionada);
+    }
+
+    private void configurarIconos() {
+        java.net.URL urlIconoAgregar = getClass().getResource("/icons/icono_agregar_al_carrito.png");
+        java.net.URL urlIconoCancelar = getClass().getResource("/icons/icono_cancelar.png");
+        java.net.URL urlIconoBuscar = getClass().getResource("/icons/icono_buscar.png");
+
+        if (urlIconoAgregar != null) {
+            ImageIcon iconoOriginal = new ImageIcon(urlIconoAgregar);
+
+            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
+
+            btnAgregar.setIcon(iconoAjustado);
+        } else {
+            System.err.println("Icono no encontrado: /icons/icono_modificar.png");
+        }
+
+        if (urlIconoCancelar != null) {
+            ImageIcon iconoOriginal = new ImageIcon(urlIconoCancelar);
+
+            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
+
+            btnCancelar.setIcon(iconoAjustado);
+        } else {
+            System.err.println("Icono no encontrado: /icons/icono_cancelar.png");
+        }
+
+        if (urlIconoBuscar != null) {
+            ImageIcon iconoOriginal = new ImageIcon(urlIconoBuscar);
+
+            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
+
+            btnBuscar.setIcon(iconoAjustado);
+        } else {
+            System.err.println("Icono no encontrado: /icons/icono_buscar.png");
         }
     }
 

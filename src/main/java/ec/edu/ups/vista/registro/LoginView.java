@@ -20,6 +20,7 @@ import ec.edu.ups.vista.usuario.ActualizarUsuarioView;
 import ec.edu.ups.vista.usuario.AnadirUsuarioView;
 import ec.edu.ups.vista.usuario.GestionDeUsuariosView;
 
+import java.awt.*;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,6 +43,7 @@ public class LoginView extends JFrame {
     private JComboBox<String> cbxIdioma;
     private JLabel lblUsuario;
     private JLabel lblContrasena;
+    private JLabel lblIdioma;
 
     private UsuarioDAO usuarioDAO;
     private ProductoDAO productoDAO;
@@ -63,7 +65,84 @@ public class LoginView extends JFrame {
             setupListeners();
             configurarSelectorDeIdioma();
             updateTexts();
+            configurarIconos();
         });
+    }
+
+    private ImageIcon redimensionarIcono(ImageIcon icono, int ancho, int alto) {
+        Image imagen = icono.getImage();
+        Image imagenRedimensionada = imagen.getScaledInstance(ancho, alto, java.awt.Image.SCALE_SMOOTH);
+        return new ImageIcon(imagenRedimensionada);
+    }
+
+    private void configurarIconos() {
+        java.net.URL urlIconoIngresar = getClass().getResource("/icons/icono_ingresar.png");
+        java.net.URL urlIconoRegistrar = getClass().getResource("/icons/icono_registrarse.png");
+        java.net.URL urlIconoIdioma = getClass().getResource("/icons/icono_idiomas.png");
+        java.net.URL urlIconoOlvido = getClass().getResource("/icons/icono_olvido_contraseña.png");
+        java.net.URL urlIconoUsuario = getClass().getResource("/icons/icono_usuario.png");
+        java.net.URL urlIconoContrasena = getClass().getResource("/icons/icono_contrasena.png");
+
+        if (urlIconoIngresar != null) {
+            ImageIcon iconoOriginal = new ImageIcon(urlIconoIngresar);
+
+            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
+
+            btnIniciarSesion.setIcon(iconoAjustado);
+        } else {
+            System.err.println("Icono no encontrado: /icons/icono_ingresar.png");
+        }
+
+        if (urlIconoRegistrar != null) {
+            ImageIcon iconoOriginal = new ImageIcon(urlIconoRegistrar);
+
+            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
+
+            btnRegistrarse.setIcon(iconoAjustado);
+        } else {
+            System.err.println("Icono no encontrado: /icons/icono_registrarse.png");
+        }
+
+        if (urlIconoIdioma != null) {
+            ImageIcon iconoOriginal = new ImageIcon(urlIconoIdioma);
+
+            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 25, 25);
+
+            lblIdioma.setText("");
+            lblIdioma.setIcon(iconoAjustado);
+        } else {
+            System.err.println("Icono no encontrado: /icons/icono_idiomas.png");
+        }
+
+        if (urlIconoOlvido != null) {
+            ImageIcon iconoOriginal = new ImageIcon(urlIconoOlvido);
+
+            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 25, 25);
+
+            btnOlvidoContrasena.setIcon(iconoAjustado);
+        } else {
+            System.err.println("Icono no encontrado: /icons/icono_olvido_contraseña.png");
+        }
+
+        if (urlIconoUsuario != null) {
+            ImageIcon iconoOriginal = new ImageIcon(urlIconoUsuario);
+
+            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 25, 25);
+
+            lblUsuario.setIcon(iconoAjustado);
+        } else {
+            System.err.println("Icono no encontrado: /icons/icono_usuario.png");
+        }
+
+        if (urlIconoContrasena != null) {
+            ImageIcon iconoOriginal = new ImageIcon(urlIconoContrasena);
+
+            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 25, 25);
+
+            lblContrasena.setIcon(iconoAjustado);
+        } else {
+            System.err.println("Icono no encontrado: /icons/icono_contrasena.png");
+        }
     }
 
     private void setupListeners() {
