@@ -5,6 +5,10 @@ Su objetivo principal es demostrar el uso de **patrones de diseño** aplicados a
 
 ---
 
+Video: [Video Explicativo ](https://youtu.be/4-6r50yHJs0)
+
+---
+
 ## 🎯 Objetivo del proyecto
 
 Implementar un sistema educativo que simula un **carrito de compras**, utilizando buenas prácticas de diseño y una arquitectura desacoplada basada en **MVC** (Modelo-Vista-Controlador), **DAO** (Data Access Object) y principios de **POO** y **SOLID**.
