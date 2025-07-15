@@ -48,6 +48,8 @@ public class CarritoDAOMemoria implements CarritoDAO {
 
     @Override
     public List<Carrito> buscarPorUsuario(Usuario usuario) {
-        return carritosMap.values().stream().filter(carrito -> carrito.getUsuario().getUsername().equals(usuario.getUsername())).collect(Collectors.toList());
+        return carritosMap.values().stream()
+                .filter(carrito -> carrito.getUsuario().getCedula().equals(usuario.getCedula()))
+                .collect(Collectors.toList());
     }
 }

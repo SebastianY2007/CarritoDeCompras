@@ -50,7 +50,7 @@ public class MenuPrincipalView extends JFrame {
         this.loginView = loginView;
         this.mensajes = ResourceBundle.getBundle("mensajes", new Locale(msgHandler.getLenguajeActual(), msgHandler.getPaisActual()));
 
-        setTitle(mensajes.getString("app.titulo") + " - " + usuarioAutenticado.getUsername());
+        setTitle(mensajes.getString("app.titulo") + " - " + usuarioAutenticado.getNombre());
         setSize(1200, 800);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -154,7 +154,8 @@ public class MenuPrincipalView extends JFrame {
 
     public void updateTexts() {
         mensajes = ResourceBundle.getBundle("mensajes", new Locale(mensajeHandler.getLenguajeActual(), mensajeHandler.getPaisActual()));
-        setTitle(mensajes.getString("app.titulo") + " - " + usuarioAutenticado.getUsername());
+        // MODIFICADO: Se muestra el nombre del usuario en lugar del username/cédula
+        setTitle(mensajes.getString("app.titulo") + " - " + usuarioAutenticado.getNombre());
 
         menuProductos.setText(mensajes.getString("principal.menu.productos"));
         menuItemGestionarProductos.setText(mensajes.getString("principal.producto.gestionar"));

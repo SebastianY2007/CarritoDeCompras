@@ -34,7 +34,7 @@ public class UsuarioController {
 
     public void initListeners() {
         gestionDeUsuariosView.getBtnListar().addActionListener(e -> listarUsuarios());
-        gestionDeUsuariosView.getBtnBuscar().addActionListener(e -> buscarUsuarioPorUsername());
+        gestionDeUsuariosView.getBtnBuscar().addActionListener(e -> buscarUsuarioPorCedula());
         gestionDeUsuariosView.getBtnAgregar().addActionListener(e -> abrirAnadirUsuario());
         gestionDeUsuariosView.getBtnEliminar().addActionListener(e -> eliminarUsuarioSeleccionado());
         gestionDeUsuariosView.getBtnActualizar().addActionListener(e -> abrirDialogoActualizar());
@@ -49,24 +49,25 @@ public class UsuarioController {
     public void listarUsuarios() {
         List<Usuario> usuarios = usuarioDAO.listarTodos();
         DefaultTableModel model = (DefaultTableModel) gestionDeUsuariosView.getTblUsuarios().getModel();
-        model.setColumnIdentifiers(new Object[]{"Username", "Email", "Rol"});
+        model.setColumnIdentifiers(new Object[]{"Cédula", "Nombre", "Email", "Rol"});
         model.setRowCount(0);
         for (Usuario u : usuarios) {
-            model.addRow(new Object[]{u.getUsername(), u.getCorreoElectronico(), u.getRol().name()});
+            model.addRow(new Object[]{u.getCedula(), u.getNombre(), u.getCorreoElectronico(), u.getRol().name()});
         }
     }
 
-    private void buscarUsuarioPorUsername() {
-        String username = gestionDeUsuariosView.getTxtNombre().getText();
-        if (username.trim().isEmpty()) {
+    // MODIFICADO: El método ahora busca por cédula
+    private void buscarUsuarioPorCedula() {
+        String cedula = gestionDeUsuariosView.getTxtNombre().getText();
+        if (cedula.trim().isEmpty()) {
             listarUsuarios();
             return;
         }
-        Usuario usuario = usuarioDAO.buscarPorUsername(username);
+        Usuario usuario = usuarioDAO.buscarPorCedula(cedula);
         DefaultTableModel model = (DefaultTableModel) gestionDeUsuariosView.getTblUsuarios().getModel();
         model.setRowCount(0);
         if (usuario != null) {
-            model.addRow(new Object[]{usuario.getUsername(), usuario.getCorreoElectronico(), usuario.getRol().name()});
+            model.addRow(new Object[]{usuario.getCedula(), usuario.getNombre(), usuario.getCorreoElectronico(), usuario.getRol().name()});
         } else {
             JOptionPane.showMessageDialog(gestionDeUsuariosView, "Usuario no encontrado.", "Búsqueda", JOptionPane.INFORMATION_MESSAGE);
         }
@@ -82,25 +83,25 @@ public class UsuarioController {
     }
 
     private void crearNuevoUsuario() {
-        String username = anadirUsuarioView.getTxtNombreUsuario().getText();
+        String cedula = anadirUsuarioView.getTxtNombreUsuario().getText();
+        String nombre = "Usuario por Defecto";
         String password = new String(anadirUsuarioView.getTxtContrasena().getPassword());
         String confirmPassword = new String(anadirUsuarioView.getTxtConfirmarContrasena().getPassword());
 
-        if (username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(anadirUsuarioView, "Username y Contraseña son obligatorios.", "Error", JOptionPane.ERROR_MESSAGE);
+        if (cedula.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(anadirUsuarioView, "Cédula y Contraseña son obligatorios.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
         if (!password.equals(confirmPassword)) {
             JOptionPane.showMessageDialog(anadirUsuarioView, "Las contraseñas no coinciden.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        if (usuarioDAO.buscarPorUsername(username) != null) {
-            JOptionPane.showMessageDialog(anadirUsuarioView, "El nombre de usuario ya existe.", "Error", JOptionPane.ERROR_MESSAGE);
+        if (usuarioDAO.buscarPorCedula(cedula) != null) {
+            JOptionPane.showMessageDialog(anadirUsuarioView, "La cédula ya está registrada.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        Usuario nuevoUsuario = new Usuario(username, password, "email@por.defecto");
-        nuevoUsuario.setRol(Rol.USUARIO);
+        Usuario nuevoUsuario = new Usuario(cedula, nombre, password, "default@mail.com", "0000000000", 1, 1, 2000, Rol.USUARIO, "", "", "", "", "", "");
 
         usuarioDAO.crear(nuevoUsuario);
         JOptionPane.showMessageDialog(anadirUsuarioView, "Usuario creado exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
@@ -114,19 +115,20 @@ public class UsuarioController {
         anadirUsuarioView.getTxtConfirmarContrasena().setText("");
     }
 
+    // MODIFICADO: El método ahora elimina por cédula
     private void eliminarUsuarioSeleccionado() {
         int filaSeleccionada = gestionDeUsuariosView.getTblUsuarios().getSelectedRow();
         if (filaSeleccionada >= 0) {
-            String username = (String) gestionDeUsuariosView.getTblUsuarios().getValueAt(filaSeleccionada, 0);
+            String cedula = (String) gestionDeUsuariosView.getTblUsuarios().getValueAt(filaSeleccionada, 0);
 
-            if (username.equals("admin")) {
+            if (cedula.equals("admin")) {
                 JOptionPane.showMessageDialog(gestionDeUsuariosView, "No se puede eliminar al usuario administrador principal.", "Acción no permitida", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            int confirm = JOptionPane.showConfirmDialog(gestionDeUsuariosView, "¿Seguro que desea eliminar al usuario '" + username + "'?", "Confirmar Eliminación", JOptionPane.YES_NO_OPTION);
+            int confirm = JOptionPane.showConfirmDialog(gestionDeUsuariosView, "¿Seguro que desea eliminar al usuario con cédula '" + cedula + "'?", "Confirmar Eliminación", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
-                usuarioDAO.eliminar(username);
+                usuarioDAO.eliminar(cedula);
                 listarUsuarios();
             }
         } else {
@@ -134,6 +136,7 @@ public class UsuarioController {
         }
     }
 
+    // MODIFICADO: El método ahora abre el diálogo de actualización usando la cédula
     private void abrirDialogoActualizar() {
         int filaSeleccionada = gestionDeUsuariosView.getTblUsuarios().getSelectedRow();
         if (filaSeleccionada < 0) {
@@ -141,8 +144,8 @@ public class UsuarioController {
             return;
         }
 
-        String username = (String) gestionDeUsuariosView.getTblUsuarios().getValueAt(filaSeleccionada, 0);
-        this.usuarioParaActualizar = usuarioDAO.buscarPorUsername(username);
+        String cedula = (String) gestionDeUsuariosView.getTblUsuarios().getValueAt(filaSeleccionada, 0);
+        this.usuarioParaActualizar = usuarioDAO.buscarPorCedula(cedula);
 
         if (usuarioParaActualizar != null) {
             actualizarUsuarioView.getTxtNuevoValor().setText("");
@@ -169,14 +172,9 @@ public class UsuarioController {
         }
 
         switch (campo.toLowerCase()) {
-            case "nombre de usuario":
-                if (usuarioDAO.buscarPorUsername(nuevoValor) != null && !nuevoValor.equals(usuarioParaActualizar.getUsername())) {
-                    JOptionPane.showMessageDialog(actualizarUsuarioView, "El nuevo nombre de usuario ya existe.", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                usuarioDAO.eliminar(usuarioParaActualizar.getUsername());
-                usuarioParaActualizar.setUsername(nuevoValor);
-                usuarioDAO.crear(usuarioParaActualizar);
+            case "nombre":
+                usuarioParaActualizar.setNombre(nuevoValor);
+                usuarioDAO.actualizar(usuarioParaActualizar);
                 break;
             case "email":
                 usuarioParaActualizar.setCorreoElectronico(nuevoValor);
@@ -193,10 +191,6 @@ public class UsuarioController {
                 }
                 break;
             case "contraseña":
-                if (nuevoValor.length() < 8 && !nuevoValor.isEmpty()) {
-                    JOptionPane.showMessageDialog(actualizarUsuarioView, "La contraseña debe tener al menos 8 caracteres.", "Contraseña Débil", JOptionPane.WARNING_MESSAGE);
-                    return;
-                }
                 if (!nuevoValor.isEmpty()){
                     usuarioParaActualizar.setContrasena(nuevoValor);
                     usuarioDAO.actualizar(usuarioParaActualizar);
@@ -205,6 +199,9 @@ public class UsuarioController {
                     return;
                 }
                 break;
+            default:
+                JOptionPane.showMessageDialog(actualizarUsuarioView, "Campo seleccionado no válido para actualización.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
         }
 
         JOptionPane.showMessageDialog(actualizarUsuarioView, "Usuario actualizado exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
@@ -212,21 +209,19 @@ public class UsuarioController {
         listarUsuarios();
     }
 
-    public boolean actualizarContrasena(String username, String nuevaContrasena) throws Exception {
+    public boolean actualizarContrasena(String cedula, String nuevaContrasena) throws Exception {
         if (nuevaContrasena == null || nuevaContrasena.trim().isEmpty()) {
             throw new Exception("La contraseña no puede estar vacía.");
         }
-        if (nuevaContrasena.length() < 3) {
-            throw new Exception("La contraseña debe tener al menos 3 caracteres.");
+        if (nuevaContrasena.length() < 6) {
+            throw new Exception("La contraseña debe tener al menos 6 caracteres.");
         }
 
-        Usuario usuario = usuarioDAO.buscarPorUsername(username);
+        Usuario usuario = usuarioDAO.buscarPorCedula(cedula);
 
         if (usuario != null) {
             usuario.setContrasena(nuevaContrasena);
-
             usuarioDAO.actualizar(usuario);
-
             return true;
         }
 

@@ -7,13 +7,18 @@ import java.util.List;
 
 public interface UsuarioDAO {
 
-    Usuario autenticar(String username, String contrasenia);
+    Usuario autenticar(String cedula, String contrasenia);
+
     void crear(Usuario usuario);
-    Usuario buscarPorUsername(String username);
-    void eliminar(String username);
+
+    Usuario buscarPorCedula(String cedula);
+
+    void eliminar(String cedula);
+
     void actualizar(Usuario usuario);
+
     List<Usuario> listarTodos();
 
-    List<Usuario> listarPorRol();
     List<Usuario> listarPorRol(Rol rol);
+
 }

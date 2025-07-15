@@ -8,8 +8,8 @@ import java.util.ResourceBundle;
 public class AnadirUsuarioView extends JInternalFrame {
 
     private JPanel panelPrincipal;
-    private JLabel lblNombre;
-    private JTextField txtNombreUsuario;
+    private JLabel lblCedula;
+    private JTextField txtCedula;
     private JLabel lblContrasena;
     private JPasswordField txtContrasena;
     private JLabel lblConfirmarContrasena;
@@ -69,7 +69,7 @@ public class AnadirUsuarioView extends JInternalFrame {
         ResourceBundle mensajes = mensajeHandler.getMensajes();
 
         setTitle(mensajes.getString("anadirUsuario.titulo"));
-        lblNombre.setText(mensajes.getString("anadirUsuario.label.nombreUsuario"));
+        lblCedula.setText(mensajes.getString("anadirUsuario.label.nombreUsuario"));
         lblContrasena.setText(mensajes.getString("anadirUsuario.label.contrasena"));
         lblConfirmarContrasena.setText(mensajes.getString("anadirUsuario.label.confirmarContrasena"));
         btnAgregar.setText(mensajes.getString("global.boton.agregar"));
@@ -77,7 +77,7 @@ public class AnadirUsuarioView extends JInternalFrame {
     }
 
     public JTextField getTxtNombreUsuario() {
-        return txtNombreUsuario;
+        return txtCedula;
     }
 
     public JPasswordField getTxtContrasena() {
@@ -102,7 +102,7 @@ public class AnadirUsuarioView extends JInternalFrame {
     }
 
     public void limpiarCampos() {
-        if (txtNombreUsuario != null) txtNombreUsuario.setText("");
+        if (txtCedula != null) txtCedula.setText("");
         if (txtContrasena != null) txtContrasena.setText("");
         if (txtConfirmarContrasena != null) txtConfirmarContrasena.setText("");
     }

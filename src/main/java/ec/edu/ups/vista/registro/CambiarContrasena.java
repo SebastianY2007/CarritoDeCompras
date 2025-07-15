@@ -57,7 +57,7 @@ public class CambiarContrasena extends JFrame {
 
     private void cargarDatosDelUsuario() {
         if (this.usuarioLogueado != null) {
-            txtNombre.setText(usuarioLogueado.getUsername());
+            txtNombre.setText(usuarioLogueado.getCedula());
             txtCorreoElectronico.setText(usuarioLogueado.getCorreoElectronico());
             txtRol.setText(usuarioLogueado.getRol().name());
         } else {
@@ -87,7 +87,7 @@ public class CambiarContrasena extends JFrame {
         }
 
         try {
-            boolean exito = usuarioController.actualizarContrasena(usuarioLogueado.getUsername(), nuevaContrasena);
+            boolean exito = usuarioController.actualizarContrasena(usuarioLogueado.getCedula(), nuevaContrasena);
             if (exito) {
                 JOptionPane.showMessageDialog(this, mensajeHandler.get("cambiarContrasena.exito"), mensajeHandler.get("global.exito.titulo"), JOptionPane.INFORMATION_MESSAGE);
                 this.dispose();

@@ -35,13 +35,13 @@ import java.util.ResourceBundle;
 public class LoginView extends JFrame {
 
     private JPanel panelPrincipal;
-    private JTextField txtUsuario;
+    private JTextField txtCedula;
     private JPasswordField txtContrasena;
     private JButton btnIniciarSesion;
     private JButton btnRegistrarse;
     private JButton btnOlvidoContrasena;
     private JComboBox<String> cbxIdioma;
-    private JLabel lblUsuario;
+    private JLabel lblCedula;
     private JLabel lblContrasena;
     private JLabel lblIdioma;
 
@@ -71,6 +71,19 @@ public class LoginView extends JFrame {
         });
     }
 
+    private void createUIComponents() {
+        panelPrincipal = new JPanel();
+        txtCedula = new JTextField();
+        txtContrasena = new JPasswordField();
+        btnIniciarSesion = new JButton();
+        btnRegistrarse = new JButton();
+        btnOlvidoContrasena = new JButton();
+        cbxIdioma = new JComboBox<>();
+        lblCedula = new JLabel();
+        lblContrasena = new JLabel();
+        lblIdioma = new JLabel();
+    }
+
     private ImageIcon redimensionarIcono(ImageIcon icono, int ancho, int alto) {
         Image imagen = icono.getImage();
         Image imagenRedimensionada = imagen.getScaledInstance(ancho, alto, java.awt.Image.SCALE_SMOOTH);
@@ -86,64 +99,23 @@ public class LoginView extends JFrame {
         java.net.URL urlIconoContrasena = getClass().getResource("/icons/icono_contrasena.png");
 
         if (urlIconoIngresar != null) {
-            ImageIcon iconoOriginal = new ImageIcon(urlIconoIngresar);
-
-            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
-
-            btnIniciarSesion.setIcon(iconoAjustado);
-        } else {
-            System.err.println("Icono no encontrado: /icons/icono_ingresar.png");
+            btnIniciarSesion.setIcon(redimensionarIcono(new ImageIcon(urlIconoIngresar), 16, 16));
         }
-
         if (urlIconoRegistrar != null) {
-            ImageIcon iconoOriginal = new ImageIcon(urlIconoRegistrar);
-
-            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
-
-            btnRegistrarse.setIcon(iconoAjustado);
-        } else {
-            System.err.println("Icono no encontrado: /icons/icono_registrarse.png");
+            btnRegistrarse.setIcon(redimensionarIcono(new ImageIcon(urlIconoRegistrar), 16, 16));
         }
-
         if (urlIconoIdioma != null) {
-            ImageIcon iconoOriginal = new ImageIcon(urlIconoIdioma);
-
-            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 25, 25);
-
             lblIdioma.setText("");
-            lblIdioma.setIcon(iconoAjustado);
-        } else {
-            System.err.println("Icono no encontrado: /icons/icono_idiomas.png");
+            lblIdioma.setIcon(redimensionarIcono(new ImageIcon(urlIconoIdioma), 25, 25));
         }
-
         if (urlIconoOlvido != null) {
-            ImageIcon iconoOriginal = new ImageIcon(urlIconoOlvido);
-
-            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 25, 25);
-
-            btnOlvidoContrasena.setIcon(iconoAjustado);
-        } else {
-            System.err.println("Icono no encontrado: /icons/icono_olvido_contraseña.png");
+            btnOlvidoContrasena.setIcon(redimensionarIcono(new ImageIcon(urlIconoOlvido), 25, 25));
         }
-
         if (urlIconoUsuario != null) {
-            ImageIcon iconoOriginal = new ImageIcon(urlIconoUsuario);
-
-            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 25, 25);
-
-            lblUsuario.setIcon(iconoAjustado);
-        } else {
-            System.err.println("Icono no encontrado: /icons/icono_usuario.png");
+            lblCedula.setIcon(redimensionarIcono(new ImageIcon(urlIconoUsuario), 25, 25));
         }
-
         if (urlIconoContrasena != null) {
-            ImageIcon iconoOriginal = new ImageIcon(urlIconoContrasena);
-
-            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 25, 25);
-
-            lblContrasena.setIcon(iconoAjustado);
-        } else {
-            System.err.println("Icono no encontrado: /icons/icono_contrasena.png");
+            lblContrasena.setIcon(redimensionarIcono(new ImageIcon(urlIconoContrasena), 25, 25));
         }
     }
 
@@ -154,17 +126,17 @@ public class LoginView extends JFrame {
     }
 
     private void iniciarSesion() {
-        String username = txtUsuario.getText().trim();
+        String cedula = txtCedula.getText().trim();
         String password = new String(txtContrasena.getPassword()).trim();
-        if (username.isEmpty() || password.isEmpty()) {
+        if (cedula.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Por favor, complete todos los campos.", "Advertencia", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        Usuario usuarioAutenticado = usuarioDAO.buscarPorUsername(username);
-        if (usuarioAutenticado != null && usuarioAutenticado.getContrasena().equals(password)) {
+        Usuario usuarioAutenticado = usuarioDAO.autenticar(cedula, password);
+        if (usuarioAutenticado != null) {
             iniciarAplicacionPrincipal(usuarioAutenticado);
         } else {
-            JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos.", "Error de Autenticación", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Cédula o contraseña incorrectos.", "Error de Autenticación", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -218,73 +190,60 @@ public class LoginView extends JFrame {
     }
 
     private void abrirRecuperarCuenta() {
-        String username = JOptionPane.showInputDialog(
+        String cedula = JOptionPane.showInputDialog(
                 this,
-                "Por favor, ingrese su nombre de usuario:",
+                "Por favor, ingrese su número de cédula:",
                 "Recuperar Contraseña",
                 JOptionPane.QUESTION_MESSAGE
         );
-
-        if (username == null || username.trim().isEmpty()) {
+        if (cedula == null || cedula.trim().isEmpty()) {
             return;
         }
-
-        Usuario usuarioARecuperar = usuarioDAO.buscarPorUsername(username.trim());
-
+        Usuario usuarioARecuperar = usuarioDAO.buscarPorCedula(cedula.trim());
         if (usuarioARecuperar == null) {
             JOptionPane.showMessageDialog(this, "Usuario no encontrado.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
         if (usuarioARecuperar.getPreguntaSeguridad1() == null || usuarioARecuperar.getPreguntaSeguridad1().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Este usuario no tiene preguntas de seguridad configuradas.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
         List<Map.Entry<String, String>> preguntas = new ArrayList<>();
         preguntas.add(new AbstractMap.SimpleEntry<>(usuarioARecuperar.getPreguntaSeguridad1(), usuarioARecuperar.getRespuestaSeguridad1()));
         preguntas.add(new AbstractMap.SimpleEntry<>(usuarioARecuperar.getPreguntaSeguridad2(), usuarioARecuperar.getRespuestaSeguridad2()));
         preguntas.add(new AbstractMap.SimpleEntry<>(usuarioARecuperar.getPreguntaSeguridad3(), usuarioARecuperar.getRespuestaSeguridad3()));
         Collections.shuffle(preguntas);
-
         boolean respuestaCorrecta = false;
         for (Map.Entry<String, String> par : preguntas) {
             String clavePregunta = par.getKey();
             String preguntaTraducida = mensajes.getString(clavePregunta);
             String respuestaCorrectaEncriptada = par.getValue();
-
             String respuestaUsuario = JOptionPane.showInputDialog(
                     this,
                     preguntaTraducida,
                     "Pregunta de Seguridad",
                     JOptionPane.QUESTION_MESSAGE
             );
-
             if (respuestaUsuario == null) {
                 return;
             }
-
             if (respuestaUsuario.trim().equalsIgnoreCase(respuestaCorrectaEncriptada)) {
                 respuestaCorrecta = true;
                 break;
             }
         }
-
         if (respuestaCorrecta) {
             JPanel panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
             JLabel lblNueva = new JLabel("Nueva Contraseña:");
             JPasswordField pwdNueva = new JPasswordField(20);
             JLabel lblConfirmar = new JLabel("Confirmar Contraseña:");
             JPasswordField pwdConfirmar = new JPasswordField(20);
-
             panel.add(lblNueva);
             panel.add(pwdNueva);
             panel.add(Box.createVerticalStrut(10));
             panel.add(lblConfirmar);
             panel.add(pwdConfirmar);
-
             int option = JOptionPane.showConfirmDialog(
                     this,
                     panel,
@@ -292,11 +251,9 @@ public class LoginView extends JFrame {
                     JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.PLAIN_MESSAGE
             );
-
             if (option == JOptionPane.OK_OPTION) {
                 String nuevaContrasena = new String(pwdNueva.getPassword());
                 String confirmacion = new String(pwdConfirmar.getPassword());
-
                 if (nuevaContrasena.isEmpty() || !nuevaContrasena.equals(confirmacion)) {
                     JOptionPane.showMessageDialog(this, "Las contraseñas no coinciden o están vacías.", "Error", JOptionPane.ERROR_MESSAGE);
                 } else {
@@ -305,7 +262,6 @@ public class LoginView extends JFrame {
                     JOptionPane.showMessageDialog(this, "Contraseña actualizada exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
-
         } else {
             JOptionPane.showMessageDialog(this, "Respuesta incorrecta o no reconocida.", "Acceso Denegado", JOptionPane.ERROR_MESSAGE);
         }
@@ -340,12 +296,12 @@ public class LoginView extends JFrame {
         btnIniciarSesion.setText(mensajes.getString("login.boton.iniciar"));
         btnRegistrarse.setText(mensajes.getString("login.boton.registrar"));
         btnOlvidoContrasena.setText(mensajes.getString("login.boton.olvido"));
-        lblUsuario.setText(mensajes.getString("login.label.username"));
+        lblCedula.setText(mensajes.getString("login.label.cedula"));
         lblContrasena.setText(mensajes.getString("login.label.password"));
     }
 
     public void limpiarCampos() {
-        txtUsuario.setText("");
+        txtCedula.setText("");
         txtContrasena.setText("");
     }
 }

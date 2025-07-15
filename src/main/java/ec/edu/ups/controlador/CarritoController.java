@@ -63,7 +63,7 @@ public class CarritoController {
 
         List<Carrito> carritos = carritoDAO.obtenerTodos();
         for (Carrito c : carritos) {
-            String propietario = (c.getUsuario() != null) ? c.getUsuario().getUsername() : "N/A";
+            String propietario = (c.getUsuario() != null) ? c.getUsuario().getCedula() : "N/A";
 
             model.addRow(new Object[]{
                     c.getCodigo(),
@@ -136,7 +136,7 @@ public class CarritoController {
         try {
             int codigo = Integer.parseInt(gestionarUsuarioView.getTxtCodigoCarrito().getText());
             Carrito carrito = carritoDAO.leer(codigo);
-            if (carrito != null && carrito.getUsuario().getUsername().equals(usuarioAutenticado.getUsername())) {
+            if (carrito != null && carrito.getUsuario().getCedula().equals(usuarioAutenticado.getCedula())) {
                 this.carritoSeleccionado = carrito;
                 actualizarTablaCarritoSeleccionado();
             } else {

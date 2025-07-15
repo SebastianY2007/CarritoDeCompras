@@ -5,6 +5,8 @@ import ec.edu.ups.dao.UsuarioDAO;
 import ec.edu.ups.modelo.Rol;
 import ec.edu.ups.modelo.Usuario;
 import ec.edu.ups.modelo.PreguntaSeguridad;
+import ec.edu.ups.excepciones.UsuarioYaExistenteException;
+import ec.edu.ups.excepciones.ValidacionException;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
 import ec.edu.ups.modelo.PreguntaSeguridadRenderer;
 
@@ -17,12 +19,12 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.regex.Pattern;
 
 public class RegistroView extends JFrame {
     private JPanel panelPrincipal;
     private JLabel lblNombre;
     private JTextField txtNombre;
-    private JTextField txtUsuario;
     private JPasswordField txtContrasena;
     private JPasswordField txtConfirmar;
     private JTextField txtCorreo;
@@ -40,26 +42,26 @@ public class RegistroView extends JFrame {
     private JLabel lblFecha;
     private JLabel lblCorreo;
     private JLabel lblTelefono;
-    private JLabel lblUsername;
     private JLabel lblContrasena;
     private JLabel lblConfirmarContrasena;
     private JLabel lblPreguntas;
-    private JTextField textField1;
+    private JTextField txtCedula;
+    private JLabel lblCedula;
 
     private List<PreguntaSeguridad> todasLasPreguntas;
     private PreguntaSeguridadRenderer renderer;
 
     private UsuarioDAO usuarioDAO;
     private PreguntaSeguridadDAO preguntaSeguridadDAO;
-    private MensajeInternacionalizacionHandler mensajeInternacionalizacionHandler;
+    private MensajeInternacionalizacionHandler mensajeHandler;
     private ResourceBundle mensajes;
     private final String MENSAJE_SELECCIONE_PREGUNTA_KEY = "registro.pregunta.seleccionar";
 
-    public RegistroView(UsuarioDAO usuarioDAO, PreguntaSeguridadDAO preguntaSeguridadDAO, MensajeInternacionalizacionHandler mensajeInternacionalizacionHandler) {
+    public RegistroView(UsuarioDAO usuarioDAO, PreguntaSeguridadDAO preguntaSeguridadDAO, MensajeInternacionalizacionHandler mensajeHandler) {
         this.usuarioDAO = usuarioDAO;
         this.preguntaSeguridadDAO = preguntaSeguridadDAO;
-        this.mensajeInternacionalizacionHandler = mensajeInternacionalizacionHandler;
-        this.mensajes = ResourceBundle.getBundle("mensajes", new Locale(mensajeInternacionalizacionHandler.getLenguajeActual(), mensajeInternacionalizacionHandler.getPaisActual()));
+        this.mensajeHandler = mensajeHandler;
+        this.mensajes = ResourceBundle.getBundle("mensajes", new Locale(mensajeHandler.getLenguajeActual(), mensajeHandler.getPaisActual()));
 
         setTitle(mensajes.getString("registro.title"));
         setContentPane(panelPrincipal);
@@ -104,96 +106,117 @@ public class RegistroView extends JFrame {
     }
 
     private void registrarUsuario() {
-        String username = txtUsuario.getText().trim();
-        String contrasena = new String(txtContrasena.getPassword()).trim();
-        String confirmar = new String(txtConfirmar.getPassword()).trim();
-        String nombre = txtNombre.getText().trim();
-        String correoElectronico = txtCorreo.getText().trim();
-        String telefono = txtTelefono.getText().trim();
-        Integer dia = (Integer) cbxDia.getSelectedItem();
-        String mesStr = (String) cbxMes.getSelectedItem();
-        Integer anio = (Integer) cbxAnio.getSelectedItem();
+        try {
+            String nombre = txtNombre.getText().trim();
+            String correo = txtCorreo.getText().trim();
+            String cedula = txtCedula.getText().trim();
+            String telefono = txtTelefono.getText().trim();
+            String contrasena = new String(txtContrasena.getPassword());
+            String confirmar = new String(txtConfirmar.getPassword());
+            Object itemP1 = cbxP1.getSelectedItem();
+            Object itemP2 = cbxP2.getSelectedItem();
+            Object itemP3 = cbxP3.getSelectedItem();
+            String respuesta1 = txtP1.getText().trim();
+            String respuesta2 = txtP2.getText().trim();
+            String respuesta3 = txtP3.getText().trim();
 
-        Object itemSeleccionado1 = cbxP1.getSelectedItem();
-        Object itemSeleccionado2 = cbxP2.getSelectedItem();
-        Object itemSeleccionado3 = cbxP3.getSelectedItem();
+            validarDatos(nombre, correo, cedula, telefono, contrasena, confirmar, itemP1, itemP2, itemP3, respuesta1, respuesta2, respuesta3);
 
-        String pregunta1;
-        if (itemSeleccionado1 instanceof PreguntaSeguridad) {
-            pregunta1 = ((PreguntaSeguridad) itemSeleccionado1).getPregunta();
-        } else {
-            pregunta1 = itemSeleccionado1 != null ? itemSeleccionado1.toString() : "";
+            String pregunta1 = ((PreguntaSeguridad) itemP1).getPregunta();
+            String pregunta2 = ((PreguntaSeguridad) itemP2).getPregunta();
+            String pregunta3 = ((PreguntaSeguridad) itemP3).getPregunta();
+            Integer dia = (Integer) cbxDia.getSelectedItem();
+            String mesStr = (String) cbxMes.getSelectedItem();
+            Integer anio = (Integer) cbxAnio.getSelectedItem();
+            int numeroMes = obtenerNumeroMes(mesStr);
+
+            Usuario nuevoUsuario = new Usuario(cedula, nombre, contrasena.trim(), correo, telefono, dia, numeroMes, anio, Rol.USUARIO, pregunta1, respuesta1, pregunta2, respuesta2, pregunta3, respuesta3);
+            usuarioDAO.crear(nuevoUsuario);
+
+            mostrarMensaje(mensajes.getString("registro.mensaje.exito"), mensajes.getString("global.exito.titulo"), JOptionPane.INFORMATION_MESSAGE);
+            limpiarCampos();
+            dispose();
+
+        } catch (ValidacionException | UsuarioYaExistenteException e) {
+            mostrarMensaje(e.getMessage(), mensajes.getString("global.error.titulo"), JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarMensaje("Ocurrió un error inesperado. Contacte al administrador.", "Error Crítico", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void validarDatos(String nombre, String correo, String cedula, String telefono, String contrasena, String confirmar,
+                              Object p1, Object p2, Object p3, String r1, String r2, String r3)
+            throws ValidacionException, UsuarioYaExistenteException {
+
+        if (nombre.isEmpty() || correo.isEmpty() || cedula.isEmpty() || telefono.isEmpty() || contrasena.isEmpty() || confirmar.isEmpty() ||
+                r1.isEmpty() || r2.isEmpty() || r3.isEmpty() || !(p1 instanceof PreguntaSeguridad) || !(p2 instanceof PreguntaSeguridad) || !(p3 instanceof PreguntaSeguridad)) {
+            throw new ValidacionException(mensajes.getString("registro.error.camposVacios"));
         }
 
-        String pregunta2;
-        if (itemSeleccionado2 instanceof PreguntaSeguridad) {
-            pregunta2 = ((PreguntaSeguridad) itemSeleccionado2).getPregunta();
-        } else {
-            pregunta2 = itemSeleccionado2 != null ? itemSeleccionado2.toString() : "";
+        if (!nombre.matches("^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+$")) {
+            throw new ValidacionException(mensajes.getString("registro.error.nombreInvalido"));
         }
-
-        String pregunta3;
-        if (itemSeleccionado3 instanceof PreguntaSeguridad) {
-            pregunta3 = ((PreguntaSeguridad) itemSeleccionado3).getPregunta();
-        } else {
-            pregunta3 = itemSeleccionado3 != null ? itemSeleccionado3.toString() : "";
+        if (!Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$").matcher(correo).matches()) {
+            throw new ValidacionException(mensajes.getString("registro.error.correoInvalido"));
         }
-
-        String respuesta1 = txtP1.getText().trim();
-        String respuesta2 = txtP2.getText().trim();
-        String respuesta3 = txtP3.getText().trim();
-
-        if (username.isEmpty() || contrasena.isEmpty() || nombre.isEmpty() || correoElectronico.isEmpty() ||
-                pregunta1.equals(mensajes.getString(MENSAJE_SELECCIONE_PREGUNTA_KEY)) || respuesta1.isEmpty() ||
-                pregunta2.equals(mensajes.getString(MENSAJE_SELECCIONE_PREGUNTA_KEY)) || respuesta2.isEmpty() ||
-                pregunta3.equals(mensajes.getString(MENSAJE_SELECCIONE_PREGUNTA_KEY)) || respuesta3.isEmpty()) {
-            mostrarMensaje(mensajes.getString("registro.mensaje.camposVacios"), "Campos Vacíos", JOptionPane.WARNING_MESSAGE);
-            return;
+        if (!telefono.matches("^\\d{10}$")) {
+            throw new ValidacionException(mensajes.getString("registro.error.telefonoInvalido"));
+        }
+        if (!validarCedula(cedula)) {
+            throw new ValidacionException(mensajes.getString("registro.mensaje.cedulaInvalida"));
+        }
+        if (!Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*[@_-]).{6,}$").matcher(contrasena).matches()) {
+            throw new ValidacionException(mensajes.getString("registro.error.contrasenaInvalida"));
         }
 
         if (!contrasena.equals(confirmar)) {
-            mostrarMensaje(mensajes.getString("registro.mensaje.contrasenasNoCoinciden"), "Error de Contraseña", JOptionPane.ERROR_MESSAGE);
-            return;
+            throw new ValidacionException(mensajes.getString("registro.mensaje.contrasenasNoCoinciden"));
+        }
+        if (((PreguntaSeguridad) p1).getPregunta().equals(((PreguntaSeguridad) p2).getPregunta()) ||
+                ((PreguntaSeguridad) p1).getPregunta().equals(((PreguntaSeguridad) p3).getPregunta()) ||
+                ((PreguntaSeguridad) p2).getPregunta().equals(((PreguntaSeguridad) p3).getPregunta())) {
+            throw new ValidacionException(mensajes.getString("registro.mensaje.preguntasDuplicadas"));
         }
 
-        if (usuarioDAO.buscarPorUsername(username) != null) {
-            mostrarMensaje(mensajes.getString("registro.mensaje.usuarioExiste"), "Usuario Existente", JOptionPane.WARNING_MESSAGE);
-            return;
+        if (usuarioDAO.buscarPorCedula(cedula) != null) {
+            throw new UsuarioYaExistenteException(mensajes.getString("registro.mensaje.usuarioExiste"));
         }
+    }
 
-        if (pregunta1.equals(pregunta2) || pregunta1.equals(pregunta3) || pregunta2.equals(pregunta3)) {
-            mostrarMensaje(mensajes.getString("registro.mensaje.preguntasDuplicadas"), "Preguntas Duplicadas", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
+    private boolean validarFormatoNombre(String nombre) { return nombre.matches("^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+$"); }
+    private boolean validarFormatoCorreo(String correo) { String regex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$"; return Pattern.compile(regex).matcher(correo).matches(); }
+    private boolean validarFormatoTelefono(String telefono) { return telefono.matches("^\\d{10}$"); }
+    private boolean validarContrasena(String contrasena) { String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[@_-]).{6,}$"; return Pattern.compile(regex).matcher(contrasena).matches(); }
+    private boolean validarCedula(String cedula) { if (cedula == null || cedula.length() != 10) return false; if (!cedula.matches("\\d+")) return false; try { int provincia = Integer.parseInt(cedula.substring(0, 2)); if (provincia < 1 || provincia > 24) return false; int[] coeficientes = {2, 1, 2, 1, 2, 1, 2, 1, 2}; int digitoVerificador = Integer.parseInt(String.valueOf(cedula.charAt(9))); int suma = 0; for (int i = 0; i < 9; i++) { int digito = Integer.parseInt(String.valueOf(cedula.charAt(i))); int producto = digito * coeficientes[i]; suma += (producto >= 10) ? producto - 9 : producto; } int residuo = suma % 10; int resultado = (residuo == 0) ? 0 : 10 - residuo; return resultado == digitoVerificador; } catch (NumberFormatException e) { return false; } }
 
-        int numeroMes = obtenerNumeroMes(mesStr);
-        Usuario nuevoUsuario = new Usuario(username, contrasena, correoElectronico, telefono, dia, numeroMes, anio, Rol.USUARIO, pregunta1, respuesta1, pregunta2, respuesta2, pregunta3, respuesta3);
-        usuarioDAO.crear(nuevoUsuario);
-        mostrarMensaje(mensajes.getString("registro.mensaje.exito"), "Registro Exitoso", JOptionPane.INFORMATION_MESSAGE);
-        limpiarCampos();
-        dispose();
+    public void mostrarMensaje(String mensaje, String titulo, int tipoMensaje) {
+        String mensajeHtml = "<html><body style='width: 350px;'>"
+                + "<p style='font-size: 13pt; font-family: sans-serif;'>"
+                + mensaje.replaceAll("\n", "<br>")
+                + "</p></body></html>";
+
+        JLabel labelConHtml = new JLabel(mensajeHtml);
+
+        JOptionPane.showMessageDialog(this, labelConHtml, titulo, tipoMensaje);
     }
 
     private void cargarPreguntasSeguridad() {
         this.todasLasPreguntas = preguntaSeguridadDAO.findAll();
         this.renderer = new PreguntaSeguridadRenderer(this.mensajes);
-
         cbxP1.setRenderer(renderer);
         cbxP2.setRenderer(renderer);
         cbxP3.setRenderer(renderer);
-
         cbxP1.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 actualizarOpcionesCbx2();
             }
         });
-
         cbxP2.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 actualizarOpcionesCbx3();
             }
         });
-
         actualizarOpcionesCbx1();
     }
 
@@ -206,8 +229,10 @@ public class RegistroView extends JFrame {
         }
         cbxP2.removeAllItems();
         cbxP2.setEnabled(false);
+        txtP2.setEnabled(false);
         cbxP3.removeAllItems();
         cbxP3.setEnabled(false);
+        txtP3.setEnabled(false);
     }
 
     private void actualizarOpcionesCbx2() {
@@ -215,7 +240,7 @@ public class RegistroView extends JFrame {
         cbxP2.removeAllItems();
         cbxP3.removeAllItems();
         cbxP3.setEnabled(false);
-
+        txtP3.setEnabled(false);
         if (seleccionP1 instanceof PreguntaSeguridad) {
             cbxP2.setEnabled(true);
             String placeholder = mensajes.getString(MENSAJE_SELECCIONE_PREGUNTA_KEY);
@@ -227,6 +252,7 @@ public class RegistroView extends JFrame {
             }
         } else {
             cbxP2.setEnabled(false);
+            txtP2.setEnabled(false);
         }
     }
 
@@ -234,7 +260,6 @@ public class RegistroView extends JFrame {
         Object seleccionP1 = cbxP1.getSelectedItem();
         Object seleccionP2 = cbxP2.getSelectedItem();
         cbxP3.removeAllItems();
-
         if (seleccionP2 instanceof PreguntaSeguridad) {
             cbxP3.setEnabled(true);
             String placeholder = mensajes.getString(MENSAJE_SELECCIONE_PREGUNTA_KEY);
@@ -246,6 +271,7 @@ public class RegistroView extends JFrame {
             }
         } else {
             cbxP3.setEnabled(false);
+            txtP3.setEnabled(false);
         }
     }
 
@@ -256,35 +282,27 @@ public class RegistroView extends JFrame {
                 mensajes.getString("fecha.mes.julio"), mensajes.getString("fecha.mes.agosto"), mensajes.getString("fecha.mes.septiembre"),
                 mensajes.getString("fecha.mes.octubre"), mensajes.getString("fecha.mes.noviembre"), mensajes.getString("fecha.mes.diciembre")
         };
-
         cbxMes.removeAllItems();
         for (String mes : meses) {
             cbxMes.addItem(mes);
         }
-
         cbxAnio.removeAllItems();
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
         for (int year = currentYear; year >= 1900; year--) {
             cbxAnio.addItem(year);
         }
-
         updateCbxDia();
     }
 
     private void updateCbxDia() {
         Object anioSeleccionado = cbxAnio.getSelectedItem();
-        if (anioSeleccionado == null) {
-            return;
-        }
-
+        if (anioSeleccionado == null) return;
         cbxDia.removeAllItems();
         int mesIndex = cbxMes.getSelectedIndex();
         if (mesIndex == -1) return;
-
         int anio = (int) anioSeleccionado;
         Calendar cal = new GregorianCalendar(anio, mesIndex, 1);
         int daysInMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
-
         for (int i = 1; i <= daysInMonth; i++) {
             cbxDia.addItem(i);
         }
@@ -305,45 +323,37 @@ public class RegistroView extends JFrame {
         return 0;
     }
 
-    public void mostrarMensaje(String mensaje, String titulo, int tipoMensaje) {
-        JOptionPane.showMessageDialog(this, mensaje, titulo, tipoMensaje);
-    }
-
     public void limpiarCampos() {
-        txtUsuario.setText("");
+        txtCedula.setText("");
         txtContrasena.setText("");
         txtConfirmar.setText("");
         txtNombre.setText("");
         txtCorreo.setText("");
         txtTelefono.setText("");
-
         if (cbxDia.getItemCount() > 0) cbxDia.setSelectedIndex(0);
         if (cbxMes.getItemCount() > 0) cbxMes.setSelectedIndex(0);
         if (cbxAnio.getItemCount() > 0) cbxAnio.setSelectedIndex(0);
-
+        txtP1.setText("");
+        txtP2.setText("");
+        txtP3.setText("");
         cargarPreguntasSeguridad();
     }
 
     public void updateTexts() {
-        this.mensajes = ResourceBundle.getBundle("mensajes", new Locale(mensajeInternacionalizacionHandler.getLenguajeActual(), mensajeInternacionalizacionHandler.getPaisActual()));
-
+        this.mensajes = ResourceBundle.getBundle("mensajes", new Locale(mensajeHandler.getLenguajeActual(), mensajeHandler.getPaisActual()));
         setTitle(mensajes.getString("registro.title"));
-
+        lblCedula.setText(mensajes.getString("registro.label.cedula"));
         lblNombre.setText(mensajes.getString("registro.label.nombre"));
         lblCorreo.setText(mensajes.getString("registro.label.email"));
         lblTelefono.setText(mensajes.getString("registro.label.telefono"));
-        lblUsername.setText(mensajes.getString("registro.label.username"));
         lblContrasena.setText(mensajes.getString("registro.label.contrasena"));
         lblConfirmarContrasena.setText(mensajes.getString("registro.label.confirmarContrasena"));
         lblPreguntas.setText(mensajes.getString("registro.label.preguntasSeguridad"));
         btnRegistrarse.setText(mensajes.getString("registro.boton.registrar"));
-
         cargarPreguntasSeguridad();
         setupFechaNacimientoComboBoxes();
-
         revalidate();
         repaint();
-
         configurarIconos();
     }
 
@@ -355,12 +365,9 @@ public class RegistroView extends JFrame {
 
     private void configurarIconos() {
         java.net.URL urlIconoRegistrar = getClass().getResource("/icons/icono_registrarse.png");
-
         if (urlIconoRegistrar != null) {
             ImageIcon iconoOriginal = new ImageIcon(urlIconoRegistrar);
-
             ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
-
             btnRegistrarse.setIcon(iconoAjustado);
         } else {
             System.err.println("Icono no encontrado: /icons/icono_registrarse.png");

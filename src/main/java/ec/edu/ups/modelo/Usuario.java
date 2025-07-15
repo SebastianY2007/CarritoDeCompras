@@ -1,7 +1,8 @@
 package ec.edu.ups.modelo;
 
 public class Usuario {
-    private String username;
+    private String cedula;
+    private String nombre;
     private String contrasena;
     private String correoElectronico;
     private String telefono;
@@ -17,22 +18,16 @@ public class Usuario {
     private String preguntaSeguridad3;
     private String respuestaSeguridad3;
 
-    public Usuario(){
+    public Usuario() {
     }
 
-    public Usuario(String username, String contrasena, String correoElectronico) {
-        this.username = username;
-        this.contrasena = contrasena;
-        this.correoElectronico = correoElectronico;
-        this.rol = Rol.USUARIO;
-    }
-
-    public Usuario(String username, String contrasena, String correoElectronico,
+    public Usuario(String cedula, String nombre, String contrasena, String correoElectronico,
                    String telefono, int diaNacimiento, int mesNacimiento, int anioNacimiento, Rol rol,
                    String preguntaSeguridad1, String respuestaSeguridad1,
                    String preguntaSeguridad2, String respuestaSeguridad2,
                    String preguntaSeguridad3, String respuestaSeguridad3) {
-        this.username = username;
+        this.cedula = cedula;
+        this.nombre = nombre;
         this.contrasena = contrasena;
         this.correoElectronico = correoElectronico;
         this.telefono = telefono;
@@ -48,15 +43,20 @@ public class Usuario {
         this.respuestaSeguridad3 = respuestaSeguridad3;
     }
 
-    public Usuario(String username, String contrasena, String correoElectronico, String nombre, String telefono, Integer dia, int numeroMes, Integer anio, Rol rol, String pregunta1, String respuesta1, String pregunta2, String respuesta2, String pregunta3, String respuesta3) {
+    public String getCedula() {
+        return cedula;
     }
 
-    public String getUsername() {
-        return username;
+    public void setCedula(String cedula) {
+        this.cedula = cedula;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
     public String getContrasena() {
@@ -166,20 +166,12 @@ public class Usuario {
     @Override
     public String toString() {
         return "Usuario{" +
-                "username='" + username + '\'' +
-                ", contrasena='" + contrasena + '\'' +
+                "cedula='" + cedula + '\'' +
+                ", nombre='" + nombre + '\'' +
+                ", contrasena='" + "********" + '\'' + // Por seguridad
                 ", correoElectronico='" + correoElectronico + '\'' +
                 ", telefono='" + telefono + '\'' +
-                ", diaNacimiento=" + diaNacimiento +
-                ", mesNacimiento=" + mesNacimiento +
-                ", anioNacimiento=" + anioNacimiento +
                 ", rol=" + rol +
-                ", preguntaSeguridad1='" + preguntaSeguridad1 + '\'' +
-                ", respuestaSeguridad1='" + respuestaSeguridad1 + '\'' +
-                ", preguntaSeguridad2='" + preguntaSeguridad2 + '\'' +
-                ", respuestaSeguridad2='" + respuestaSeguridad2 + '\'' +
-                ", preguntaSeguridad3='" + preguntaSeguridad3 + '\'' +
-                ", respuestaSeguridad3='" + respuestaSeguridad3 + '\'' +
                 '}';
     }
 }
