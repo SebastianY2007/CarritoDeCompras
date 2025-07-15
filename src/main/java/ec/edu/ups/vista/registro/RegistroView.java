@@ -44,6 +44,7 @@ public class RegistroView extends JFrame {
     private JLabel lblContrasena;
     private JLabel lblConfirmarContrasena;
     private JLabel lblPreguntas;
+    private JTextField textField1;
 
     private List<PreguntaSeguridad> todasLasPreguntas;
     private PreguntaSeguridadRenderer renderer;
@@ -86,7 +87,7 @@ public class RegistroView extends JFrame {
                 else if (sourceComboBox == cbxP3) targetTextField = txtP3;
 
                 if (targetTextField != null) {
-                    boolean isPlaceholder = sourceComboBox.getSelectedItem().equals(mensajes.getString(MENSAJE_SELECCIONE_PREGUNTA_KEY));
+                    boolean isPlaceholder = !(sourceComboBox.getSelectedItem() instanceof PreguntaSeguridad);
                     targetTextField.setEnabled(!isPlaceholder);
                     if (isPlaceholder) {
                         targetTextField.setText("");
@@ -112,11 +113,34 @@ public class RegistroView extends JFrame {
         Integer dia = (Integer) cbxDia.getSelectedItem();
         String mesStr = (String) cbxMes.getSelectedItem();
         Integer anio = (Integer) cbxAnio.getSelectedItem();
-        String pregunta1 = (String) cbxP1.getSelectedItem();
+
+        Object itemSeleccionado1 = cbxP1.getSelectedItem();
+        Object itemSeleccionado2 = cbxP2.getSelectedItem();
+        Object itemSeleccionado3 = cbxP3.getSelectedItem();
+
+        String pregunta1;
+        if (itemSeleccionado1 instanceof PreguntaSeguridad) {
+            pregunta1 = ((PreguntaSeguridad) itemSeleccionado1).getPregunta();
+        } else {
+            pregunta1 = itemSeleccionado1 != null ? itemSeleccionado1.toString() : "";
+        }
+
+        String pregunta2;
+        if (itemSeleccionado2 instanceof PreguntaSeguridad) {
+            pregunta2 = ((PreguntaSeguridad) itemSeleccionado2).getPregunta();
+        } else {
+            pregunta2 = itemSeleccionado2 != null ? itemSeleccionado2.toString() : "";
+        }
+
+        String pregunta3;
+        if (itemSeleccionado3 instanceof PreguntaSeguridad) {
+            pregunta3 = ((PreguntaSeguridad) itemSeleccionado3).getPregunta();
+        } else {
+            pregunta3 = itemSeleccionado3 != null ? itemSeleccionado3.toString() : "";
+        }
+
         String respuesta1 = txtP1.getText().trim();
-        String pregunta2 = (String) cbxP2.getSelectedItem();
         String respuesta2 = txtP2.getText().trim();
-        String pregunta3 = (String) cbxP3.getSelectedItem();
         String respuesta3 = txtP3.getText().trim();
 
         if (username.isEmpty() || contrasena.isEmpty() || nombre.isEmpty() || correoElectronico.isEmpty() ||
@@ -292,12 +316,12 @@ public class RegistroView extends JFrame {
         txtNombre.setText("");
         txtCorreo.setText("");
         txtTelefono.setText("");
-        cbxDia.setSelectedIndex(0);
-        cbxMes.setSelectedIndex(0);
-        cbxAnio.setSelectedIndex(0);
-        cbxP1.setSelectedIndex(0);
-        cbxP2.setSelectedIndex(0);
-        cbxP3.setSelectedIndex(0);
+
+        if (cbxDia.getItemCount() > 0) cbxDia.setSelectedIndex(0);
+        if (cbxMes.getItemCount() > 0) cbxMes.setSelectedIndex(0);
+        if (cbxAnio.getItemCount() > 0) cbxAnio.setSelectedIndex(0);
+
+        cargarPreguntasSeguridad();
     }
 
     public void updateTexts() {

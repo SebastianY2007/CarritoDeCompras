@@ -50,6 +50,7 @@ public class LoginView extends JFrame {
     private CarritoDAO carritoDAO;
     private PreguntaSeguridadDAO preguntaSeguridadDAO;
     private MensajeInternacionalizacionHandler mensajeHandler;
+    private ResourceBundle mensajes;
 
     public LoginView(UsuarioDAO usuarioDAO, ProductoDAO productoDAO, CarritoDAO carritoDAO, PreguntaSeguridadDAO preguntaSeguridadDAO, MensajeInternacionalizacionHandler mensajeHandler) {
         this.usuarioDAO = usuarioDAO;
@@ -57,6 +58,7 @@ public class LoginView extends JFrame {
         this.carritoDAO = carritoDAO;
         this.preguntaSeguridadDAO = preguntaSeguridadDAO;
         this.mensajeHandler = mensajeHandler;
+
         setContentPane(panelPrincipal);
         setSize(600, 400);
         setLocationRelativeTo(null);
@@ -229,8 +231,13 @@ public class LoginView extends JFrame {
 
         Usuario usuarioARecuperar = usuarioDAO.buscarPorUsername(username.trim());
 
-        if (usuarioARecuperar == null || usuarioARecuperar.getPreguntaSeguridad1() == null || usuarioARecuperar.getPreguntaSeguridad1().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Usuario no encontrado o sin preguntas de seguridad.", "Error", JOptionPane.ERROR_MESSAGE);
+        if (usuarioARecuperar == null) {
+            JOptionPane.showMessageDialog(this, "Usuario no encontrado.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (usuarioARecuperar.getPreguntaSeguridad1() == null || usuarioARecuperar.getPreguntaSeguridad1().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Este usuario no tiene preguntas de seguridad configuradas.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -242,12 +249,13 @@ public class LoginView extends JFrame {
 
         boolean respuestaCorrecta = false;
         for (Map.Entry<String, String> par : preguntas) {
-            String pregunta = par.getKey();
+            String clavePregunta = par.getKey();
+            String preguntaTraducida = mensajes.getString(clavePregunta);
             String respuestaCorrectaEncriptada = par.getValue();
 
             String respuestaUsuario = JOptionPane.showInputDialog(
                     this,
-                    pregunta,
+                    preguntaTraducida,
                     "Pregunta de Seguridad",
                     JOptionPane.QUESTION_MESSAGE
             );
@@ -265,12 +273,16 @@ public class LoginView extends JFrame {
         if (respuestaCorrecta) {
             JPanel panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-            JPasswordField pwdNueva = new JPasswordField(15);
-            JPasswordField pwdConfirmar = new JPasswordField(15);
-            panel.add(new JLabel("Nueva Contraseña:"));
+
+            JLabel lblNueva = new JLabel("Nueva Contraseña:");
+            JPasswordField pwdNueva = new JPasswordField(20);
+            JLabel lblConfirmar = new JLabel("Confirmar Contraseña:");
+            JPasswordField pwdConfirmar = new JPasswordField(20);
+
+            panel.add(lblNueva);
             panel.add(pwdNueva);
-            panel.add(Box.createVerticalStrut(15));
-            panel.add(new JLabel("Confirmar Contraseña:"));
+            panel.add(Box.createVerticalStrut(10));
+            panel.add(lblConfirmar);
             panel.add(pwdConfirmar);
 
             int option = JOptionPane.showConfirmDialog(
@@ -282,19 +294,20 @@ public class LoginView extends JFrame {
             );
 
             if (option == JOptionPane.OK_OPTION) {
-                String nueva = new String(pwdNueva.getPassword());
+                String nuevaContrasena = new String(pwdNueva.getPassword());
                 String confirmacion = new String(pwdConfirmar.getPassword());
 
-                if (nueva.isEmpty() || !nueva.equals(confirmacion)) {
+                if (nuevaContrasena.isEmpty() || !nuevaContrasena.equals(confirmacion)) {
                     JOptionPane.showMessageDialog(this, "Las contraseñas no coinciden o están vacías.", "Error", JOptionPane.ERROR_MESSAGE);
                 } else {
-                    usuarioARecuperar.setContrasena(nueva);
+                    usuarioARecuperar.setContrasena(nuevaContrasena);
                     usuarioDAO.actualizar(usuarioARecuperar);
                     JOptionPane.showMessageDialog(this, "Contraseña actualizada exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
+
         } else {
-            JOptionPane.showMessageDialog(this, "Ha fallado todas las preguntas. No puede recuperar la contraseña.", "Acceso Denegado", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Respuesta incorrecta o no reconocida.", "Acceso Denegado", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -322,7 +335,7 @@ public class LoginView extends JFrame {
     }
 
     public void updateTexts() {
-        ResourceBundle mensajes = ResourceBundle.getBundle("mensajes", new Locale(mensajeHandler.getLenguajeActual(), mensajeHandler.getPaisActual()));
+        mensajes = ResourceBundle.getBundle("mensajes", new Locale(mensajeHandler.getLenguajeActual(), mensajeHandler.getPaisActual()));
         setTitle(mensajes.getString("login.titulo"));
         btnIniciarSesion.setText(mensajes.getString("login.boton.iniciar"));
         btnRegistrarse.setText(mensajes.getString("login.boton.registrar"));
