@@ -21,6 +21,18 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 
+/**
+ * Clase RegistroView
+ *
+ * Esta clase representa la vista (un JFrame) para el registro de nuevos usuarios.
+ * Contiene todos los campos necesarios para capturar la información del usuario
+ * y utiliza un enfoque de validación mediante excepciones para asegurar la
+ * integridad de los datos antes de la creación.
+ *
+ * @author Sebastian Yupangui
+ * @version 1.0
+ * @since 15/07/2025
+ */
 public class RegistroView extends JFrame {
     private JPanel panelPrincipal;
     private JLabel lblNombre;
@@ -57,6 +69,17 @@ public class RegistroView extends JFrame {
     private ResourceBundle mensajes;
     private final String MENSAJE_SELECCIONE_PREGUNTA_KEY = "registro.pregunta.seleccionar";
 
+    /**
+     * Constructor de RegistroView.
+     *
+     * Inicializa la ventana de registro, inyectando las dependencias necesarias
+     * como los DAOs y el manejador de internacionalización. Configura la UI
+     * y los listeners de eventos.
+     *
+     * @param usuarioDAO El objeto de acceso a datos para usuarios.
+     * @param preguntaSeguridadDAO El objeto de acceso a datos para preguntas de seguridad.
+     * @param mensajeHandler El manejador para la internacionalización de textos.
+     */
     public RegistroView(UsuarioDAO usuarioDAO, PreguntaSeguridadDAO preguntaSeguridadDAO, MensajeInternacionalizacionHandler mensajeHandler) {
         this.usuarioDAO = usuarioDAO;
         this.preguntaSeguridadDAO = preguntaSeguridadDAO;
@@ -74,9 +97,13 @@ public class RegistroView extends JFrame {
             setupFechaNacimientoComboBoxes();
             cargarPreguntasSeguridad();
             updateTexts();
+            configurarIconos();
         });
     }
 
+    /**
+     * Configura los listeners para los componentes interactivos de la vista.
+     */
     private void setupListeners() {
         btnRegistrarse.addActionListener(e -> registrarUsuario());
 
@@ -105,6 +132,14 @@ public class RegistroView extends JFrame {
         cbxAnio.addActionListener(e -> updateCbxDia());
     }
 
+    /**
+     * Procesa el intento de registro de un nuevo usuario.
+     *
+     * Este método orquesta el proceso de registro: recolecta los datos,
+     * invoca al método de validación y, si no se lanzan excepciones,
+     * procede a crear el usuario. Atrapa excepciones personalizadas para
+     * mostrar mensajes de error claros al usuario.
+     */
     private void registrarUsuario() {
         try {
             String nombre = txtNombre.getText().trim();
@@ -145,6 +180,16 @@ public class RegistroView extends JFrame {
         }
     }
 
+    /**
+     * Valida todos los datos de entrada del formulario de registro.
+     *
+     * Este método centraliza toda la lógica de validación y lanza excepciones
+     * personalizadas (`ValidacionException`, `UsuarioYaExistenteException`)
+     * si alguna regla no se cumple.
+     *
+     * @throws ValidacionException si hay un error de formato o campos vacíos.
+     * @throws UsuarioYaExistenteException si la cédula ya está registrada.
+     */
     private void validarDatos(String nombre, String correo, String cedula, String telefono, String contrasena, String confirmar,
                               Object p1, Object p2, Object p3, String r1, String r2, String r3)
             throws ValidacionException, UsuarioYaExistenteException {
@@ -153,7 +198,6 @@ public class RegistroView extends JFrame {
                 r1.isEmpty() || r2.isEmpty() || r3.isEmpty() || !(p1 instanceof PreguntaSeguridad) || !(p2 instanceof PreguntaSeguridad) || !(p3 instanceof PreguntaSeguridad)) {
             throw new ValidacionException(mensajes.getString("registro.error.camposVacios"));
         }
-
         if (!nombre.matches("^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+$")) {
             throw new ValidacionException(mensajes.getString("registro.error.nombreInvalido"));
         }
@@ -169,7 +213,6 @@ public class RegistroView extends JFrame {
         if (!Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*[@_-]).{6,}$").matcher(contrasena).matches()) {
             throw new ValidacionException(mensajes.getString("registro.error.contrasenaInvalida"));
         }
-
         if (!contrasena.equals(confirmar)) {
             throw new ValidacionException(mensajes.getString("registro.mensaje.contrasenasNoCoinciden"));
         }
@@ -178,29 +221,64 @@ public class RegistroView extends JFrame {
                 ((PreguntaSeguridad) p2).getPregunta().equals(((PreguntaSeguridad) p3).getPregunta())) {
             throw new ValidacionException(mensajes.getString("registro.mensaje.preguntasDuplicadas"));
         }
-
         if (usuarioDAO.buscarPorCedula(cedula) != null) {
             throw new UsuarioYaExistenteException(mensajes.getString("registro.mensaje.usuarioExiste"));
         }
     }
 
+    /**
+     * Valida el formato de un nombre (solo letras y espacios).
+     * @param nombre El nombre a validar.
+     * @return true si es válido, false en caso contrario.
+     */
     private boolean validarFormatoNombre(String nombre) { return nombre.matches("^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+$"); }
+
+    /**
+     * Valida el formato de un correo electrónico.
+     * @param correo El correo a validar.
+     * @return true si es válido, false en caso contrario.
+     */
     private boolean validarFormatoCorreo(String correo) { String regex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$"; return Pattern.compile(regex).matcher(correo).matches(); }
+
+    /**
+     * Valida el formato de un teléfono (10 dígitos).
+     * @param telefono El teléfono a validar.
+     * @return true si es válido, false en caso contrario.
+     */
     private boolean validarFormatoTelefono(String telefono) { return telefono.matches("^\\d{10}$"); }
+
+    /**
+     * Valida la seguridad de una contraseña.
+     * @param contrasena La contraseña a validar.
+     * @return true si cumple los requisitos, false en caso contrario.
+     */
     private boolean validarContrasena(String contrasena) { String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[@_-]).{6,}$"; return Pattern.compile(regex).matcher(contrasena).matches(); }
+
+    /**
+     * Valida una cédula ecuatoriana usando el algoritmo de Módulo 10.
+     * @param cedula La cédula a validar.
+     * @return true si la cédula es válida, false en caso contrario.
+     */
     private boolean validarCedula(String cedula) { if (cedula == null || cedula.length() != 10) return false; if (!cedula.matches("\\d+")) return false; try { int provincia = Integer.parseInt(cedula.substring(0, 2)); if (provincia < 1 || provincia > 24) return false; int[] coeficientes = {2, 1, 2, 1, 2, 1, 2, 1, 2}; int digitoVerificador = Integer.parseInt(String.valueOf(cedula.charAt(9))); int suma = 0; for (int i = 0; i < 9; i++) { int digito = Integer.parseInt(String.valueOf(cedula.charAt(i))); int producto = digito * coeficientes[i]; suma += (producto >= 10) ? producto - 9 : producto; } int residuo = suma % 10; int resultado = (residuo == 0) ? 0 : 10 - residuo; return resultado == digitoVerificador; } catch (NumberFormatException e) { return false; } }
 
+    /**
+     * Muestra un mensaje al usuario con formato HTML para un mejor aspecto.
+     * @param mensaje El texto del mensaje a mostrar.
+     * @param titulo El título de la ventana del mensaje.
+     * @param tipoMensaje El tipo de mensaje (ej: JOptionPane.ERROR_MESSAGE).
+     */
     public void mostrarMensaje(String mensaje, String titulo, int tipoMensaje) {
         String mensajeHtml = "<html><body style='width: 350px;'>"
                 + "<p style='font-size: 13pt; font-family: sans-serif;'>"
                 + mensaje.replaceAll("\n", "<br>")
                 + "</p></body></html>";
-
         JLabel labelConHtml = new JLabel(mensajeHtml);
-
         JOptionPane.showMessageDialog(this, labelConHtml, titulo, tipoMensaje);
     }
 
+    /**
+     * Carga las preguntas de seguridad desde el DAO y las configura en los JComboBox.
+     */
     private void cargarPreguntasSeguridad() {
         this.todasLasPreguntas = preguntaSeguridadDAO.findAll();
         this.renderer = new PreguntaSeguridadRenderer(this.mensajes);
@@ -220,6 +298,9 @@ public class RegistroView extends JFrame {
         actualizarOpcionesCbx1();
     }
 
+    /**
+     * Actualiza el primer JComboBox de preguntas de seguridad.
+     */
     private void actualizarOpcionesCbx1() {
         cbxP1.removeAllItems();
         String placeholder = mensajes.getString(MENSAJE_SELECCIONE_PREGUNTA_KEY);
@@ -235,6 +316,9 @@ public class RegistroView extends JFrame {
         txtP3.setEnabled(false);
     }
 
+    /**
+     * Actualiza el segundo JComboBox de preguntas, excluyendo la seleccionada en el primero.
+     */
     private void actualizarOpcionesCbx2() {
         Object seleccionP1 = cbxP1.getSelectedItem();
         cbxP2.removeAllItems();
@@ -256,6 +340,9 @@ public class RegistroView extends JFrame {
         }
     }
 
+    /**
+     * Actualiza el tercer JComboBox de preguntas, excluyendo las seleccionadas en los dos primeros.
+     */
     private void actualizarOpcionesCbx3() {
         Object seleccionP1 = cbxP1.getSelectedItem();
         Object seleccionP2 = cbxP2.getSelectedItem();
@@ -275,6 +362,9 @@ public class RegistroView extends JFrame {
         }
     }
 
+    /**
+     * Configura los JComboBox para la selección de la fecha de nacimiento.
+     */
     private void setupFechaNacimientoComboBoxes() {
         String[] meses = {
                 mensajes.getString("fecha.mes.enero"), mensajes.getString("fecha.mes.febrero"), mensajes.getString("fecha.mes.marzo"),
@@ -294,6 +384,9 @@ public class RegistroView extends JFrame {
         updateCbxDia();
     }
 
+    /**
+     * Actualiza el JComboBox de días según el mes y año seleccionados.
+     */
     private void updateCbxDia() {
         Object anioSeleccionado = cbxAnio.getSelectedItem();
         if (anioSeleccionado == null) return;
@@ -308,6 +401,11 @@ public class RegistroView extends JFrame {
         }
     }
 
+    /**
+     * Convierte el nombre de un mes a su número correspondiente (1-12).
+     * @param nombreMes El nombre del mes (ej: "Enero").
+     * @return El número del mes.
+     */
     private int obtenerNumeroMes(String nombreMes) {
         String[] meses = {
                 mensajes.getString("fecha.mes.enero"), mensajes.getString("fecha.mes.febrero"), mensajes.getString("fecha.mes.marzo"),
@@ -323,6 +421,9 @@ public class RegistroView extends JFrame {
         return 0;
     }
 
+    /**
+     * Limpia todos los campos del formulario a su estado inicial.
+     */
     public void limpiarCampos() {
         txtCedula.setText("");
         txtContrasena.setText("");
@@ -339,6 +440,9 @@ public class RegistroView extends JFrame {
         cargarPreguntasSeguridad();
     }
 
+    /**
+     * Actualiza todos los textos de la interfaz según el idioma seleccionado.
+     */
     public void updateTexts() {
         this.mensajes = ResourceBundle.getBundle("mensajes", new Locale(mensajeHandler.getLenguajeActual(), mensajeHandler.getPaisActual()));
         setTitle(mensajes.getString("registro.title"));
@@ -357,12 +461,22 @@ public class RegistroView extends JFrame {
         configurarIconos();
     }
 
+    /**
+     * Redimensiona un icono a un tamaño específico.
+     * @param icono El ImageIcon original.
+     * @param ancho El nuevo ancho del icono.
+     * @param alto El nuevo alto del icono.
+     * @return un nuevo ImageIcon redimensionado.
+     */
     private ImageIcon redimensionarIcono(ImageIcon icono, int ancho, int alto) {
         Image imagen = icono.getImage();
         Image imagenRedimensionada = imagen.getScaledInstance(ancho, alto, java.awt.Image.SCALE_SMOOTH);
         return new ImageIcon(imagenRedimensionada);
     }
 
+    /**
+     * Configura el icono para el botón de registrarse.
+     */
     private void configurarIconos() {
         java.net.URL urlIconoRegistrar = getClass().getResource("/icons/icono_registrarse.png");
         if (urlIconoRegistrar != null) {

@@ -12,6 +12,17 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
 
+/**
+ * Clase UsuarioController
+ *
+ * Este controlador gestiona toda la lógica de negocio para la administración
+ * de usuarios por parte de un administrador. Se encarga de la comunicación
+ * entre las vistas de gestión de usuarios y la capa de acceso a datos (DAO).
+ *
+ * @author Sebastian Yupangui
+ * @version 1.0
+ * @since 15-07-2025
+ */
 public class UsuarioController {
 
     private final UsuarioDAO usuarioDAO;
@@ -23,6 +34,19 @@ public class UsuarioController {
 
     private Usuario usuarioParaActualizar;
 
+    /**
+     * Constructor del UsuarioController.
+     *
+     * Inyecta todas las dependencias necesarias para la gestión de usuarios,
+     * incluyendo el DAO y las vistas de la interfaz gráfica.
+     *
+     * @param usuarioDAO El DAO para la persistencia de usuarios.
+     * @param gestionDeUsuariosView La vista principal para gestionar usuarios.
+     * @param anadirUsuarioView La vista para añadir nuevos usuarios.
+     * @param actualizarUsuarioView La vista para actualizar usuarios existentes.
+     * @param desktopPane El panel de escritorio principal.
+     * @param mensajeHandler El manejador de internacionalización.
+     */
     public UsuarioController(UsuarioDAO usuarioDAO, GestionDeUsuariosView gestionDeUsuariosView, AnadirUsuarioView anadirUsuarioView, ActualizarUsuarioView actualizarUsuarioView, JDesktopPane desktopPane, MensajeInternacionalizacionHandler mensajeHandler) {
         this.usuarioDAO = usuarioDAO;
         this.gestionDeUsuariosView = gestionDeUsuariosView;
@@ -32,6 +56,9 @@ public class UsuarioController {
         this.mensajeHandler = mensajeHandler;
     }
 
+    /**
+     * Inicializa los listeners de eventos para las vistas de gestión de usuarios.
+     */
     public void initListeners() {
         gestionDeUsuariosView.getBtnListar().addActionListener(e -> listarUsuarios());
         gestionDeUsuariosView.getBtnBuscar().addActionListener(e -> buscarUsuarioPorCedula());
@@ -46,6 +73,9 @@ public class UsuarioController {
         actualizarUsuarioView.getBtnCancelar().addActionListener(e -> actualizarUsuarioView.dispose());
     }
 
+    /**
+     * Carga y muestra todos los usuarios del sistema en la tabla de gestión.
+     */
     public void listarUsuarios() {
         List<Usuario> usuarios = usuarioDAO.listarTodos();
         DefaultTableModel model = (DefaultTableModel) gestionDeUsuariosView.getTblUsuarios().getModel();
@@ -56,7 +86,9 @@ public class UsuarioController {
         }
     }
 
-    // MODIFICADO: El método ahora busca por cédula
+    /**
+     * Busca un usuario por su cédula y lo muestra en la tabla.
+     */
     private void buscarUsuarioPorCedula() {
         String cedula = gestionDeUsuariosView.getTxtNombre().getText();
         if (cedula.trim().isEmpty()) {
@@ -73,6 +105,9 @@ public class UsuarioController {
         }
     }
 
+    /**
+     * Abre la ventana interna para añadir un nuevo usuario.
+     */
     private void abrirAnadirUsuario() {
         limpiarCamposAnadirUsuario();
         if (!anadirUsuarioView.isVisible()) {
@@ -82,6 +117,9 @@ public class UsuarioController {
         anadirUsuarioView.toFront();
     }
 
+    /**
+     * Crea un nuevo usuario a partir de los datos ingresados por el administrador.
+     */
     private void crearNuevoUsuario() {
         String cedula = anadirUsuarioView.getTxtNombreUsuario().getText();
         String nombre = "Usuario por Defecto";
@@ -109,13 +147,18 @@ public class UsuarioController {
         listarUsuarios();
     }
 
+    /**
+     * Limpia los campos del formulario de añadir usuario.
+     */
     private void limpiarCamposAnadirUsuario() {
         anadirUsuarioView.getTxtNombreUsuario().setText("");
         anadirUsuarioView.getTxtContrasena().setText("");
         anadirUsuarioView.getTxtConfirmarContrasena().setText("");
     }
 
-    // MODIFICADO: El método ahora elimina por cédula
+    /**
+     * Elimina el usuario seleccionado en la tabla de gestión.
+     */
     private void eliminarUsuarioSeleccionado() {
         int filaSeleccionada = gestionDeUsuariosView.getTblUsuarios().getSelectedRow();
         if (filaSeleccionada >= 0) {
@@ -136,7 +179,9 @@ public class UsuarioController {
         }
     }
 
-    // MODIFICADO: El método ahora abre el diálogo de actualización usando la cédula
+    /**
+     * Abre el diálogo para actualizar un usuario seleccionado.
+     */
     private void abrirDialogoActualizar() {
         int filaSeleccionada = gestionDeUsuariosView.getTblUsuarios().getSelectedRow();
         if (filaSeleccionada < 0) {
@@ -157,6 +202,9 @@ public class UsuarioController {
         }
     }
 
+    /**
+     * Actualiza el campo seleccionado (Nombre, Email, Rol o Contraseña) del usuario en edición.
+     */
     private void actualizarCampoSeleccionado() {
         if (usuarioParaActualizar == null) {
             JOptionPane.showMessageDialog(actualizarUsuarioView, "No hay un usuario seleccionado para actualizar.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -209,6 +257,14 @@ public class UsuarioController {
         listarUsuarios();
     }
 
+    /**
+     * Actualiza la contraseña de un usuario específico.
+     *
+     * @param cedula La cédula del usuario cuya contraseña se actualizará.
+     * @param nuevaContrasena La nueva contraseña para el usuario.
+     * @return true si la actualización fue exitosa, false en caso contrario.
+     * @throws Exception si la nueva contraseña es inválida.
+     */
     public boolean actualizarContrasena(String cedula, String nuevaContrasena) throws Exception {
         if (nuevaContrasena == null || nuevaContrasena.trim().isEmpty()) {
             throw new Exception("La contraseña no puede estar vacía.");

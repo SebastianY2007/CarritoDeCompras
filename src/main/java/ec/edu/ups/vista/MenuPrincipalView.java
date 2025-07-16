@@ -21,6 +21,17 @@ import java.awt.event.WindowEvent;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+/**
+ * Clase MenuPrincipalView
+ *
+ * Esta clase representa la ventana principal de la aplicación, que funciona como
+ * un contenedor MDI (Multiple Document Interface) utilizando un JDesktopPane.
+ * Alberga el menú principal y gestiona la visualización de las ventanas internas.
+ *
+ * @author Sebastian Yupangui
+ * @version 1.0
+ * @since 15/07/2025
+ */
 public class MenuPrincipalView extends JFrame {
 
     private Usuario usuarioAutenticado;
@@ -44,6 +55,13 @@ public class MenuPrincipalView extends JFrame {
     private ProductoController productoController;
     private CarritoController carritoController;
 
+    /**
+     * Constructor de MenuPrincipalView.
+     *
+     * @param usuarioAutenticado El objeto del usuario que ha iniciado sesión.
+     * @param msgHandler El manejador para la internacionalización de textos.
+     * @param loginView Una referencia a la ventana de login para poder mostrarla al cerrar sesión.
+     */
     public MenuPrincipalView(Usuario usuarioAutenticado, MensajeInternacionalizacionHandler msgHandler, LoginView loginView) {
         this.usuarioAutenticado = usuarioAutenticado;
         this.mensajeHandler = msgHandler;
@@ -61,12 +79,19 @@ public class MenuPrincipalView extends JFrame {
         configurarVentanaCierre();
     }
 
+    /**
+     * Inicializa los componentes principales de la ventana.
+     * Establece el panel de escritorio personalizado como el contenedor principal.
+     */
     private void initComponents() {
         jDesktopPane = new FondoDesktopPane();
         jDesktopPane.setBackground(new Color(230, 240, 255));
         setContentPane(jDesktopPane);
     }
 
+    /**
+     * Construye y configura la barra de menú y sus elementos.
+     */
     private void setupMenuBar() {
         menuBar = new JMenuBar();
 
@@ -104,10 +129,13 @@ public class MenuPrincipalView extends JFrame {
         menuItemGestionarCarritos.addActionListener(e -> abrirGestionCarritos());
         menuItemCerrarSesion.addActionListener(e -> cerrarSesion());
         menuItemSalirAplicacion.addActionListener(e -> salirDeAplicacion());
-
         menuItemCambiarContrasena.addActionListener(e -> abrirCambiarContrasena());
     }
 
+    /**
+     * Método genérico para abrir y gestionar ventanas internas (JInternalFrame).
+     * @param frame La ventana interna a mostrar.
+     */
     private void abrirVentanaInterna(JInternalFrame frame) {
         if (frame == null) return;
         if (!frame.isVisible()) {
@@ -120,21 +148,33 @@ public class MenuPrincipalView extends JFrame {
         frame.toFront();
     }
 
+    /**
+     * Abre la ventana de gestión de productos.
+     */
     private void abrirGestionDeProductos() {
         if (productoController != null) productoController.listarProductos();
         abrirVentanaInterna(gestionDeProductosView);
     }
 
+    /**
+     * Abre la ventana de gestión de usuarios.
+     */
     private void abrirGestionDeUsuarios() {
         if (usuarioController != null) usuarioController.listarUsuarios();
         abrirVentanaInterna(gestionDeUsuariosView);
     }
 
+    /**
+     * Abre la ventana para crear un nuevo carrito.
+     */
     private void abrirCrearCarrito() {
         if (carritoController != null) carritoController.iniciarNuevoCarrito();
         abrirVentanaInterna(crearCarritoView);
     }
 
+    /**
+     * Abre la ventana de gestión de carritos correspondiente al rol del usuario.
+     */
     private void abrirGestionCarritos() {
         if (usuarioAutenticado.getRol() == Rol.ADMINISTRADOR) {
             abrirVentanaInterna(gestionarCarritoAdminView);
@@ -143,6 +183,9 @@ public class MenuPrincipalView extends JFrame {
         }
     }
 
+    /**
+     * Abre la ventana para que el usuario cambie su contraseña.
+     */
     private void abrirCambiarContrasena() {
         if (usuarioController != null && usuarioAutenticado != null) {
             CambiarContrasena vista = new CambiarContrasena(this.usuarioController, this.usuarioAutenticado, this.mensajeHandler);
@@ -152,9 +195,11 @@ public class MenuPrincipalView extends JFrame {
         }
     }
 
+    /**
+     * Actualiza todos los textos de la interfaz según el idioma seleccionado.
+     */
     public void updateTexts() {
         mensajes = ResourceBundle.getBundle("mensajes", new Locale(mensajeHandler.getLenguajeActual(), mensajeHandler.getPaisActual()));
-        // MODIFICADO: Se muestra el nombre del usuario en lugar del username/cédula
         setTitle(mensajes.getString("app.titulo") + " - " + usuarioAutenticado.getNombre());
 
         menuProductos.setText(mensajes.getString("principal.menu.productos"));
@@ -176,6 +221,9 @@ public class MenuPrincipalView extends JFrame {
         repaint();
     }
 
+    /**
+     * Configura la visibilidad de los menús según el rol del usuario autenticado.
+     */
     public void configurarAccesoPorRol() {
         boolean esAdmin = (usuarioAutenticado != null && usuarioAutenticado.getRol() == Rol.ADMINISTRADOR);
         boolean esUsuario = (usuarioAutenticado != null && usuarioAutenticado.getRol() == Rol.USUARIO);
@@ -187,6 +235,9 @@ public class MenuPrincipalView extends JFrame {
         menuItemGestionarCarritos.setVisible(true);
     }
 
+    /**
+     * Cierra la sesión del usuario actual y muestra la ventana de login.
+     */
     private void cerrarSesion() {
         int confirm = JOptionPane.showConfirmDialog(this,
                 mensajes.getString("principal.confirmar.cerrar"),
@@ -200,6 +251,9 @@ public class MenuPrincipalView extends JFrame {
         }
     }
 
+    /**
+     * Muestra un diálogo de confirmación y cierra la aplicación si el usuario acepta.
+     */
     private void salirDeAplicacion() {
         int confirm = JOptionPane.showConfirmDialog(this,
                 mensajes.getString("principal.confirmar.salir"),
@@ -211,6 +265,9 @@ public class MenuPrincipalView extends JFrame {
         }
     }
 
+    /**
+     * Configura el comportamiento de la ventana al intentar cerrarla.
+     */
     private void configurarVentanaCierre() {
         addWindowListener(new WindowAdapter() {
             @Override
@@ -220,11 +277,17 @@ public class MenuPrincipalView extends JFrame {
         });
     }
 
+    /**
+     * Cambia el idioma de la aplicación.
+     * @param lenguaje El código del nuevo lenguaje.
+     * @param pais El código del nuevo país.
+     */
     public void cambiarIdioma(String lenguaje, String pais) {
         mensajeHandler.setLenguaje(lenguaje, pais);
         updateTexts();
     }
 
+    // --- Getters y Setters para la comunicación con otras clases ---
     public JDesktopPane getjDesktopPane() { return jDesktopPane; }
     public void setGestionDeProductosView(GestionDeProductosView g) { this.gestionDeProductosView = g; }
     public void setProductoController(ProductoController p) { this.productoController = p; }

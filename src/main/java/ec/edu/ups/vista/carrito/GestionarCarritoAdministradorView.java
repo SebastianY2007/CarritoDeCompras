@@ -8,6 +8,16 @@ import java.awt.*;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+/**
+ * Clase GestionarCarritoAdministradorView
+ *
+ * Esta clase representa la vista (un JInternalFrame) que permite a un
+ * administrador ver y gestionar todos los carritos de compra del sistema.
+ *
+ * @author Sebastian Yupangui
+ * @version 1.0
+ * @since 15/07/2025
+ */
 public class GestionarCarritoAdministradorView extends JInternalFrame {
     private JPanel panelPrincipal;
     private JTable tblCarritos;
@@ -16,6 +26,11 @@ public class GestionarCarritoAdministradorView extends JInternalFrame {
     private ResourceBundle mensajes;
     private DefaultTableModel tableModel;
 
+    /**
+     * Constructor de GestionarCarritoAdministradorView.
+     *
+     * Inicializa la ventana interna y sus componentes.
+     */
     public GestionarCarritoAdministradorView() {
         setTitle("Gestion de Carritos (Administrador)");
         setContentPane(panelPrincipal);
@@ -29,31 +44,41 @@ public class GestionarCarritoAdministradorView extends JInternalFrame {
         configurarIconos();
     }
 
+    /**
+     * Redimensiona un icono a un tamaño específico.
+     * @param icono El ImageIcon original.
+     * @param ancho El nuevo ancho del icono.
+     * @param alto El nuevo alto del icono.
+     * @return un nuevo ImageIcon redimensionado.
+     */
     private ImageIcon redimensionarIcono(ImageIcon icono, int ancho, int alto) {
         Image imagen = icono.getImage();
         Image imagenRedimensionada = imagen.getScaledInstance(ancho, alto, java.awt.Image.SCALE_SMOOTH);
         return new ImageIcon(imagenRedimensionada);
     }
 
+    /**
+     * Configura los iconos para los botones de la vista.
+     */
     private void configurarIconos() {
         java.net.URL urlIconoListar = getClass().getResource("/icons/icono_listar.png");
 
         if (urlIconoListar != null) {
-            ImageIcon iconoOriginal = new ImageIcon(urlIconoListar);
-
-            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
-
-            btnListar.setIcon(iconoAjustado);
-        } else {
-            System.err.println("Icono no encontrado: /icons/icono_listar.png");
+            btnListar.setIcon(redimensionarIcono(new ImageIcon(urlIconoListar), 16, 16));
         }
     }
 
+    /**
+     * Configura el modelo de la tabla de carritos.
+     */
     private void configurarTabla() {
         tableModel = new DefaultTableModel();
         tblCarritos.setModel(tableModel);
     }
 
+    /**
+     * Actualiza los textos de la interfaz según el idioma seleccionado.
+     */
     public void updateTexts() {
         this.mensajes = ResourceBundle.getBundle("mensajes", new Locale(mensajeInternacionalizacionHandler.getLenguajeActual(), mensajeInternacionalizacionHandler.getPaisActual()));
 
@@ -71,15 +96,8 @@ public class GestionarCarritoAdministradorView extends JInternalFrame {
         repaint();
     }
 
-    public JPanel getPanelPrincipal() {
-        return panelPrincipal;
-    }
+    // --- Getters para que el Controlador pueda acceder a los componentes ---
 
-    public JTable getTblCarritos() {
-        return tblCarritos;
-    }
-
-    public JButton getBtnListar() {
-        return btnListar;
-    }
+    public JTable getTblCarritos() { return tblCarritos; }
+    public JButton getBtnListar() { return btnListar; }
 }

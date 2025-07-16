@@ -2,20 +2,40 @@ package ec.edu.ups.dao;
 
 import ec.edu.ups.modelo.Rol;
 import ec.edu.ups.modelo.Usuario;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Clase UsuarioDAOArchivosTexto
+ *
+ * Implementación de la interfaz UsuarioDAO para persistir los datos de usuarios
+ * en archivos de texto plano. Cada usuario se guarda en un archivo individual
+ * nombrado con su cédula.
+ *
+ * @author Sebastian Yupangui
+ * @version 1.0
+ * @since 15/07/2025
+ */
 public class UsuarioDAOArchivosTexto implements UsuarioDAO {
 
     private String rutaBase;
 
+    /**
+     * Constructor de UsuarioDAOArchivosTexto.
+     * @param rutaBase La ruta a la carpeta donde se guardarán los archivos de usuario.
+     */
     public UsuarioDAOArchivosTexto(String rutaBase) {
         this.rutaBase = rutaBase;
         new File(this.rutaBase).mkdirs();
     }
 
+    /**
+     * Crea un archivo de texto para un nuevo usuario.
+     *
+     * Escribe cada atributo del usuario en una nueva línea dentro del archivo.
+     * @param usuario El objeto Usuario a persistir.
+     */
     @Override
     public void crear(Usuario usuario) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(rutaBase + File.separator + usuario.getCedula() + ".txt"))) {
@@ -39,6 +59,11 @@ public class UsuarioDAOArchivosTexto implements UsuarioDAO {
         }
     }
 
+    /**
+     * Busca un usuario leyendo su archivo de texto correspondiente.
+     * @param cedula La cédula del usuario, que corresponde al nombre del archivo.
+     * @return El objeto Usuario reconstruido si se encuentra, de lo contrario null.
+     */
     @Override
     public Usuario buscarPorCedula(String cedula) {
         try (BufferedReader reader = new BufferedReader(new FileReader(rutaBase + File.separator + cedula + ".txt"))) {
@@ -64,16 +89,28 @@ public class UsuarioDAOArchivosTexto implements UsuarioDAO {
         }
     }
 
+    /**
+     * Actualiza un usuario sobrescribiendo su archivo de texto.
+     * @param usuario El objeto Usuario con los datos actualizados.
+     */
     @Override
     public void actualizar(Usuario usuario) {
         crear(usuario);
     }
 
+    /**
+     * Elimina el archivo de texto de un usuario.
+     * @param cedula La cédula del usuario a eliminar.
+     */
     @Override
     public void eliminar(String cedula) {
         new File(rutaBase + File.separator + cedula + ".txt").delete();
     }
 
+    /**
+     * Lista todos los usuarios leyendo todos los archivos .txt del directorio.
+     * @return Una lista con todos los usuarios.
+     */
     @Override
     public List<Usuario> listarTodos() {
         List<Usuario> usuarios = new ArrayList<>();
@@ -89,6 +126,12 @@ public class UsuarioDAOArchivosTexto implements UsuarioDAO {
         return usuarios;
     }
 
+    /**
+     * Autentica a un usuario.
+     * @param cedula La cédula del usuario.
+     * @param contrasenia La contraseña a verificar.
+     * @return El objeto Usuario si las credenciales son correctas, de lo contrario null.
+     */
     @Override
     public Usuario autenticar(String cedula, String contrasenia) {
         Usuario usuario = buscarPorCedula(cedula);
@@ -98,6 +141,11 @@ public class UsuarioDAOArchivosTexto implements UsuarioDAO {
         return null;
     }
 
+    /**
+     * Lista los usuarios que pertenecen a un rol específico.
+     * @param rol El rol para filtrar la lista de usuarios.
+     * @return Una lista de usuarios filtrada por rol.
+     */
     @Override
     public List<Usuario> listarPorRol(Rol rol) {
         List<Usuario> filtrados = new ArrayList<>();

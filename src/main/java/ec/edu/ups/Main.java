@@ -4,16 +4,36 @@ import ec.edu.ups.dao.CarritoDAO;
 import ec.edu.ups.dao.ProductoDAO;
 import ec.edu.ups.dao.PreguntaSeguridadDAO;
 import ec.edu.ups.dao.UsuarioDAO;
-import ec.edu.ups.dao.FabricaDAO; // O la ruta del paquete donde la creaste
+import ec.edu.ups.dao.FabricaDAO;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
 import ec.edu.ups.vista.registro.LoginView;
 
 import javax.swing.*;
 
+/**
+ * Clase Main
+ *
+ * Esta clase es el punto de entrada principal de la aplicación. Su responsabilidad
+ * es configurar la capa de persistencia de datos al inicio, preguntando al
+ * usuario qué método de almacenamiento desea utilizar, para luego lanzar la
+ * ventana de inicio de sesión.
+ *
+ * @author Sebastian Yupangui
+ * @version 1.0
+ * @since 15/07/2025
+ */
 public class Main {
 
+    /**
+     * Método principal que inicia la aplicación.
+     *
+     * Orquesta el arranque de la aplicación: muestra un diálogo para seleccionar
+     * el almacenamiento, crea la fábrica de DAOs correspondiente y finalmente
+     * lanza la vista de Login.
+     *
+     * @param args Argumentos de la línea de comandos (no se utilizan).
+     */
     public static void main(String[] args) {
-        // Ejecutar en el hilo de despacho de eventos de Swing
         SwingUtilities.invokeLater(() -> {
             try {
                 // 1. Mostrar diálogo para elegir el tipo de almacenamiento
@@ -75,7 +95,11 @@ public class Main {
         });
     }
 
-    // Método auxiliar para mostrar el selector de carpetas
+    /**
+     * Muestra un diálogo para que el usuario seleccione una carpeta.
+     *
+     * @return La ruta absoluta de la carpeta seleccionada, o null si el usuario cancela.
+     */
     private static String seleccionarRuta() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Seleccione la Carpeta de Almacenamiento");
@@ -86,6 +110,6 @@ public class Main {
         if (resultado == JFileChooser.APPROVE_OPTION) {
             return fileChooser.getSelectedFile().getAbsolutePath();
         }
-        return null; // El usuario canceló
+        return null;
     }
 }

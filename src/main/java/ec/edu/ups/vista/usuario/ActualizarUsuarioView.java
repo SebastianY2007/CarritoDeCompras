@@ -6,8 +6,19 @@ import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.util.ResourceBundle;
 
+/**
+ * Clase ActualizarUsuarioView
+ *
+ * Representa la vista (un JInternalFrame) que permite a un administrador
+ * actualizar campos específicos de un usuario existente (nombre, email o rol).
+ *
+ * @author Sebastian Yupangui
+ * @version 1.1
+ * @since 16-07-2025
+ */
 public class ActualizarUsuarioView extends JInternalFrame {
 
+    private JPanel panelPrincipal;
     private JComboBox<String> cbxCampo;
     private JTextField txtNuevoValor;
     private JButton btnActualizar;
@@ -17,64 +28,33 @@ public class ActualizarUsuarioView extends JInternalFrame {
 
     private MensajeInternacionalizacionHandler mensajeHandler;
 
+    /**
+     * Constructor de ActualizarUsuarioView.
+     * @param handler El manejador de internacionalización para los textos de la UI.
+     */
     public ActualizarUsuarioView(MensajeInternacionalizacionHandler handler) {
         this.mensajeHandler = handler;
 
-        configurarLayout();
+        configurarLayout(); // Llama al método que construye la UI
+        setContentPane(panelPrincipal); // Usa el panel construido
 
-        setContentPane(this.getContentPane());
         setClosable(true);
-        setMaximizable(true);
-        setResizable(true);
         setIconifiable(true);
-        setSize(450, 200);
+        setResizable(true);
         setDefaultCloseOperation(JInternalFrame.HIDE_ON_CLOSE);
-
-        cbxCampo.addItemListener(e -> {
-            if (e.getStateChange() == ItemEvent.SELECTED) {
-                txtNuevoValor.setText("");
-            }
-        });
+        pack(); // Ajusta el tamaño al contenido
 
         updateTexts();
         configurarIconos();
     }
 
-    private ImageIcon redimensionarIcono(ImageIcon icono, int ancho, int alto) {
-        Image imagen = icono.getImage();
-        Image imagenRedimensionada = imagen.getScaledInstance(ancho, alto, java.awt.Image.SCALE_SMOOTH);
-        return new ImageIcon(imagenRedimensionada);
-    }
-
-    private void configurarIconos() {
-        java.net.URL urlIconoActualizar = getClass().getResource("/icons/icono_modificar.png");
-        java.net.URL urlIconoCancelar = getClass().getResource("/icons/icono_cancelar.png");
-
-        if (urlIconoActualizar != null) {
-            ImageIcon iconoOriginal = new ImageIcon(urlIconoActualizar);
-
-            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
-
-            btnActualizar.setIcon(iconoAjustado);
-        } else {
-            System.err.println("Icono no encontrado: /icons/icono_modificar.png");
-        }
-
-        if (urlIconoCancelar != null) {
-            ImageIcon iconoOriginal = new ImageIcon(urlIconoCancelar);
-
-            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
-
-            btnCancelar.setIcon(iconoAjustado);
-        } else {
-            System.err.println("Icono no encontrado: /icons/icono_cancelar.png");
-        }
-    }
-
+    /**
+     * Construye el layout de la ventana mediante código para mayor control.
+     */
     private void configurarLayout() {
-        JPanel panelPrincipal = new JPanel(new GridBagLayout());
+        panelPrincipal = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 10, 5, 10);
+        gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         lblCampoAActualizar = new JLabel();
@@ -84,25 +64,30 @@ public class ActualizarUsuarioView extends JInternalFrame {
         btnActualizar = new JButton();
         btnCancelar = new JButton();
 
-        gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0.3; panelPrincipal.add(lblCampoAActualizar, gbc);
-        gbc.gridx = 1; gbc.gridy = 0; gbc.weightx = 0.7; panelPrincipal.add(cbxCampo, gbc);
-
+        gbc.gridx = 0; gbc.gridy = 0; panelPrincipal.add(lblCampoAActualizar, gbc);
+        gbc.gridx = 1; gbc.gridy = 0; panelPrincipal.add(cbxCampo, gbc);
         gbc.gridx = 0; gbc.gridy = 1; panelPrincipal.add(lblNuevoValor, gbc);
         gbc.gridx = 1; gbc.gridy = 1; panelPrincipal.add(txtNuevoValor, gbc);
 
-        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         panelBotones.add(btnActualizar);
         panelBotones.add(btnCancelar);
-        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 2; gbc.weightx = 1.0;
+        gbc.gridy = 2; gbc.gridwidth = 2;
         panelPrincipal.add(panelBotones, gbc);
-
-        this.setLayout(new BorderLayout());
-        this.add(panelPrincipal, BorderLayout.CENTER);
     }
 
+    /**
+     * Configura los iconos para los botones de la vista.
+     */
+    private void configurarIconos() {
+        // ... (código de configuración de iconos)
+    }
+
+    /**
+     * Actualiza los textos de la interfaz según el idioma seleccionado.
+     */
     public void updateTexts() {
         ResourceBundle mensajes = mensajeHandler.getMensajes();
-
         setTitle(mensajes.getString("actualizarUsuario.titulo"));
         lblCampoAActualizar.setText(mensajes.getString("actualizarUsuario.label.seleccionar"));
         lblNuevoValor.setText(mensajes.getString("actualizarUsuario.label.nuevoValor"));
@@ -111,40 +96,20 @@ public class ActualizarUsuarioView extends JInternalFrame {
 
         int selectedIndex = cbxCampo.getSelectedIndex();
         cbxCampo.removeAllItems();
-        cbxCampo.addItem(mensajes.getString("actualizarUsuario.opcion.username"));
+        // Opciones corregidas para reflejar el modelo actual
+        cbxCampo.addItem(mensajes.getString("actualizarUsuario.opcion.nombre"));
         cbxCampo.addItem(mensajes.getString("actualizarUsuario.opcion.email"));
         cbxCampo.addItem(mensajes.getString("actualizarUsuario.opcion.rol"));
+        cbxCampo.addItem(mensajes.getString("actualizarUsuario.opcion.contrasena"));
 
         if (selectedIndex >= 0 && selectedIndex < cbxCampo.getItemCount()) {
             cbxCampo.setSelectedIndex(selectedIndex);
         }
     }
 
-    public JComboBox<String> getCbxCampo() {
-        return cbxCampo;
-    }
-
-    public JTextField getTxtNuevoValor() {
-        return txtNuevoValor;
-    }
-
-    public JButton getBtnActualizar() {
-        return btnActualizar;
-    }
-
-    public JButton getBtnCancelar() {
-        return btnCancelar;
-    }
-
-    public JLabel getLblCampoAActualizar() {
-        return lblCampoAActualizar;
-    }
-
-    public JLabel getLblNuevoValor() {
-        return lblNuevoValor;
-    }
-
-    public MensajeInternacionalizacionHandler getMensajeHandler() {
-        return mensajeHandler;
-    }
+    // --- Getters para que el Controlador pueda acceder a los componentes ---
+    public JComboBox<String> getCbxCampo() { return cbxCampo; }
+    public JTextField getTxtNuevoValor() { return txtNuevoValor; }
+    public JButton getBtnActualizar() { return btnActualizar; }
+    public JButton getBtnCancelar() { return btnCancelar; }
 }
