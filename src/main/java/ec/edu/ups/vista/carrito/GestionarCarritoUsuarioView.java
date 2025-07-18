@@ -8,6 +8,17 @@ import java.awt.*;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+/**
+ * Clase GestionarCarritoUsuarioView
+ *
+ * Esta clase representa la vista (un JInternalFrame) donde un usuario estándar
+ * puede gestionar sus propios carritos de compra. Permite listar, buscar,
+ * editar (añadir/quitar productos, modificar cantidad) y eliminar sus carritos.
+ *
+ * @author Sebastian Yupangui
+ * @version 1.0
+ * @since 15/07/2025
+ */
 public class GestionarCarritoUsuarioView extends JInternalFrame {
     private JPanel panelPrincipal;
     private JTable tblMisCarritos;
@@ -27,6 +38,11 @@ public class GestionarCarritoUsuarioView extends JInternalFrame {
     private DefaultTableModel modeloMisCarritos;
     private DefaultTableModel modeloCarrito;
 
+    /**
+     * Constructor de GestionarCarritoUsuarioView.
+     *
+     * Inicializa la ventana interna y sus componentes.
+     */
     public GestionarCarritoUsuarioView() {
         setTitle("Gestionar Mis Carritos");
         setContentPane(panelPrincipal);
@@ -40,92 +56,36 @@ public class GestionarCarritoUsuarioView extends JInternalFrame {
         configurarIconos();
     }
 
+    /**
+     * Redimensiona un icono a un tamaño específico.
+     * @param icono El ImageIcon original.
+     * @param ancho El nuevo ancho del icono.
+     * @param alto El nuevo alto del icono.
+     * @return un nuevo ImageIcon redimensionado.
+     */
     private ImageIcon redimensionarIcono(ImageIcon icono, int ancho, int alto) {
         Image imagen = icono.getImage();
         Image imagenRedimensionada = imagen.getScaledInstance(ancho, alto, java.awt.Image.SCALE_SMOOTH);
         return new ImageIcon(imagenRedimensionada);
     }
 
+    /**
+     * Configura los iconos para los botones de la vista.
+     */
     private void configurarIconos() {
-        java.net.URL urlIconoListar = getClass().getResource("/icons/icono_listar.png");
-        java.net.URL urlIconoBuscar = getClass().getResource("/icons/icono_buscar_carrito.png");
-        java.net.URL urlIconoEliminar = getClass().getResource("/icons/icono_basurero.png");
-        java.net.URL urlIconoModificar = getClass().getResource("/icons/icono_modificar.png");
-        java.net.URL urlIconoAgregar = getClass().getResource("/icons/icono_agregar_producto.png");
-        java.net.URL urlIconoGuardarCarrito = getClass().getResource("/icons/icono_guardar.png");
-        java.net.URL urlIconoEliminarCarrito = getClass().getResource("/icons/icono_basurero.png");
-
-        if (urlIconoListar != null) {
-            ImageIcon iconoOriginal = new ImageIcon(urlIconoListar);
-
-            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
-
-            btnListarMisCarritos.setIcon(iconoAjustado);
-        } else {
-            System.err.println("Icono no encontrado: /icons/icono_listar.png");
-        }
-
-        if (urlIconoBuscar != null) {
-            ImageIcon iconoOriginal = new ImageIcon(urlIconoBuscar);
-
-            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
-
-            btnListarMisCarritos.setIcon(iconoAjustado);
-        } else {
-            System.err.println("Icono no encontrado: /icons/icono_buscar_carrito.png");
-        }
-
-        if (urlIconoEliminar != null) {
-            ImageIcon iconoOriginal = new ImageIcon(urlIconoEliminar);
-
-            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
-
-            btnEliminarProducto.setIcon(iconoAjustado);
-        } else {
-            System.err.println("Icono no encontrado: /icons/icono_basurero.png");
-        }
-
-        if (urlIconoModificar != null) {
-            ImageIcon iconoOriginal = new ImageIcon(urlIconoModificar);
-
-            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
-
-            btnEliminarProducto.setIcon(iconoAjustado);
-        } else {
-            System.err.println("Icono no encontrado: /icons/icono_modificar.png");
-        }
-
-        if (urlIconoAgregar != null) {
-            ImageIcon iconoOriginal = new ImageIcon(urlIconoAgregar);
-
-            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
-
-            btnEliminarProducto.setIcon(iconoAjustado);
-        } else {
-            System.err.println("Icono no encontrado: /icons/icono_agregar_producto.png");
-        }
-
-        if (urlIconoGuardarCarrito != null) {
-            ImageIcon iconoOriginal = new ImageIcon(urlIconoGuardarCarrito);
-
-            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
-
-            btnEliminarProducto.setIcon(iconoAjustado);
-        } else {
-            System.err.println("Icono no encontrado: /icons/icono_guardar.png");
-        }
-
-        if (urlIconoEliminarCarrito != null) {
-            ImageIcon iconoOriginal = new ImageIcon(urlIconoEliminarCarrito);
-
-            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
-
-            btnEliminarProducto.setIcon(iconoAjustado);
-        } else {
-            System.err.println("Icono no encontrado: /icons/icono_basurero.png");
-        }
+        // Asignación de iconos a cada botón
+        btnListarMisCarritos.setIcon(redimensionarIcono(new ImageIcon(getClass().getResource("/icons/icono_listar.png")), 16, 16));
+        btnBuscar.setIcon(redimensionarIcono(new ImageIcon(getClass().getResource("/icons/icono_buscar_carrito.png")), 16, 16));
+        btnEliminarProducto.setIcon(redimensionarIcono(new ImageIcon(getClass().getResource("/icons/icono_basurero.png")), 16, 16));
+        btnModificarCantidad.setIcon(redimensionarIcono(new ImageIcon(getClass().getResource("/icons/icono_modificar.png")), 16, 16));
+        btnAgregarProducto.setIcon(redimensionarIcono(new ImageIcon(getClass().getResource("/icons/icono_agregar_producto.png")), 16, 16));
+        btnGuardarCarrito.setIcon(redimensionarIcono(new ImageIcon(getClass().getResource("/icons/icono_guardar.png")), 16, 16));
+        btnEliminarCarrito.setIcon(redimensionarIcono(new ImageIcon(getClass().getResource("/icons/icono_basurero.png")), 16, 16));
     }
 
+    /**
+     * Configura los modelos para las dos tablas de la vista.
+     */
     private void configurarTablas() {
         modeloMisCarritos = new DefaultTableModel();
         tblMisCarritos.setModel(modeloMisCarritos);
@@ -134,6 +94,9 @@ public class GestionarCarritoUsuarioView extends JInternalFrame {
         tblCarrito.setModel(modeloCarrito);
     }
 
+    /**
+     * Actualiza los textos de la interfaz según el idioma seleccionado.
+     */
     public void updateTexts() {
         this.mensajes = ResourceBundle.getBundle("mensajes", new Locale(mensajeInternacionalizacionHandler.getLenguajeActual(), mensajeInternacionalizacionHandler.getPaisActual()));
 
@@ -154,7 +117,6 @@ public class GestionarCarritoUsuarioView extends JInternalFrame {
                 mensajes.getString("carrito.gestionarAdmin.tabla.fecha"),
                 mensajes.getString("carrito.gestionarAdmin.tabla.total")
         });
-
         modeloCarrito.setColumnIdentifiers(new Object[]{
                 mensajes.getString("carrito.tabla.codigo"),
                 mensajes.getString("carrito.tabla.nombre"),
@@ -167,55 +129,16 @@ public class GestionarCarritoUsuarioView extends JInternalFrame {
         repaint();
     }
 
-    public JPanel getPanelPrincipal() {
-        return panelPrincipal;
-    }
+    // --- Getters para que el Controlador pueda acceder a los componentes ---
 
-    public JTable getTblMisCarritos() {
-        return tblMisCarritos;
-    }
-
-    public JButton getBtnListarMisCarritos() {
-        return btnListarMisCarritos;
-    }
-
-    public JTextField getTxtCodigoCarrito() {
-        return txtCodigoCarrito;
-    }
-
-    public JButton getBtnBuscar() {
-        return btnBuscar;
-    }
-
-    public JTable getTblCarrito() {
-        return tblCarrito;
-    }
-
-    public JButton getBtnAgregarProducto() {
-        return btnAgregarProducto;
-    }
-
-    public JButton getBtnModificarCantidad() {
-        return btnModificarCantidad;
-    }
-
-    public JButton getBtnEliminarProducto() {
-        return btnEliminarProducto;
-    }
-
-    public JButton getBtnGuardarCarrito() {
-        return btnGuardarCarrito;
-    }
-
-    public JButton getBtnEliminarCarrito() {
-        return btnEliminarCarrito;
-    }
-
-    public JLabel getLblEditarCarrito() {
-        return lblEditarCarrito;
-    }
-
-    public JLabel getLblCodigo() {
-        return lblCodigo;
-    }
+    public JTable getTblMisCarritos() { return tblMisCarritos; }
+    public JButton getBtnListarMisCarritos() { return btnListarMisCarritos; }
+    public JTextField getTxtCodigoCarrito() { return txtCodigoCarrito; }
+    public JButton getBtnBuscar() { return btnBuscar; }
+    public JTable getTblCarrito() { return tblCarrito; }
+    public JButton getBtnAgregarProducto() { return btnAgregarProducto; }
+    public JButton getBtnModificarCantidad() { return btnModificarCantidad; }
+    public JButton getBtnEliminarProducto() { return btnEliminarProducto; }
+    public JButton getBtnGuardarCarrito() { return btnGuardarCarrito; }
+    public JButton getBtnEliminarCarrito() { return btnEliminarCarrito; }
 }

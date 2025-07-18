@@ -7,6 +7,17 @@ import ec.edu.ups.util.MensajeInternacionalizacionHandler;
 import javax.swing.*;
 import java.util.Arrays;
 
+/**
+ * Clase CambiarContrasena
+ *
+ * Esta clase representa la vista (un JFrame) que permite a un usuario
+ * cambiar su propia contraseña. Muestra los datos del usuario logueado y
+ * proporciona campos para ingresar y confirmar la nueva contraseña.
+ *
+ * @author Sebastian Yupangui
+ * @version 1.0
+ * @since 15/07/2025
+ */
 public class CambiarContrasena extends JFrame {
 
     private JPanel panelPrincipal;
@@ -28,6 +39,13 @@ public class CambiarContrasena extends JFrame {
     private final Usuario usuarioLogueado;
     private final MensajeInternacionalizacionHandler mensajeHandler;
 
+    /**
+     * Constructor de CambiarContrasena.
+     *
+     * @param usuarioController El controlador de usuarios para procesar la actualización.
+     * @param usuarioLogueado El objeto del usuario que ha iniciado sesión.
+     * @param mensajeHandler El manejador para la internacionalización de textos.
+     */
     public CambiarContrasena(UsuarioController usuarioController, Usuario usuarioLogueado, MensajeInternacionalizacionHandler mensajeHandler) {
         this.usuarioController = usuarioController;
         this.usuarioLogueado = usuarioLogueado;
@@ -43,6 +61,9 @@ public class CambiarContrasena extends JFrame {
         configurarListeners();
     }
 
+    /**
+     * Actualiza los textos de la interfaz según el idioma seleccionado.
+     */
     private void actualizarTextos() {
         setTitle(mensajeHandler.get("cambiarContrasena.titulo"));
         lblDatosUsuario.setText(mensajeHandler.get("cambiarContrasena.label.datosUsuario"));
@@ -55,9 +76,13 @@ public class CambiarContrasena extends JFrame {
         btnCambiar.setText(mensajeHandler.get("global.boton.actualizar"));
     }
 
+    /**
+     * Carga y muestra los datos del usuario logueado en las etiquetas.
+     * Muestra la cédula en lugar del nombre para identificación.
+     */
     private void cargarDatosDelUsuario() {
         if (this.usuarioLogueado != null) {
-            txtNombre.setText(usuarioLogueado.getUsername());
+            txtNombre.setText(usuarioLogueado.getCedula());
             txtCorreoElectronico.setText(usuarioLogueado.getCorreoElectronico());
             txtRol.setText(usuarioLogueado.getRol().name());
         } else {
@@ -66,17 +91,25 @@ public class CambiarContrasena extends JFrame {
         }
     }
 
+    /**
+     * Configura el listener para el botón de cambiar contraseña.
+     */
     private void configurarListeners() {
         btnCambiar.addActionListener(e -> cambiarContrasena());
     }
 
+    /**
+     * Procesa el cambio de contraseña.
+     *
+     * Realiza las validaciones necesarias y, si son correctas, llama al
+     * controlador para actualizar la contraseña en la capa de persistencia.
+     */
     private void cambiarContrasena() {
         char[] nuevaPassChars = txtNuevaContrasena.getPassword();
         char[] confirmarPassChars = txtConfirmarContrasena.getPassword();
         String nuevaContrasena = new String(nuevaPassChars);
         String confirmarContrasena = new String(confirmarPassChars);
 
-        // Validaciones con mensajes internacionalizados
         if (nuevaContrasena.isEmpty() || confirmarContrasena.isEmpty()) {
             JOptionPane.showMessageDialog(this, mensajeHandler.get("cambiarContrasena.error.camposVacios"), mensajeHandler.get("global.aviso.titulo"), JOptionPane.WARNING_MESSAGE);
             return;
@@ -87,7 +120,7 @@ public class CambiarContrasena extends JFrame {
         }
 
         try {
-            boolean exito = usuarioController.actualizarContrasena(usuarioLogueado.getUsername(), nuevaContrasena);
+            boolean exito = usuarioController.actualizarContrasena(usuarioLogueado.getCedula(), nuevaContrasena);
             if (exito) {
                 JOptionPane.showMessageDialog(this, mensajeHandler.get("cambiarContrasena.exito"), mensajeHandler.get("global.exito.titulo"), JOptionPane.INFORMATION_MESSAGE);
                 this.dispose();
@@ -97,6 +130,7 @@ public class CambiarContrasena extends JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), mensajeHandler.get("global.error.titulo"), JOptionPane.ERROR_MESSAGE);
         } finally {
+            // Limpieza segura de las contraseñas en memoria
             Arrays.fill(nuevaPassChars, ' ');
             Arrays.fill(confirmarPassChars, ' ');
         }
