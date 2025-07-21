@@ -1,5 +1,7 @@
 package ec.edu.ups.dao;
 
+import ec.edu.ups.dao.impl.FabricaDAOArchivoBinario;
+import ec.edu.ups.dao.impl.FabricaDAOArchivoTexto;
 import ec.edu.ups.dao.impl.FabricaDAOMemoria;
 
 /**
@@ -61,9 +63,9 @@ public abstract class FabricaDAO {
             case MEMORIA:
                 return new FabricaDAOMemoria();
             case ARCHIVOS_TEXTO:
-                return new FabricaDAOArchivosTexto(rutaBase);
+                return new FabricaDAOArchivoTexto(rutaBase);
             case ARCHIVOS_BINARIOS:
-                return new FabricaDAOArchivosBinarios(rutaBase);
+                return new FabricaDAOArchivoBinario(rutaBase);
             default:
                 throw new IllegalArgumentException("El tipo de almacenamiento especificado no es válido.");
         }

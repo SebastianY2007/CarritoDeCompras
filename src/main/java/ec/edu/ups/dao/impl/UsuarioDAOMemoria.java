@@ -36,7 +36,7 @@ public class UsuarioDAOMemoria implements UsuarioDAO {
         this.usuariosMap = new HashMap<>();
 
         Usuario admin = new Usuario(
-                "0107271777", "Administrador Sebastian", "admin.123@", "derlis567y@gmail.com",
+                "0107271777", "Administrador Sebastian", "Admin.123@", "derlis567y@gmail.com",
                 "0995399230", 19, 4, 2007, Rol.ADMINISTRADOR,
                 "p1", "r1", "p2", "r2", "p3", "r3"
         );
