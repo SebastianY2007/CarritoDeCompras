@@ -1,13 +1,16 @@
-package ec.edu.ups.dao;
+package ec.edu.ups.dao.impl;
 
+import ec.edu.ups.dao.UsuarioDAO;
 import ec.edu.ups.modelo.Rol;
 import ec.edu.ups.modelo.Usuario;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * Clase UsuarioDAOArchivosTexto
+ * Clase UsuarioDAOArchivoTexto
  *
  * Implementación de la interfaz UsuarioDAO para persistir los datos de usuarios
  * en archivos de texto plano. Cada usuario se guarda en un archivo individual
@@ -17,17 +20,41 @@ import java.util.List;
  * @version 1.0
  * @since 15/07/2025
  */
-public class UsuarioDAOArchivosTexto implements UsuarioDAO {
+public class UsuarioDAOArchivoTexto implements UsuarioDAO {
 
     private String rutaBase;
 
     /**
-     * Constructor de UsuarioDAOArchivosTexto.
+     * Constructor de UsuarioDAOArchivoTexto.
+     *
+     * Inicializa el DAO, crea el directorio base si no existe y genera un
+     * usuario administrador por defecto si el directorio está vacío.
+     *
      * @param rutaBase La ruta a la carpeta donde se guardarán los archivos de usuario.
      */
-    public UsuarioDAOArchivosTexto(String rutaBase) {
+    public UsuarioDAOArchivoTexto(String rutaBase) {
         this.rutaBase = rutaBase;
         new File(this.rutaBase).mkdirs();
+
+        File directorio = new File(rutaBase);
+        if (directorio.list() == null || directorio.list().length == 0) {
+            crearAdminPorDefecto();
+        }
+    }
+
+    /**
+     * Crea un usuario administrador por defecto.
+     *
+     * Este método asegura que la aplicación siempre tenga al menos un usuario
+     * administrador al iniciar con una carpeta de almacenamiento vacía.
+     */
+    private void crearAdminPorDefecto() {
+        Usuario admin = new Usuario(
+                "0107271777", "Administrador Sebastian", "Admin.123@", "derlis567y@gmail.com",
+                "0995399230", 19, 4, 2007, Rol.ADMINISTRADOR,
+                "pregunta.mascota", "Negra", "pregunta.madre", "Isabel", "pregunta.escuela", "Francisco Alvarado"
+        );
+        crear(admin);
     }
 
     /**
@@ -61,6 +88,8 @@ public class UsuarioDAOArchivosTexto implements UsuarioDAO {
 
     /**
      * Busca un usuario leyendo su archivo de texto correspondiente.
+     *
+     * Reconstruye el objeto Usuario a partir de los datos leídos en el archivo.
      * @param cedula La cédula del usuario, que corresponde al nombre del archivo.
      * @return El objeto Usuario reconstruido si se encuentra, de lo contrario null.
      */
@@ -128,6 +157,10 @@ public class UsuarioDAOArchivosTexto implements UsuarioDAO {
 
     /**
      * Autentica a un usuario.
+     *
+     * Busca al usuario por su cédula y luego compara la contraseña proporcionada
+     * con la almacenada.
+     *
      * @param cedula La cédula del usuario.
      * @param contrasenia La contraseña a verificar.
      * @return El objeto Usuario si las credenciales son correctas, de lo contrario null.
@@ -148,12 +181,8 @@ public class UsuarioDAOArchivosTexto implements UsuarioDAO {
      */
     @Override
     public List<Usuario> listarPorRol(Rol rol) {
-        List<Usuario> filtrados = new ArrayList<>();
-        for (Usuario usuario : listarTodos()) {
-            if (usuario.getRol() == rol) {
-                filtrados.add(usuario);
-            }
-        }
-        return filtrados;
+        return listarTodos().stream()
+                .filter(usuario -> usuario.getRol() == rol)
+                .collect(Collectors.toList());
     }
 }
