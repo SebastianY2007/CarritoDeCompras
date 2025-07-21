@@ -1,0 +1,12 @@
+ec.edu.ups
+ec.edu.ups.controlador
+ec.edu.ups.dao
+ec.edu.ups.dao.impl
+ec.edu.ups.excepciones
+ec.edu.ups.modelo
+ec.edu.ups.util
+ec.edu.ups.vista
+ec.edu.ups.vista.carrito
+ec.edu.ups.vista.producto
+ec.edu.ups.vista.registro
+ec.edu.ups.vista.usuario

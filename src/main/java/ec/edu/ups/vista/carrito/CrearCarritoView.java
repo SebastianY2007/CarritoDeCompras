@@ -7,6 +7,17 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import ec.edu.ups.util.MensajeInternacionalizacionHandler;
 
+/**
+ * Clase CrearCarritoView
+ *
+ * Esta clase representa la vista (un JInternalFrame) para la creación de un
+ * nuevo carrito de compras. Permite al usuario buscar productos, añadirlos
+ * al carrito y finalmente guardar el carrito completo.
+ *
+ * @author Sebastian Yupangui
+ * @version 1.0
+ * @since 15/07/2025
+ */
 public class CrearCarritoView extends JInternalFrame {
     private JPanel panelPrincipal;
     private JTextField txtCodigo;
@@ -31,6 +42,11 @@ public class CrearCarritoView extends JInternalFrame {
     private ResourceBundle mensajes;
     private DefaultTableModel tableModel;
 
+    /**
+     * Constructor de CrearCarritoView.
+     *
+     * Inicializa la ventana interna, sus componentes y configura los iconos.
+     */
     public CrearCarritoView() {
         setTitle("Crear Carrito");
         setContentPane(panelPrincipal);
@@ -48,53 +64,49 @@ public class CrearCarritoView extends JInternalFrame {
         configurarIconos();
     }
 
+    /**
+     * Redimensiona un icono a un tamaño específico.
+     * @param icono El ImageIcon original.
+     * @param ancho El nuevo ancho del icono.
+     * @param alto El nuevo alto del icono.
+     * @return un nuevo ImageIcon redimensionado.
+     */
     private ImageIcon redimensionarIcono(ImageIcon icono, int ancho, int alto) {
         Image imagen = icono.getImage();
         Image imagenRedimensionada = imagen.getScaledInstance(ancho, alto, java.awt.Image.SCALE_SMOOTH);
         return new ImageIcon(imagenRedimensionada);
     }
 
+    /**
+     * Configura los iconos para los botones de la vista.
+     */
     private void configurarIconos() {
         java.net.URL urlIconoAgregar = getClass().getResource("/icons/icono_agregar_al_carrito.png");
         java.net.URL urlIconoCrearCarrito = getClass().getResource("/icons/icono_crear_carrito.png");
         java.net.URL urlIconoBuscar = getClass().getResource("/icons/icono_buscar.png");
 
         if (urlIconoAgregar != null) {
-            ImageIcon iconoOriginal = new ImageIcon(urlIconoAgregar);
-
-            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
-
-            btnAgregar.setIcon(iconoAjustado);
-        } else {
-            System.err.println("Icono no encontrado: /icons/icono_modificar.png");
+            btnAgregar.setIcon(redimensionarIcono(new ImageIcon(urlIconoAgregar), 16, 16));
         }
-
         if (urlIconoCrearCarrito != null) {
-            ImageIcon iconoOriginal = new ImageIcon(urlIconoCrearCarrito);
-
-            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
-
-            btnCrearCarrito.setIcon(iconoAjustado);
-        } else {
-            System.err.println("Icono no encontrado: /icons/icono_crear_carrito.png");
+            btnCrearCarrito.setIcon(redimensionarIcono(new ImageIcon(urlIconoCrearCarrito), 16, 16));
         }
-
         if (urlIconoBuscar != null) {
-            ImageIcon iconoOriginal = new ImageIcon(urlIconoBuscar);
-
-            ImageIcon iconoAjustado = redimensionarIcono(iconoOriginal, 16, 16);
-
-            btnBuscar.setIcon(iconoAjustado);
-        } else {
-            System.err.println("Icono no encontrado: /icons/icono_buscar.png");
+            btnBuscar.setIcon(redimensionarIcono(new ImageIcon(urlIconoBuscar), 16, 16));
         }
     }
 
+    /**
+     * Configura el modelo de la tabla de productos.
+     */
     private void configurarTabla() {
         tableModel = new DefaultTableModel();
         tblProductos.setModel(tableModel);
     }
 
+    /**
+     * Actualiza los textos de la interfaz según el idioma seleccionado.
+     */
     public void updateTexts() {
         this.mensajes = ResourceBundle.getBundle("mensajes", new Locale(mensajeInternacionalizacionHandler.getLenguajeActual(), mensajeInternacionalizacionHandler.getPaisActual()));
 
@@ -119,85 +131,21 @@ public class CrearCarritoView extends JInternalFrame {
                 mensajes.getString("carrito.tabla.subtotal")
         });
 
-
         revalidate();
         repaint();
     }
 
+    // --- Getters para que el Controlador pueda acceder a los componentes ---
 
-    public JPanel getPanelPrincipal() {
-        return panelPrincipal;
-    }
-
-    public JTextField getTxtCodigo() {
-        return txtCodigo;
-    }
-
-    public JButton getBtnBuscar() {
-        return btnBuscar;
-    }
-
-    public JComboBox<Integer> getCbxCantidad() {
-        return cbxCantidad;
-    }
-
-    public JButton getBtnAgregar() {
-        return btnAgregar;
-    }
-
-    public JTable getTblProductos() {
-        return tblProductos;
-    }
-
-    public JButton getBtnCrearCarrito() {
-        return btnCrearCarrito;
-    }
-
-    public JLabel getTxtNombre() {
-        return txtNombre;
-    }
-
-    public JLabel getTxtPrecio() {
-        return txtPrecio;
-    }
-
-    public JLabel getTxtSubtotal() {
-        return txtSubtotal;
-    }
-
-    public JLabel getTxtIVA() {
-        return txtIVA;
-    }
-
-    public JLabel getTxtTotal() {
-        return txtTotal;
-    }
-
-    public JLabel getLblCodigo() {
-        return lblCodigo;
-    }
-
-    public JLabel getLblNombre() {
-        return lblNombre;
-    }
-
-    public JLabel getLblPrecio() {
-        return lblPrecio;
-    }
-
-    public JLabel getLblCantidad() {
-        return lblCantidad;
-    }
-
-    public JLabel getLblSubtotal() {
-        return lblSubtotal;
-    }
-
-    public JLabel getLblIVA() {
-        return lblIVA;
-    }
-
-    public JLabel getLblTotal() {
-        return lblTotal;
-    }
+    public JTextField getTxtCodigo() { return txtCodigo; }
+    public JButton getBtnBuscar() { return btnBuscar; }
+    public JComboBox<Integer> getCbxCantidad() { return cbxCantidad; }
+    public JButton getBtnAgregar() { return btnAgregar; }
+    public JTable getTblProductos() { return tblProductos; }
+    public JButton getBtnCrearCarrito() { return btnCrearCarrito; }
+    public JLabel getTxtNombre() { return txtNombre; }
+    public JLabel getTxtPrecio() { return txtPrecio; }
+    public JLabel getTxtSubtotal() { return txtSubtotal; }
+    public JLabel getTxtIVA() { return txtIVA; }
+    public JLabel getTxtTotal() { return txtTotal; }
 }
