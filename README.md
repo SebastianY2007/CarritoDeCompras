@@ -1,51 +1,60 @@
-# 🛒 Proyecto - Carrito de Compras
+# User Authentication System (Java)
 
-Este proyecto fue desarrollado como parte del **período 66** de la asignatura **Programación Orientada a Objetos** en la Universidad Politécnica Salesiana.  
-Su objetivo principal es demostrar el uso de **patrones de diseño** aplicados a una aplicación Java con interfaz gráfica construida con **Swing**.
+This project is a desktop-based user authentication system developed using Java, following the MVC (Model-View-Controller) architectural pattern and implementing the DAO (Data Access Object) design pattern.
 
----
-
-Video: [Video Explicativo ](https://youtu.be/4-6r50yHJs0)
+It simulates a basic backend user management system with login and registration functionalities.
 
 ---
 
-## 🎯 Objetivo del proyecto
+## Features
 
-Implementar un sistema educativo que simula un **carrito de compras**, utilizando buenas prácticas de diseño y una arquitectura desacoplada basada en **MVC** (Modelo-Vista-Controlador), **DAO** (Data Access Object) y principios de **POO** y **SOLID**.
-
----
-
-## 🛠️ Tecnologías utilizadas
-
-- 💻 **Java 21**
-- 🧰 **IntelliJ IDEA** (recomendado con el plugin de diseñador gráfico de interfaces Swing)
-- ☕ **Swing** para la interfaz gráfica
-- 📦 Estructura modular basada en paquetes: `modelo`, `dao`, `controlador` y `vista`
+- User Registration
+- User Login
+- Data Validation
+- MVC Architecture
+- DAO Pattern Implementation
+- Separation of Concerns
+- Object-Oriented Programming Principles
 
 ---
 
-## 🧱 Patrones de Diseño aplicados
+## Technologies Used
 
-- **MVC (Modelo - Vista - Controlador)**  
-  Para separar la lógica de negocio de la interfaz gráfica.
-
-- **DAO (Data Access Object)**  
-  Para desacoplar el acceso a los datos, facilitando la migración a diferentes fuentes (archivos, base de datos, etc.).
-
-- **SRP y DIP** de los principios **SOLID**  
-  Para asegurar una arquitectura mantenible, extensible y fácil de testear.
+- Java
+- Maven
+- Swing
+- MVC Architecture
+- DAO Pattern
 
 ---
 
+## Project Structure
+```
+src/main/java/ec/edu/ups
+│
+├── controlador
+├── dao
+├── modelo
+├── util
+└── vista
+```
+---
 
-## 📚 Recomendaciones
+## Purpose
 
-- Ejecutar el proyecto desde `Main.java`
-- Usar IntelliJ IDEA para aprovechar el editor visual de formularios `.form`
-- Probar con diferentes implementaciones del DAO para observar la flexibilidad del patrón
+This project demonstrates the implementation of backend development concepts such as user authentication logic, layered architecture, and data access abstraction using DAO.
 
 ---
 
-## © Créditos
+## How to Run
 
-Desarrollado como parte de la práctica académica en **Programación Orientada a Objetos – Periodo 66**.
+1. Clone the repository
+2. Open the project in IntelliJ IDEA
+3. Run the `Main` class located in:
+src/main/java/ec/edu/ups/Main.java
+
+---
+
+## Author
+
+Developed by Sebastian Yupangui
